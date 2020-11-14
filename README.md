@@ -15,7 +15,7 @@ matplotlib
 tensorflow
 ```
 
-### Simple code
+### Simple object detection codecode
 ```
 import cv2
 import matplotlib.pyplot as plt
@@ -28,7 +28,11 @@ plt.imshow(output_image)
 plt.show()
 ```
 
-### Geocoding cameras
+## Geocoding trail cameras
+
+https://towardsdatascience.com/a-complete-guide-to-an-interactive-geographical-map-using-python-f4c5197e23e0
+
+### Simple shapefile rendering
 
 US shapefile 1:500,000
 https://www2.census.gov/geo/tiger/GENZ2019/shp/cb_2019_us_all_500k.zip
@@ -36,6 +40,16 @@ https://www2.census.gov/geo/tiger/GENZ2019/shp/cb_2019_us_all_500k.zip
 Other shapefiles
 https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html
 
-### Interpolating lines from camera geocoords
+```
+import geopandas as gpd
+shapefile = 'data/countries_110m/ne_110m_admin_0_countries.shp'
+#Read shapefile using Geopandas
+gdf = gpd.read_file(shapefile)[['ADMIN', 'ADM0_A3', 'geometry']]
+#Rename columns.
+gdf.columns = ['country', 'country_code', 'geometry']
+gdf.head()
+```
+
+## Interpolating lines from camera geocoords
 
 https://www.statology.org/matplotlib-smooth-curve/
