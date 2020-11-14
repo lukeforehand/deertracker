@@ -21,12 +21,13 @@ Each deer identity, geolocation, and time will be tracked and visualized.
 Interpolated paths will be drawn on map linking each deer identity's geocoded data points in time order.
 
 Photo import process:
-  Choose photos,
-  Associate batch with saved camera location
-  Tag photo with geolocation.
-  Date Times are based on photo metadata
-  Model runs deer tagging, user can correct
-  Tag photo with model prediction, becomes training data.
+
+* Choose photos,
+* Associate batch with saved camera location
+* Tag photo with geolocation.
+* Date Times are based on photo metadata
+* Model runs deer tagging, user can correct
+* Tag photo with model prediction, becomes training data.
 
 Feature to retrain model based on user tags
 
@@ -65,9 +66,11 @@ https://towardsdatascience.com/a-complete-guide-to-an-interactive-geographical-m
 Simple shapefile rendering
 
 US shapefile 1:500,000
+
 https://www2.census.gov/geo/tiger/GENZ2019/shp/cb_2019_us_all_500k.zip
 
 Other shapefiles
+
 https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html
 
 ```
@@ -81,4 +84,5 @@ gdf.head()
 ```
 
 Interpolating lines from camera geocoords
+
 https://www.statology.org/matplotlib-smooth-curve/
