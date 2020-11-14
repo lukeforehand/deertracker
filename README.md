@@ -60,6 +60,10 @@ plt.imshow(output_image)
 plt.show()
 ```
 
+Deep Cut
+
+https://pypi.org/project/deeplabcut/
+
 ## Geotracking / Geocoding trail cameras
 https://towardsdatascience.com/a-complete-guide-to-an-interactive-geographical-map-using-python-f4c5197e23e0
 
