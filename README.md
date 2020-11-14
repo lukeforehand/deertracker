@@ -29,5 +29,13 @@ plt.show()
 ```
 
 ### Geocoding cameras
-- Shapefile
-- https://www2.census.gov/geo/tiger/GENZ2019/shp/cb_2019_us_all_500k.zip
+
+US shapefile 1:500,000
+https://www2.census.gov/geo/tiger/GENZ2019/shp/cb_2019_us_all_500k.zip
+
+Other shapefiles
+https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html
+
+### Interpolating lines from camera geocoords
+
+https://www.statology.org/matplotlib-smooth-curve/
