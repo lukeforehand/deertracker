@@ -6,12 +6,30 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-# run import
+# add camera
 ```
-python -m deertracker.import \
+./dt add-camera \
+    --name "Southwest Stand" \
     --photos ~/Google\ Drive/Trail\ Cam \
     --lat 46.399995 \
     --lon -90.772639
+
+./dt add-camera \
+    --name "Turkey Blind" \
+    --photos ~/Google\ Drive/Trail\ Cam \
+    --lat 46.400041 \
+    --lon -90.768497
+```
+
+# run import
+```
+./dt import-photos \
+    --photos ~/Google\ Drive/Trail\ Cam \
+    --camera "Soutwest Stand"
+
+./dt import-photos \
+    --photos ~/Google\ Drive/Trail\ Cam \
+    --camera "Turkey Blind"
 ```
 
 Go here to find the lat/lon for your trail cam:
