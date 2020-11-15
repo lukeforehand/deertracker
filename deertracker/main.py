@@ -4,6 +4,21 @@ import pathlib
 from deertracker import photo
 
 
+def file_filter(photos):
+    exts = (
+        "*.png",
+        "*.jpg",
+        "*.jpeg",
+        "*.PNG",
+        "*.JPG",
+        "*.JPEG",
+    )
+    files = []
+    for ext in exts:
+        files.extend([x for x in pathlib.Path(photos).glob(f"**/{ext}") if x.is_file()])
+    return files
+
+
 @click.group()
 def main():
     pass
@@ -19,7 +34,7 @@ def main():
 @click.option("--lat", required=True, help="Latitude of camera location")
 @click.option("--lon", required=True, help="Longitude of camera location")
 def add_camera(name, photos, lat, lon):
-    files = [x for x in pathlib.Path(photos).glob("**/*") if x.is_file()]
+    files = file_filter(photos)
     camera = photo.add_camera(name, files, lat, lon)
     print(camera)
 
@@ -30,12 +45,10 @@ def add_camera(name, photos, lat, lon):
     "--camera", required=True, help="Name of trail cam to associate with photos"
 )
 def import_photos(photos, camera):
-    files = [x for x in pathlib.Path(photos).glob("**/*") if x.is_file()]
+    files = file_filter(photos)
     results = photo.import_photos(camera, files)
     for i, result in enumerate(results):
-        if results[i] is None:
-            print(f"Not processed:\t\t\t\t{files[i]}")
-        else:
+        if results[i] is not None:
             print(results[i])
 
 

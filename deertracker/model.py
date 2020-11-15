@@ -8,6 +8,7 @@ from cvlib.object_detection import draw_bbox
 def model(photo_path):
     print(photo_path)
     image = cv2.imread(photo_path)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     bbox, label, conf = cv.detect_common_objects(image)
     output_image = draw_bbox(image, bbox, label, conf)
     plt.imshow(output_image)

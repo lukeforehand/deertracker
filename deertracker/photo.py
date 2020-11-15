@@ -66,11 +66,9 @@ def process_photo(camera, file_path):
     try:
         photo_hash = hash_photo(file_path)
         photo_meta = get_meta(file_path)
-
         photo_path = store(photo_hash, file_path, camera)
-
         model.model(photo_path)
-
+        print(f"Processed {file_path}")
         return database.Connection().insert_photo(
             (
                 photo_hash,
@@ -82,6 +80,7 @@ def process_photo(camera, file_path):
             )
         )
     except BadPhotoError:
+        print(f"Could not process {file_path}")
         return None
     except Exception:
         logging.exception("Error processing photo")
@@ -98,7 +97,9 @@ def get_meta(photo_path):
             "model": "".join(filter(lambda x: x in string.printable, exif["Model"])),
             "time": datetime.strptime(exif["DateTime"], "%Y:%m:%d %H:%M:%S"),
         }
-
+    except KeyError:
+        # missing exif
+        raise BadPhotoError(photo_path)
     except UnidentifiedImageError:
         raise BadPhotoError(photo_path)
 
