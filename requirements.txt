@@ -1,5 +1,4 @@
 black
 click
 exif
-imagehash
 pathlib

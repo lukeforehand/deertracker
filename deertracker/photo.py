@@ -1,5 +1,4 @@
 import hashlib
-import imagehash
 import io
 import pathlib
 import shutil
