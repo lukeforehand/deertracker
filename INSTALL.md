@@ -8,5 +8,12 @@ pip install -r requirements.txt
 
 # run import
 ```
-python import.py --input-dir ~/Google\ Drive/Trail\ Cam --output-dir /tmp/
+python -m deertracker.import \
+    --photos ~/Google\ Drive/Trail\ Cam \
+    --lat 46.399995 \
+    --lon -90.772639
 ```
+
+Go here to find the lat/lon for your trail cam:
+
+https://www.latlong.net/
