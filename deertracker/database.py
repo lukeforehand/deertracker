@@ -12,8 +12,12 @@ class Connection:
         self.conn.execute(schema.CREATE_TABLE_MODEL)
 
     def insert_photo(self, photo):
-        sql = "INSERT INTO photo(id, path, lat, lng, time) VALUES(?, ?, ?, ?, ?)"
-        cur = self.conn.cursor()
-        cur.execute(sql, photo)
-        conn.commit()
+        try:
+            sql = "INSERT INTO photo(id, path, lat, lng, time) VALUES(?, ?, ?, ?, ?)"
+            cur = self.conn.cursor()
+            cur.execute(sql, photo)
+            self.conn.commit()
+        except sqlite3.IntegrityError:
+            # already exists so skip
+            pass
         return photo[0]

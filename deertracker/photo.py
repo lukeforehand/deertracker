@@ -1,7 +1,10 @@
+import hashlib
 import imagehash
+import io
 import pathlib
 import shutil
 
+from datetime import datetime
 from exif import Image as ExifImage
 from PIL import Image, UnidentifiedImageError
 
@@ -20,12 +23,12 @@ def set_exif(photo_path):
     pass
 
 
-def get_exif(photo_path):
+def get_exif_datetime(photo_path):
     with open(photo_path, "rb") as image_file:
-        my_image = ExifImage(image_file)
-        if not my_image.has_exif:
+        image = ExifImage(image_file)
+        if not image.has_exif:
             raise BadPhotoError(photo_path)
-        return dir(my_image)
+        return datetime.strptime(image["datetime"], "%Y:%m:%d %H:%M:%S")
 
 
 def store(photo_hash, photo_path):
@@ -43,6 +46,8 @@ def hash(photo_path):
     should be used to avoid double imports
     """
     try:
-        return str(imagehash.phash_simple(Image.open(photo_path)))
+        Image.open(photo_path)
+        with open(photo_path, "rb") as image_file:
+            return hashlib.md5(image_file.read()).hexdigest()
     except UnidentifiedImageError:
         raise BadPhotoError(photo_path)
