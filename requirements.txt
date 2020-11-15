@@ -1,4 +1,8 @@
 black
 click
+cvlib
+matplotlib
+opencv-python
 pathlib
 pillow
+tensorflow

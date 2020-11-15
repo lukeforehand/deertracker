@@ -4,7 +4,7 @@ import io
 import logging
 import multiprocessing
 import pathlib
-import shutil
+
 import string
 
 from datetime import datetime
@@ -12,8 +12,7 @@ from datetime import datetime
 from PIL import Image, UnidentifiedImageError
 from PIL.ExifTags import TAGS
 
-from deertracker import DEFAULT_DATA_STORE
-from deertracker import database
+from deertracker import DEFAULT_DATA_STORE, database, model
 
 DEFAULT_PHOTO_STORE = pathlib.Path(DEFAULT_DATA_STORE / "photos")
 DEFAULT_PHOTO_STORE.mkdir(exist_ok=True)
@@ -67,8 +66,11 @@ def process_photo(camera, file_path):
     try:
         photo_hash = hash_photo(file_path)
         photo_meta = get_meta(file_path)
-        photo_path = store(photo_hash, file_path)
-        # TODO: set lat/lon in exif photo_path
+
+        photo_path = store(photo_hash, file_path, camera)
+
+        model.model(photo_path)
+
         return database.Connection().insert_photo(
             (
                 photo_hash,
@@ -86,17 +88,11 @@ def process_photo(camera, file_path):
         return None
 
 
-def set_exif(photo_path):
-    # TODO set the geolocation
-    # "gps_latitude", "gps_longitude"
-    pass
-
-
 def get_meta(photo_path):
     try:
         image = Image.open(photo_path)
         exif = image.getexif()
-        exif = {TAGS.get(tag_id): exif.get(tag_id) for tag_id in exif}
+        exif = {TAGS[tag_id]: exif[tag_id] for tag_id in exif}
         return {
             "make": "".join(filter(lambda x: x in string.printable, exif["Make"])),
             "model": "".join(filter(lambda x: x in string.printable, exif["Model"])),
@@ -107,12 +103,17 @@ def get_meta(photo_path):
         raise BadPhotoError(photo_path)
 
 
-def store(photo_hash, photo_path):
+def store(photo_hash, photo_path, camera):
     """
     copy photo to datastore with photo_hash as filename
     """
-    dest_path = DEFAULT_PHOTO_STORE / photo_hash
-    shutil.copyfile(photo_path, dest_path)
+    image = Image.open(photo_path)
+    dest_path = f"{DEFAULT_PHOTO_STORE}/{photo_hash}.jpg"
+    # TODO: set_exif GPSTAGS GPSInfo GPSLatitude, GPSLongitude using camera["lat"], camera["lon"]
+    image.save(
+        dest_path,
+        "JPEG",
+    )
     return str(dest_path)
 
 
