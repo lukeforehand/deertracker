@@ -21,7 +21,7 @@ class Connection:
             self.conn.commit()
             return self._camera_from_tuple(camera)
         except sqlite3.IntegrityError:
-            print("Camera already exists")
+            print(f"Camera {camera[0]} already exists")
             return None
 
     def select_camera(self, camera_name):
@@ -55,5 +55,5 @@ class Connection:
                 "camera_id": photo[7],
             }
         except sqlite3.IntegrityError:
-            print("Photo already exists")
+            print(f"Photo {photo[1]} already exists")
             return None

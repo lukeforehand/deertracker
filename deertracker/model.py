@@ -28,7 +28,4 @@ def model(image):
 def first_frame(video_path):
     vidcap = cv2.VideoCapture(video_path)
     success, image = vidcap.read()
-    if success:
-        return Image.fromarray(image[:, :, ::-1].copy())
-    else:
-        return None
+    return Image.fromarray(image[:, :, ::-1].copy())

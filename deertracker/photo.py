@@ -1,6 +1,5 @@
 import functools
 import hashlib
-import logging
 import multiprocessing
 import pathlib
 
@@ -11,7 +10,7 @@ from datetime import datetime
 from PIL import Image, UnidentifiedImageError
 from PIL.ExifTags import TAGS
 
-from deertracker import DEFAULT_DATA_STORE, database, model
+from deertracker import DEFAULT_DATA_STORE, database, model, logger
 
 DEFAULT_PHOTO_STORE = pathlib.Path(DEFAULT_DATA_STORE / "photos")
 DEFAULT_PHOTO_STORE.mkdir(exist_ok=True)
@@ -20,6 +19,8 @@ EXIF_TAGS = dict(((v, k) for k, v in TAGS.items()))
 
 PHOTO_EXTS = {".jpg", ".jpeg", ".png"}
 VIDEO_EXTS = {".mp4"}
+
+LOGGER = logger.get_logger()
 
 
 def add_camera(name, lat, lon):
@@ -67,24 +68,15 @@ def process_photo(camera, file_path):
                 )
             )
         print(f"Processed {file_path}")
-    except (UnidentifiedImageError, NoMetaError):
-        return None
     except Exception:
-        logging.exception(f"Error processing photo {file_path}")
+        LOGGER.exception(f"Error processing photo {file_path}")
         return None
-
-
-class NoMetaError(BaseException):
-    pass
 
 
 def get_time(image):
-    try:
-        return datetime.strptime(
-            image.getexif()[EXIF_TAGS["DateTime"]], "%Y:%m:%d %H:%M:%S"
-        )
-    except KeyError:
-        raise NoMetaError()
+    return datetime.strptime(
+        image.getexif()[EXIF_TAGS["DateTime"]], "%Y:%m:%d %H:%M:%S"
+    )
 
 
 def store(photo_hash, photo, exif, camera):
