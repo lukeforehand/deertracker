@@ -10,13 +10,11 @@ pip install -r requirements.txt
 ```
 ./dt add-camera \
     --name "Southwest Stand" \
-    --photos ~/Google\ Drive/Trail\ Cam \
     --lat 46.399995 \
     --lon -90.772639
 
 ./dt add-camera \
     --name "Turkey Blind" \
-    --photos ~/Google\ Drive/Trail\ Cam \
     --lat 46.400041 \
     --lon -90.768497
 ```

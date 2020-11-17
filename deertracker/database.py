@@ -15,9 +15,7 @@ class Connection:
 
     def insert_camera(self, camera):
         try:
-            sql = (
-                "INSERT INTO camera(name, make, model, lat, lon) VALUES(?, ?, ?, ?, ?)"
-            )
+            sql = "INSERT INTO camera(name, lat, lon) VALUES(?, ?, ?)"
             cur = self.conn.cursor()
             cur.execute(sql, camera)
             self.conn.commit()
@@ -36,15 +34,13 @@ class Connection:
     def _camera_from_tuple(self, camera):
         return {
             "name": camera[0],
-            "make": camera[1],
-            "model": camera[2],
-            "lat": camera[3],
-            "lon": camera[4],
+            "lat": camera[1],
+            "lon": camera[2],
         }
 
     def insert_photo(self, photo):
         try:
-            sql = "INSERT INTO photo(id, path, lat, lon, time, camera_id) VALUES(?, ?, ?, ?, ?, ?)"
+            sql = "INSERT INTO photo(id, path, lat, lon, time, label, confidence, camera_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?)"
             cur = self.conn.cursor()
             cur.execute(sql, photo)
             self.conn.commit()
@@ -54,7 +50,9 @@ class Connection:
                 "lat": photo[2],
                 "lon": photo[3],
                 "time": photo[4],
-                "camera_id": photo[5],
+                "label": photo[5],
+                "confidence": photo[6],
+                "camera_id": photo[7],
             }
         except sqlite3.IntegrityError:
             print("Photo already exists")

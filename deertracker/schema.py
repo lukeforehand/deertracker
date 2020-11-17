@@ -1,8 +1,6 @@
 CREATE_TABLE_CAMERA = """
 CREATE TABLE IF NOT EXISTS camera (
     name VARCHAR(255) PRIMARY KEY NOT NULL,
-    make VARCHAR(255) NOT NULL,
-	model VARCHAR(255) NOT NULL,
     lat FLOAT NOT NULL,
     lon FLOAT NOT NULL
 )
@@ -15,6 +13,8 @@ CREATE TABLE IF NOT EXISTS photo (
     lat FLOAT NOT NULL,
     lon FLOAT NOT NULL,
     time DATETIME NOT NULL,
+    label VARCHAR(255) NOT NULL,
+    confidence FLOAT NOT NULL,
     camera_id VARCHAR(255) NOT NULL,
     FOREIGN KEY(camera_id) REFERENCES camera(name)
 )
