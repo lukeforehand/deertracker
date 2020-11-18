@@ -4,18 +4,16 @@ import pathlib
 from deertracker import photo
 
 
-def file_filter(photos):
+def file_generator(photos):
     exts = []
     exts.extend(photo.PHOTO_EXTS)
     exts.extend([ext.upper() for ext in photo.PHOTO_EXTS])
     exts.extend(photo.VIDEO_EXTS)
     exts.extend([ext.upper() for ext in photo.VIDEO_EXTS])
-    files = []
     for ext in exts:
-        files.extend(
-            [x for x in pathlib.Path(photos).glob(f"**/*{ext}") if x.is_file()]
-        )
-    return files
+        for x in pathlib.Path(photos).glob(f"**/*{ext}"):
+            if x.is_file():
+                yield x
 
 
 @click.group()
@@ -38,8 +36,7 @@ def add_camera(name, lat, lon):
     "--camera", required=True, help="Name of trail cam to associate with photos"
 )
 def import_photos(photos, camera):
-    files = file_filter(photos)
-    results = photo.import_photos(camera, files)
+    results = photo.import_photos(camera, file_generator(photos))
     for i, result in enumerate(results):
         if results[i] is not None:
             print(results[i])

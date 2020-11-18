@@ -18,7 +18,7 @@ DEFAULT_PHOTO_STORE.mkdir(exist_ok=True)
 EXIF_TAGS = dict(((v, k) for k, v in TAGS.items()))
 
 PHOTO_EXTS = {".jpg", ".jpeg", ".png"}
-VIDEO_EXTS = {".mp4"}
+VIDEO_EXTS = {".mp4", ".mov", ".avi"}
 
 LOGGER = logger.get_logger()
 
