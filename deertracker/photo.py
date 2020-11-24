@@ -33,6 +33,8 @@ def import_photos(camera_name, files):
         print(f"Camera {camera_name} not found")
         return
     pool = multiprocessing.Pool(multiprocessing.cpu_count())
+    # FIXME: database locked
+    # FIXME: foreign key constraints don't work
     results = pool.map(functools.partial(process_photo, camera), files)
     pool.close()
     pool.join()
@@ -40,8 +42,7 @@ def import_photos(camera_name, files):
 
 
 def hash_exists(photo_hash):
-    print(database.Connection().get_photo_hash(photo_hash))
-    return database.Connection().get_photo_hash(photo_hash) is not None
+    return database.Connection().get_photo(photo_hash) is not None
 
 
 def process_photo(camera, file_path):
@@ -56,26 +57,27 @@ def process_photo(camera, file_path):
         photo_hash = hashlib.md5(image.tobytes()).hexdigest()
         if not hash_exists(photo_hash):
             photo_time = get_time(image)
-            for detected_object in model.model(image):
-                photo = detected_object["image"]
-                label = detected_object["label"]
-                confidence = detected_object["confidence"]
-                object_hash = hashlib.md5(photo.tobytes()).hexdigest()
-                photo_id = f"{label}_{int(confidence*100)}_{object_hash}"
-                photo_path = store(photo_id, photo, image.info["exif"], camera)
-                database.Connection().insert_photo(
+            for obj in model.model(image):
+                photo = obj["image"]
+                label = obj["label"]
+                confidence = obj["confidence"]
+                obj_hash = hashlib.md5(photo.tobytes()).hexdigest()
+                obj_id = f"{label}_{int(confidence*100)}_{obj_hash}"
+                obj_path = store(obj_id, photo, image.info["exif"], camera)
+                database.Connection().insert_object(
                     (
-                        photo_id,
-                        photo_path,
+                        obj_id,
+                        obj_path,
                         camera["lat"],
                         camera["lon"],
                         photo_time,
                         label,
                         confidence,
+                        photo_hash,
                         camera["name"],
                     )
                 )
-            database.Connection().insert_photo_hash(photo_hash)
+            database.Connection().insert_photo(photo_hash)
         print(f"Processed {file_path}")
     except Exception:
         LOGGER.exception(f"Error processing photo {file_path}")

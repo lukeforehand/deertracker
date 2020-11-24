@@ -9,8 +9,8 @@ class Connection:
     def __init__(self, database=DEFAULT_DATABASE):
         conn = sqlite3.connect(database)
         conn.execute(schema.CREATE_TABLE_CAMERA)
-        conn.execute(schema.CREATE_TABLE_PHOTO_HASH)
         conn.execute(schema.CREATE_TABLE_PHOTO)
+        conn.execute(schema.CREATE_TABLE_OBJECT)
         self.conn = conn
 
     def insert_camera(self, camera):
@@ -38,37 +38,39 @@ class Connection:
             "lon": camera[2],
         }
 
-    def get_photo_hash(self, photo_hash):
+    def get_photo(self, photo_id):
         cur = self.conn.cursor()
-        cur.execute("SELECT * FROM photo_hash WHERE id = ?", [photo_hash])
+        cur.execute("SELECT * FROM photo WHERE id = ?", [photo_id])
         return cur.fetchone()
-
-    def insert_photo_hash(self, photo_hash):
-        try:
-            sql = "INSERT INTO photo_hash(id) VALUES(?)"
-            cur = self.conn.cursor()
-            cur.execute(sql, [photo_hash])
-            self.conn.commit()
-            return True
-        except sqlite3.IntegrityError:
-            return False
 
     def insert_photo(self, photo):
         try:
-            sql = "INSERT INTO photo(id, path, lat, lon, time, label, confidence, camera_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?)"
+            sql = "INSERT INTO photo(id) VALUES(?)"
             cur = self.conn.cursor()
-            cur.execute(sql, photo)
+            cur.execute(sql, [photo])
             self.conn.commit()
-            return {
-                "id": photo[0],
-                "path": photo[1],
-                "lat": photo[2],
-                "lon": photo[3],
-                "time": photo[4],
-                "label": photo[5],
-                "confidence": photo[6],
-                "camera_id": photo[7],
-            }
+            return {"id": photo[0]}
         except sqlite3.IntegrityError:
             print(f"Photo {photo[1]} already exists")
+            return None
+
+    def insert_object(self, obj):
+        try:
+            sql = "INSERT INTO object(id, path, lat, lon, time, label, confidence, photo_id, camera_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            cur = self.conn.cursor()
+            cur.execute(sql, obj)
+            self.conn.commit()
+            return {
+                "id": obj[0],
+                "path": obj[1],
+                "lat": obj[2],
+                "lon": obj[3],
+                "time": obj[4],
+                "label": obj[5],
+                "confidence": obj[6],
+                "photo_id": obj[7],
+                "camera_id": obj[8],
+            }
+        except sqlite3.IntegrityError as e:
+            print(f"Object {obj[1]} already exists")
             return None
