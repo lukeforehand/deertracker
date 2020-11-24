@@ -26,10 +26,9 @@ Photo import process:
 * Associate batch with saved camera location
 * Tag photo with geolocation.
 * Date Times are based on photo metadata
-* Model runs deer tagging, user can correct
-* Tag photo with model prediction, becomes training data.
+* Model runs animal tagging, outputs object images, labels, confidence
 
-Feature to retrain model based on user tags
+Feature to retrain model based on user feedback?
 
 # Development Notes
 
