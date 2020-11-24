@@ -9,8 +9,8 @@ class Connection:
     def __init__(self, database=DEFAULT_DATABASE):
         conn = sqlite3.connect(database)
         conn.execute(schema.CREATE_TABLE_CAMERA)
+        conn.execute(schema.CREATE_TABLE_PHOTO_HASH)
         conn.execute(schema.CREATE_TABLE_PHOTO)
-        conn.execute(schema.CREATE_TABLE_MODEL)
         self.conn = conn
 
     def insert_camera(self, camera):
@@ -37,6 +37,21 @@ class Connection:
             "lat": camera[1],
             "lon": camera[2],
         }
+
+    def get_photo_hash(self, photo_hash):
+        cur = self.conn.cursor()
+        cur.execute("SELECT * FROM photo_hash WHERE id = ?", [photo_hash])
+        return cur.fetchone()
+
+    def insert_photo_hash(self, photo_hash):
+        try:
+            sql = "INSERT INTO photo_hash(id) VALUES(?)"
+            cur = self.conn.cursor()
+            cur.execute(sql, [photo_hash])
+            self.conn.commit()
+            return True
+        except sqlite3.IntegrityError:
+            return False
 
     def insert_photo(self, photo):
         try:

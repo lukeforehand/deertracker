@@ -39,6 +39,11 @@ def import_photos(camera_name, files):
     return results
 
 
+def hash_exists(photo_hash):
+    print(database.Connection().get_photo_hash(photo_hash))
+    return database.Connection().get_photo_hash(photo_hash) is not None
+
+
 def process_photo(camera, file_path):
     try:
         if pathlib.Path(file_path).suffix.lower() in VIDEO_EXTS:
@@ -47,26 +52,30 @@ def process_photo(camera, file_path):
                 return None
         else:
             image = Image.open(file_path)
-        photo_time = get_time(image)
-        for detected_object in model.model(image):
-            photo = detected_object["image"]
-            label = detected_object["label"]
-            confidence = detected_object["confidence"]
-            photo_hash = hashlib.md5(photo.tobytes()).hexdigest()
-            photo_id = f"{label}_{int(confidence*100)}_{photo_hash}"
-            photo_path = store(photo_id, photo, image.info["exif"], camera)
-            database.Connection().insert_photo(
-                (
-                    photo_id,
-                    photo_path,
-                    camera["lat"],
-                    camera["lon"],
-                    photo_time,
-                    label,
-                    confidence,
-                    camera["name"],
+
+        photo_hash = hashlib.md5(image.tobytes()).hexdigest()
+        if not hash_exists(photo_hash):
+            photo_time = get_time(image)
+            for detected_object in model.model(image):
+                photo = detected_object["image"]
+                label = detected_object["label"]
+                confidence = detected_object["confidence"]
+                object_hash = hashlib.md5(photo.tobytes()).hexdigest()
+                photo_id = f"{label}_{int(confidence*100)}_{object_hash}"
+                photo_path = store(photo_id, photo, image.info["exif"], camera)
+                database.Connection().insert_photo(
+                    (
+                        photo_id,
+                        photo_path,
+                        camera["lat"],
+                        camera["lon"],
+                        photo_time,
+                        label,
+                        confidence,
+                        camera["name"],
+                    )
                 )
-            )
+            database.Connection().insert_photo_hash(photo_hash)
         print(f"Processed {file_path}")
     except Exception:
         LOGGER.exception(f"Error processing photo {file_path}")
