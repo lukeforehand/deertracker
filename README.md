@@ -18,11 +18,11 @@ pip install -r requirements.txt
 ./dt show-prediction --photo ~/Google\ Drive/Trail\ Cam/001.jpg
 ```
 
-![Buck 1](main/examples/buck1-predict.png?raw=true)
+![Buck 1](examples/buck1-predict.png?raw=true)
 
-![Buck 2](main/examples/buck2-predict.png?raw=true)
+![Buck 2](examples/buck2-predict.png?raw=true)
 
-![Doe](main/examples/doe-predict.png?raw=true)
+![Doe](examples/doe-predict.png?raw=true)
 
 ## add camera
 
