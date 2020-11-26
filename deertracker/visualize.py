@@ -14,6 +14,7 @@ def show_prediction(image_path: str, md: MegaDetector = MegaDetector()):
 
     # np.ndarray (width, height, 3) image array
     image = cv2.imread(image_path)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
     bboxes, classes, scores = md.predict(image)
     colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]
@@ -23,7 +24,7 @@ def show_prediction(image_path: str, md: MegaDetector = MegaDetector()):
         cv2.putText(
             image,
             str(f"{md.labels[_class]} {score}"),
-            (bbox[0], bbox[1] - 10),
+            (bbox[1], bbox[0] - 10),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.5,
             color,
