@@ -1,36 +1,12 @@
-from typing import Tuple
 import cv2
-import cvlib as cv
-import matplotlib.pyplot as plt
+import pathlib
 import numpy as np
 import tensorflow as tf
 
-from cvlib.object_detection import draw_bbox
 from PIL import Image
+from typing import Tuple
 
-
-def model(image):
-    image = np.array(image)
-    bbox, label, conf = cv.detect_common_objects(image)
-    results = []
-    for i, _ in enumerate(bbox):
-        results.append(
-            {
-                "image": Image.fromarray(
-                    # y1:y2, x1:x2
-                    image[bbox[i][1] : bbox[i][3], bbox[i][0] : bbox[i][2]]
-                ),
-                "label": label[i],
-                "confidence": conf[i],
-            }
-        )
-    return results
-
-
-def first_frame(video_path):
-    vidcap = cv2.VideoCapture(video_path)
-    success, image = vidcap.read()
-    return Image.fromarray(image[:, :, ::-1].copy())
+DEFAULT_MODEL_PATH = pathlib.Path(__file__).parent.absolute() / "models/md_v4.1.0"
 
 
 class MegaDetector:
@@ -38,7 +14,7 @@ class MegaDetector:
     Microsoft's MegaDetector. https://github.com/microsoft/CameraTraps
     """
 
-    def __init__(self, filepath: str):
+    def __init__(self, filepath: str = DEFAULT_MODEL_PATH):
         """
         Load the protobuf file, massage from TF 1.13.1 to TF 2.x
 
@@ -73,6 +49,12 @@ class MegaDetector:
             "image_tensor:0",
             ["detection_boxes:0", "detection_classes:0", "detection_scores:0"],
         )
+
+        self.labels = {
+            1: "animal",
+            2: "person",
+            3: "vehicle",  # available in megadetector v4+
+        }
 
     def predict(
         self, image: np.ndarray, confidence: float = 0.5
@@ -111,3 +93,30 @@ class MegaDetector:
         # Need to convert fractions -> pixels
         bboxes = np.round(bboxes * (image.shape[:2] * 2)).astype("uint16")
         return bboxes, classes, scores
+
+
+def model(detector: MegaDetector, image):
+    bbox, _class, score = detector.predict(np.array(image))
+    results = []
+    for i, _ in enumerate(bbox):
+        results.append(
+            {
+                "image": Image.fromarray(
+                    image[
+                        bbox[i][1] : bbox[i][1] + bbox[i][3],
+                        bbox[i][0] : bbox[i][0] + bbox[i][2],
+                    ]
+                ),
+                "label": detector.labels[_class[i]],
+                "confidence": score[i],
+            }
+        )
+    return results
+
+
+# FIXME: this doesn't support a lot of video types right now,
+# probably need to install more codecs
+def first_frame(video_path):
+    vidcap = cv2.VideoCapture(video_path)
+    success, image = vidcap.read()
+    return Image.fromarray(image[:, :, ::-1].copy())

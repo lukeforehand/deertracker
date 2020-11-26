@@ -2,9 +2,9 @@
 
 [Development notes](NOTES.md)
 
-
 ## install env
-```
+
+```bash
 pyenv install 3.8.2
 pyenv global 3.8.2
 pip install --upgrade pip
@@ -12,7 +12,8 @@ pip install -r requirements.txt
 ```
 
 ## add camera
-```
+
+```bash
 ./dt add-camera \
     --name "Southwest Stand" \
     --lat 46.399995 \
@@ -25,7 +26,8 @@ pip install -r requirements.txt
 ```
 
 ## run import
-```
+
+```bash
 ./dt import-photos \
     --photos ~/Google\ Drive/Trail\ Cam \
     --camera "Soutwest Stand"
@@ -37,5 +39,4 @@ pip install -r requirements.txt
 
 Go here to find the lat/lon for your trail cam:
 
-https://www.latlong.net/
-
+[Find lat/lon](https://www.latlong.net/)

@@ -1,7 +1,7 @@
 import click
 import pathlib
 
-from deertracker import photo
+from deertracker import photo, visualize
 
 
 def file_generator(photos):
@@ -40,6 +40,12 @@ def import_photos(photos, camera):
     for i, result in enumerate(results):
         if results[i] is not None:
             print(results[i])
+
+
+@main.command()
+@click.option("--photo", required=True, help="File path to a photo")
+def show_prediction(photo):
+    visualize.show_prediction(photo)
 
 
 if __name__ == "__main__":

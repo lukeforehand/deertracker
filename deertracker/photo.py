@@ -11,6 +11,7 @@ from PIL import Image, UnidentifiedImageError
 from PIL.ExifTags import TAGS
 
 from deertracker import DEFAULT_DATA_STORE, database, model, logger
+from deertracker.model import MegaDetector
 
 DEFAULT_PHOTO_STORE = pathlib.Path(DEFAULT_DATA_STORE / "photos")
 DEFAULT_PHOTO_STORE.mkdir(exist_ok=True)
@@ -35,7 +36,8 @@ def import_photos(camera_name, files):
     pool = multiprocessing.Pool(multiprocessing.cpu_count())
     # FIXME: database locked
     # FIXME: foreign key constraints don't work
-    results = pool.map(functools.partial(process_photo, camera), files)
+    # FIXME: model is probably not serializable, how can we share it or make a pool of them?
+    results = pool.map(functools.partial(process_photo, MegaDetector(), camera), files)
     pool.close()
     pool.join()
     return results
@@ -45,7 +47,7 @@ def hash_exists(photo_hash):
     return database.Connection().get_photo(photo_hash) is not None
 
 
-def process_photo(camera, file_path):
+def process_photo(detector, camera, file_path):
     try:
         if pathlib.Path(file_path).suffix.lower() in VIDEO_EXTS:
             image = model.first_frame(file_path)
@@ -53,11 +55,10 @@ def process_photo(camera, file_path):
                 return None
         else:
             image = Image.open(file_path)
-
         photo_hash = hashlib.md5(image.tobytes()).hexdigest()
         if not hash_exists(photo_hash):
             photo_time = get_time(image)
-            for obj in model.model(image):
+            for obj in model.model(detector, image):
                 photo = obj["image"]
                 label = obj["label"]
                 confidence = obj["confidence"]
