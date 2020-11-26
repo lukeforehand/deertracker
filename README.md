@@ -12,18 +12,6 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-## show prediction
-
-```bash
-./dt show-prediction --photo ~/Google\ Drive/Trail\ Cam/001.jpg
-```
-
-![Buck 1](examples/buck1-predict.png?raw=true)
-
-![Buck 2](examples/buck2-predict.png?raw=true)
-
-![Doe](examples/doe-predict.png?raw=true)
-
 ## add camera
 
 ```bash
@@ -53,3 +41,15 @@ Go here to find the lat/lon for your trail cam:
     --photos ~/Google\ Drive/Trail\ Cam \
     --camera "Turkey Blind"
 ```
+
+## show prediction
+
+```bash
+./dt show-prediction --photo ~/Google\ Drive/Trail\ Cam/001.jpg
+```
+
+![Buck 1](examples/buck1-predict.png?raw=true)
+
+![Buck 2](examples/buck2-predict.png?raw=true)
+
+![Doe](examples/doe-predict.png?raw=true)
