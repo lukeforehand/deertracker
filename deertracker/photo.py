@@ -29,25 +29,27 @@ def add_camera(name, lat, lon):
 
 
 def import_photos(camera_name, files):
-    camera = database.Connection().select_camera(camera_name)
+    db = database.Connection()
+    camera = db.select_camera(camera_name)
     if camera is None:
         print(f"Camera {camera_name} not found")
         return
     pool = multiprocessing.Pool(multiprocessing.cpu_count())
-    # FIXME: database locked
-    # FIXME: foreign key constraints don't work
     # FIXME: model is probably not serializable, how can we share it or make a pool of them?
-    results = pool.map(functools.partial(process_photo, MegaDetector(), camera), files)
+    results = pool.map(
+        functools.partial(process_photo, MegaDetector(), db, camera),
+        files,
+    )
     pool.close()
     pool.join()
     return results
 
 
-def hash_exists(photo_hash):
-    return database.Connection().get_photo(photo_hash) is not None
+def hash_exists(db, photo_hash):
+    return db.get_photo(photo_hash) is not None
 
 
-def process_photo(detector, camera, file_path):
+def process_photo(detector, db, camera, file_path):
     try:
         if pathlib.Path(file_path).suffix.lower() in VIDEO_EXTS:
             image = model.first_frame(file_path)
@@ -56,7 +58,7 @@ def process_photo(detector, camera, file_path):
         else:
             image = Image.open(file_path)
         photo_hash = hashlib.md5(image.tobytes()).hexdigest()
-        if not hash_exists(photo_hash):
+        if not hash_exists(db, photo_hash):
             photo_time = get_time(image)
             for obj in model.model(detector, image):
                 photo = obj["image"]
@@ -65,7 +67,7 @@ def process_photo(detector, camera, file_path):
                 obj_hash = hashlib.md5(photo.tobytes()).hexdigest()
                 obj_id = f"{label}_{int(confidence*100)}_{obj_hash}"
                 obj_path = store(obj_id, photo, image.info["exif"], camera)
-                database.Connection().insert_object(
+                db.insert_object(
                     (
                         obj_id,
                         obj_path,
@@ -78,7 +80,7 @@ def process_photo(detector, camera, file_path):
                         camera["name"],
                     )
                 )
-            database.Connection().insert_photo(photo_hash)
+            db.insert_photo(photo_hash)
         print(f"Processed {file_path}")
     except Exception:
         LOGGER.exception(f"Error processing photo {file_path}")

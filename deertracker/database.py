@@ -5,6 +5,7 @@ from deertracker import DEFAULT_DATA_STORE, schema
 DEFAULT_DATABASE = DEFAULT_DATA_STORE / "deertracker.db"
 
 
+# FIXME: foreign key constraints don't work
 class Connection:
     def __init__(self, database=DEFAULT_DATABASE):
         conn = sqlite3.connect(database)
