@@ -5,10 +5,17 @@
 ## install env
 
 ```bash
+sudo apt-get install -y tk-dev
 pyenv install 3.8.2
 pyenv global 3.8.2
 pip install --upgrade pip
 pip install -r requirements.txt
+```
+
+## show prediction
+
+```bash
+./dt show-prediction --photo ~/Google\ Drive/Trail\ Cam/001.jpg
 ```
 
 ## add camera
@@ -25,6 +32,10 @@ pip install -r requirements.txt
     --lon -90.768497
 ```
 
+Go here to find the lat/lon for your trail cam:
+
+[Find lat/lon](https://www.latlong.net/)
+
 ## run import
 
 ```bash
@@ -36,7 +47,3 @@ pip install -r requirements.txt
     --photos ~/Google\ Drive/Trail\ Cam \
     --camera "Turkey Blind"
 ```
-
-Go here to find the lat/lon for your trail cam:
-
-[Find lat/lon](https://www.latlong.net/)

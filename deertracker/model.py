@@ -6,7 +6,9 @@ import tensorflow as tf
 from PIL import Image
 from typing import Tuple
 
-DEFAULT_MODEL_PATH = pathlib.Path(__file__).parent.absolute() / "models/md_v4.1.0"
+DEFAULT_MODEL_PATH = str(
+    pathlib.Path(__file__).parent.absolute() / "models/md_v4.1.0.pb"
+)
 
 
 class MegaDetector:
@@ -95,16 +97,17 @@ class MegaDetector:
         return bboxes, classes, scores
 
 
-def model(detector: MegaDetector, image):
-    bbox, _class, score = detector.predict(np.array(image))
+def model(detector: MegaDetector, photo):
+    image = np.array(photo)
+    bbox, _class, score = detector.predict(image)
     results = []
     for i, _ in enumerate(bbox):
         results.append(
             {
                 "image": Image.fromarray(
                     image[
-                        bbox[i][1] : bbox[i][1] + bbox[i][3],
-                        bbox[i][0] : bbox[i][0] + bbox[i][2],
+                        bbox[i][0] : bbox[i][2],
+                        bbox[i][1] : bbox[i][3],
                     ]
                 ),
                 "label": detector.labels[_class[i]],

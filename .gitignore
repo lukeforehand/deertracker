@@ -4,4 +4,4 @@ __pycache__
 .DS_Store
 deertracker.err
 test/
-deertracker/*.pb
+deertracker/models/

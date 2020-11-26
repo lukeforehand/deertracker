@@ -1,3 +1,6 @@
+import matplotlib
+
+matplotlib.use("tkagg")
 import matplotlib.pyplot as plt
 import cv2
 
@@ -14,12 +17,12 @@ def show_prediction(image_path: str, md: MegaDetector = MegaDetector()):
 
     bboxes, classes, scores = md.predict(image)
     colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]
-    for bbox, label, score in zip(bboxes, classes, scores):
-        color = colors[label]
-        cv2.rectangle(image, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, 2)
+    for bbox, _class, score in zip(bboxes, classes, scores):
+        color = colors[_class]
+        cv2.rectangle(image, (bbox[1], bbox[0]), (bbox[3], bbox[2]), color, 2)
         cv2.putText(
             image,
-            str(label),
+            str(f"{md.labels[_class]} {score}"),
             (bbox[0], bbox[1] - 10),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.5,

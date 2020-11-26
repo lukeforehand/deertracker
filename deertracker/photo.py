@@ -34,14 +34,18 @@ def import_photos(camera_name, files):
     if camera is None:
         print(f"Camera {camera_name} not found")
         return
-    pool = multiprocessing.Pool(multiprocessing.cpu_count())
+    # pool = multiprocessing.Pool(multiprocessing.cpu_count())
     # FIXME: model is probably not serializable, how can we share it or make a pool of them?
-    results = pool.map(
-        functools.partial(process_photo, MegaDetector(), db, camera),
-        files,
-    )
-    pool.close()
-    pool.join()
+    # results = pool.map(
+    #    functools.partial(process_photo, MegaDetector(), db, camera),
+    #    files,
+    # )
+    md = MegaDetector()
+    results = []
+    for photo in files:
+        results.append(process_photo(md, db, camera, photo))
+    # pool.close()
+    # pool.join()
     return results
 
 
@@ -60,13 +64,14 @@ def process_photo(detector, db, camera, file_path):
         photo_hash = hashlib.md5(image.tobytes()).hexdigest()
         if not hash_exists(db, photo_hash):
             photo_time = get_time(image)
+            photo_exif = image.info["exif"]
             for obj in model.model(detector, image):
-                photo = obj["image"]
-                label = obj["label"]
-                confidence = obj["confidence"]
-                obj_hash = hashlib.md5(photo.tobytes()).hexdigest()
-                obj_id = f"{label}_{int(confidence*100)}_{obj_hash}"
-                obj_path = store(obj_id, photo, image.info["exif"], camera)
+                obj_photo = obj["image"]
+                obj_label = obj["label"]
+                obj_conf = obj["confidence"]
+                obj_hash = hashlib.md5(obj_photo.tobytes()).hexdigest()
+                obj_id = f"{obj_label}_{int(obj_conf*100)}_{obj_hash}"
+                obj_path = store(obj_id, obj_photo, photo_exif, camera)
                 db.insert_object(
                     (
                         obj_id,
@@ -74,8 +79,8 @@ def process_photo(detector, db, camera, file_path):
                         camera["lat"],
                         camera["lon"],
                         photo_time,
-                        label,
-                        confidence,
+                        obj_label,
+                        obj_conf,
                         photo_hash,
                         camera["name"],
                     )
