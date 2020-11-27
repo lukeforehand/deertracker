@@ -3,6 +3,8 @@ import pathlib
 
 from deertracker import photo, visualize
 
+from deertracker.model import MegaDetector
+
 
 def file_generator(photos):
     exts = []
@@ -13,7 +15,7 @@ def file_generator(photos):
     for ext in exts:
         for x in pathlib.Path(photos).glob(f"**/*{ext}"):
             if x.is_file():
-                yield x
+                yield str(x)
 
 
 @click.group()
@@ -43,9 +45,11 @@ def import_photos(photos, camera):
 
 
 @main.command()
-@click.option("--photo", required=True, help="File path to a photo")
-def show_prediction(photo):
-    visualize.show_prediction(photo)
+@click.option("--photos", required=True, help="Location of photos to process")
+def show_prediction(photos):
+    md = MegaDetector()
+    for photo in file_generator(photos):
+        visualize.show_prediction(photo, md)
 
 
 if __name__ == "__main__":

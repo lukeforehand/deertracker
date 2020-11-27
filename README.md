@@ -2,6 +2,8 @@
 
 [Development notes](NOTES.md)
 
+[Prediction Examples](EXAMPLES.md)
+
 ## install env
 
 ```bash
@@ -48,8 +50,3 @@ Go here to find the lat/lon for your trail cam:
 ./dt show-prediction --photo ~/Google\ Drive/Trail\ Cam/001.jpg
 ```
 
-![Buck 1](examples/buck1-predict.png?raw=true)
-
-![Buck 2](examples/buck2-predict.png?raw=true)
-
-![Doe](examples/doe-predict.png?raw=true)

@@ -7,7 +7,7 @@ import cv2
 from .model import MegaDetector
 
 
-def show_prediction(image_path: str, md: MegaDetector = MegaDetector()):
+def show_prediction(image_path: str, md: MegaDetector):
     """
     Visualize Microsoft's MegaDetector bounding boxes.
     """

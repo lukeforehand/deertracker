@@ -10,7 +10,7 @@ DEFAULT_MODEL_PATH = str(
     pathlib.Path(__file__).parent.absolute() / "models/md_v4.1.0.pb"
 )
 
-
+# FIXME: find better ways to globally share the model
 class MegaDetector:
     """
     Microsoft's MegaDetector. https://github.com/microsoft/CameraTraps
