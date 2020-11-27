@@ -13,6 +13,12 @@ def plot(image):
     plt.show()
 
 
+def show_predictions(image_paths):
+    detector = MegaDetector()
+    for image_path in image_paths:
+        show_prediction(image_path, detector)
+
+
 def show_prediction(image_path: str, md: MegaDetector):
     """
     Visualize Microsoft's MegaDetector bounding boxes.

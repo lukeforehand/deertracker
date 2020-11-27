@@ -3,8 +3,6 @@ import pathlib
 
 from deertracker import photo, visualize
 
-from deertracker.model import MegaDetector
-
 
 def find_files(photos):
     exts = []
@@ -25,7 +23,7 @@ def main():
     pass
 
 
-@main.command()
+@main.command(help="Add camera location")
 @click.option("--name", required=True, help="Name of camera")
 @click.option("--lat", required=True, help="Latitude of camera location")
 @click.option("--lon", required=True, help="Longitude of camera location")
@@ -34,7 +32,7 @@ def add_camera(name, lat, lon):
     print(camera)
 
 
-@main.command()
+@main.command(help="Import photos")
 @click.option("--photos", required=True, help="Location of photos to process")
 @click.option(
     "--camera", required=True, help="Name of trail cam to associate with photos"
@@ -47,18 +45,14 @@ def add_camera(name, lat, lon):
     help="Ignore failures if image exif is missing",
 )
 def import_photos(photos, camera, ignore_exif):
-    results = photo.import_photos(camera, find_files(photos), ignore_exif)
-    for i, result in enumerate(results):
-        if results[i] is not None:
-            print(results[i])
+    for result in photo.import_photos(camera, find_files(photos), ignore_exif):
+        print(result)
 
 
-@main.command()
+@main.command(help="Show predictions for photos")
 @click.option("--photos", required=True, help="Location of photos to process")
-def show_prediction(photos):
-    md = MegaDetector()
-    for photo in find_files(photos):
-        visualize.show_prediction(photo, md)
+def show_predictions(photos):
+    visualize.show_predictions(find_files(photos))
 
 
 if __name__ == "__main__":

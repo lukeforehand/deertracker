@@ -36,8 +36,7 @@ class Connection:
             self.conn.commit()
             return self._camera_from_tuple(camera)
         except sqlite3.IntegrityError:
-            print(f"Camera {camera[0]} already exists")
-            return None
+            return {"error": f"Camera `{camera[0]}` already exists."}
 
     def select_camera(self, camera_name):
         return self._camera_from_tuple(
@@ -47,27 +46,28 @@ class Connection:
         )
 
     def _camera_from_tuple(self, camera):
+        if camera is None:
+            return None
         return {
             "name": camera[0],
             "lat": camera[1],
             "lon": camera[2],
         }
 
-    def get_photo(self, photo_id):
+    def select_photo(self, photo_id):
         cur = self.conn.cursor()
         cur.execute("SELECT * FROM photo WHERE id = ?", [photo_id])
         return cur.fetchone()
 
     def insert_photo(self, photo):
         try:
-            sql = "INSERT INTO photo(id) VALUES(?)"
+            sql = "INSERT INTO photo(id, path) VALUES(?, ?)"
             cur = self.conn.cursor()
-            cur.execute(sql, [photo])
+            cur.execute(sql, photo)
             self.conn.commit()
-            return {"id": photo[0]}
+            return {"id": photo[0], "path": photo[1]}
         except sqlite3.IntegrityError:
-            print(f"Photo {photo[1]} already exists")
-            return None
+            return {"error": f"Photo `{photo[1]}` already exists."}
 
     def insert_object(self, obj):
         try:
@@ -87,5 +87,4 @@ class Connection:
                 "camera_id": obj[8],
             }
         except sqlite3.IntegrityError:
-            print(f"Object {obj[1]} already exists")
-            return None
+            return {"error": f"Object `{obj[1]}` already exists."}

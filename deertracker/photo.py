@@ -41,8 +41,7 @@ def import_photos(camera_name, files, ignore_exif=False):
     with database.conn() as db:
         camera = db.select_camera(camera_name)
     if camera is None:
-        print(f"Camera {camera_name} not found")
-        return
+        return [{"error": f"Camera `{camera_name}` not found."}]
 
     if CPUS <= 1 or tf.test.is_gpu_available():
         return process_photos(camera, ignore_exif, files)
@@ -60,10 +59,8 @@ def import_photos(camera_name, files, ignore_exif=False):
 def process_photos(camera, ignore_exif, file_paths):
     detector = MegaDetector()
     with database.conn() as db:
-        return [
-            process_photo(detector, db, camera, ignore_exif, file_path)
-            for file_path in file_paths
-        ]
+        for file_path in file_paths:
+            yield process_photo(detector, db, camera, ignore_exif, file_path)
 
 
 def process_photo(detector, db, camera, ignore_exif, file_path):
@@ -71,41 +68,45 @@ def process_photo(detector, db, camera, ignore_exif, file_path):
         if pathlib.Path(file_path).suffix.lower() in VIDEO_EXTS:
             image = model.first_frame(file_path)
             if image is None:
-                return None
+                return {"error": f"Video `{file_path}` could not be processed."}
         else:
             image = Image.open(file_path)
         photo_hash = hashlib.md5(image.tobytes()).hexdigest()
-        if not hash_exists(db, photo_hash):
-            photo_time = get_time(image, ignore_exif)
-            for obj in model.model(detector, image):
-                obj_photo = obj["image"]
-                obj_label = obj["label"]
-                obj_conf = obj["confidence"]
-                obj_hash = hashlib.md5(obj_photo.tobytes()).hexdigest()
-                obj_id = f"{obj_label}_{int(obj_conf*100)}_{obj_hash}"
-                obj_path = store(obj_id, obj_photo, camera)
-                db.insert_object(
-                    (
-                        obj_id,
-                        obj_path,
-                        camera["lat"],
-                        camera["lon"],
-                        photo_time,
-                        obj_label,
-                        obj_conf,
-                        photo_hash,
-                        camera["name"],
-                    )
+        if hash_exists(db, photo_hash):
+            return {"error": f"Photo `{file_path}` already exists."}
+        photo_time = get_time(image, ignore_exif)
+        for obj in model.model(detector, image):
+            obj_photo = obj["image"]
+            obj_label = obj["label"]
+            obj_conf = obj["confidence"]
+            obj_hash = hashlib.md5(obj_photo.tobytes()).hexdigest()
+            obj_id = f"{obj_label}_{int(obj_conf*100)}_{obj_hash}"
+            obj_path = store(obj_id, obj_photo, camera)
+            db.insert_object(
+                (
+                    obj_id,
+                    obj_path,
+                    camera["lat"],
+                    camera["lon"],
+                    photo_time,
+                    obj_label,
+                    obj_conf,
+                    photo_hash,
+                    camera["name"],
                 )
-            db.insert_photo(photo_hash)
-        print(f"Processed {file_path}")
+            )
+        return db.insert_photo((photo_hash, file_path))
     except Exception:
-        LOGGER.exception(f"Error processing photo {file_path}")
-        return None
+        msg = f"Error processing photo `{file_path}`"
+        LOGGER.exception(msg)
+        return {"error": msg}
 
 
 def hash_exists(db, photo_hash):
-    return db.get_photo(photo_hash) is not None
+    return db.select_photo(photo_hash) is not None
+
+
+# TODO: do we want to override lat/lon from EXIF if available?
 
 
 def get_time(image, ignore_exif):
