@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS object (
     path VARCHAR(255) NOT NULL UNIQUE,
     lat FLOAT NOT NULL,
     lon FLOAT NOT NULL,
-    time DATETIME NOT NULL,
+    time DATETIME,
     label VARCHAR(255) NOT NULL,
     confidence FLOAT NOT NULL,
     camera_id VARCHAR(255) NOT NULL,

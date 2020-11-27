@@ -75,10 +75,10 @@ class MegaDetector:
         -------
         bboxes : np.ndarray
             Nx4 array of bounding boxes:
-                bboxes[i][0]  # starting x coordinate
-                bboxes[i][1]  # starting y coordinate
-                bboxes[i][2]  # width of bounding box
-                bboxes[i][3]  # height of bounding box
+                bboxes[i][0]  # starting y coordinate
+                bboxes[i][1]  # starting x coordinate
+                bboxes[i][2]  # ending y coordinate
+                bboxes[i][3]  # ending x coordinate
         classes : np.ndarray
             N-length array of class labels (integers)
         scores : np.ndarray

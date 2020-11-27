@@ -1,10 +1,16 @@
-import matplotlib
-
-matplotlib.use("tkagg")
-import matplotlib.pyplot as plt
 import cv2
+import matplotlib
+import matplotlib.pyplot as plt
+import multiprocessing
 
-from .model import MegaDetector
+from deertracker.model import MegaDetector
+
+
+def plot(image):
+    matplotlib.use("tkagg")
+    plt.imshow(image)
+    plt.axis("off")
+    plt.show()
 
 
 def show_prediction(image_path: str, md: MegaDetector):
@@ -30,6 +36,4 @@ def show_prediction(image_path: str, md: MegaDetector):
             color,
             2,
         )
-    plt.imshow(image)
-    plt.axis("off")
-    plt.show()
+    multiprocessing.Process(target=plot, args=(image,)).start()

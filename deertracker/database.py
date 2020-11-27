@@ -1,8 +1,19 @@
 import sqlite3
 
+from contextlib import contextmanager
+
 from deertracker import DEFAULT_DATA_STORE, schema
 
 DEFAULT_DATABASE = DEFAULT_DATA_STORE / "deertracker.db"
+
+
+@contextmanager
+def conn():
+    c = Connection()
+    try:
+        yield c
+    finally:
+        c.close()
 
 
 # FIXME: foreign key constraints don't work
@@ -13,6 +24,9 @@ class Connection:
         conn.execute(schema.CREATE_TABLE_PHOTO)
         conn.execute(schema.CREATE_TABLE_OBJECT)
         self.conn = conn
+
+    def close(self):
+        self.conn.close()
 
     def insert_camera(self, camera):
         try:
@@ -72,6 +86,6 @@ class Connection:
                 "photo_id": obj[7],
                 "camera_id": obj[8],
             }
-        except sqlite3.IntegrityError as e:
+        except sqlite3.IntegrityError:
             print(f"Object {obj[1]} already exists")
             return None

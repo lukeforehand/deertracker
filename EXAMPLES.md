@@ -1,6 +1,7 @@
 # Prediction Examples
 
 ![](examples/buck1.png?raw=true)
+![](examples/buck2.png?raw=true)
 ![](examples/cat2.png?raw=true)
 ![](examples/cat.png?raw=true)
 ![](examples/coyote?raw=true)
