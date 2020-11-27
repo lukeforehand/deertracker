@@ -44,8 +44,7 @@ Go here to find the lat/lon for your trail cam:
     --camera "Turkey Blind"
 ```
 
-Passing the `--ignore-exif` flag will avoid errors in missing exif data
-but will not collect photo timestamps as a result.
+Passing the `--ignore-time` flag will process photos that are missing exif Datetime.
 
 ## show prediction
 

@@ -38,14 +38,14 @@ def add_camera(name, lat, lon):
     "--camera", required=True, help="Name of trail cam to associate with photos"
 )
 @click.option(
-    "--ignore-exif",
+    "--ignore-time",
     default=False,
     is_flag=True,
     required=False,
-    help="Ignore failures if image exif is missing",
+    help="Process photos that are missing EXIF Datetime",
 )
-def import_photos(photos, camera, ignore_exif):
-    for result in photo.import_photos(camera, find_files(photos), ignore_exif):
+def import_photos(photos, camera, ignore_time):
+    for result in photo.import_photos(camera, find_files(photos), ignore_time):
         print(result)
 
 
