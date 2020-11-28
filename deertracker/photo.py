@@ -36,40 +36,38 @@ def add_camera(name, lat, lon):
         return db.insert_camera((name, lat, lon))
 
 
-def import_photos(camera_name, files, ignore_time=False):
-    if CPUS <= 1 or tf.test.is_gpu_available():
-        return _import_photos(camera_name, ignore_time, True, files)
-    pool = multiprocessing.Pool(CPUS)
-    results = pool.map(
-        functools.partial(_import_photos, camera_name, ignore_time, False),
-        np.array_split(files, CPUS),
-    )
-    pool.close()
-    pool.join()
-    return itertools.chain.from_iterable(results)
-
-
-def _import_photos(camera_name, ignore_time, yield_results, file_paths):
-    with database.conn() as db:
-        camera = db.select_camera(camera_name)
-    if camera is None:
-        return [{"error": f"Camera `{camera_name}` not found."}]
-    results = PhotoProcessor(camera, ignore_time, file_paths).process_photos()
-    if yield_results:
-        return results
-    return list(results)
-
-
 class PhotoProcessor:
-    def __init__(self, camera, ignore_time, file_paths):
-        self.detector = MegaDetector()
-        self.camera = camera
+    def __init__(self, camera_name, ignore_time, file_paths):
+        self.batch_id = hashlib.md5("".join(file_paths).encode()).hexdigest()
+        self.batch_time = datetime.now()
         self.ignore_time = ignore_time
         self.file_paths = file_paths
+        with database.conn() as db:
+            self.camera = db.select_camera(camera_name)
+        if self.camera is None:
+            raise Exception(f"Camera `{camera_name}` not found.")
+        self.detector = MegaDetector()
 
-    def process_photos(self):
-        for file_path in self.file_paths:
-            yield self.process_photo(file_path)
+    def import_photos(
+        self,
+    ):
+        if CPUS <= 1 or tf.test.is_gpu_available():
+            return self._import_photos(True, self.file_paths)
+        pool = multiprocessing.Pool(CPUS)
+        results = pool.map(
+            functools.partial(self._import_photos, False),
+            np.array_split(self.file_paths, CPUS),
+        )
+        pool.close()
+        pool.join()
+        return itertools.chain.from_iterable(results)
+
+    def _import_photos(self, yield_results, file_paths):
+        if yield_results:
+            for file_path in file_paths:
+                yield self.process_photo(file_path)
+        else:
+            return [self.process_photo(file_path) for file_path in file_paths]
 
     def process_photo(self, file_path):
         try:
@@ -87,7 +85,7 @@ class PhotoProcessor:
                 for obj in model.model(self.detector, image):
                     obj_photo = obj["image"]
                     obj_label = obj["label"]
-                    obj_conf = obj["confidence"]
+                    obj_conf = float(obj["confidence"])
                     obj_hash = hashlib.md5(obj_photo.tobytes()).hexdigest()
                     obj_id = f"{obj_label}_{int(obj_conf*100)}_{obj_hash}"
                     obj_path = self.store(obj_id, obj_photo)
@@ -104,7 +102,9 @@ class PhotoProcessor:
                             self.camera["name"],
                         )
                     )
-                return db.insert_photo((photo_hash, file_path))
+                return db.insert_photo(
+                    (photo_hash, file_path, self.batch_id, self.batch_time)
+                )
         except Exception:
             msg = f"Error processing photo `{file_path}`"
             LOGGER.exception(msg)

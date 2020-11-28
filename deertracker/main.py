@@ -2,6 +2,7 @@ import click
 import pathlib
 
 from deertracker import photo, visualize
+from deertracker.photo import PhotoProcessor
 
 
 def find_files(photos):
@@ -45,7 +46,8 @@ def add_camera(name, lat, lon):
     help="Process photos that are missing EXIF Datetime",
 )
 def import_photos(photos, camera, ignore_time):
-    for result in photo.import_photos(camera, find_files(photos), ignore_time):
+    p = PhotoProcessor(camera, ignore_time, find_files(photos))
+    for result in p.import_photos():
         print(result)
 
 

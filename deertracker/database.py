@@ -61,7 +61,7 @@ class Connection:
 
     def insert_photo(self, photo):
         try:
-            sql = "INSERT INTO photo(id, path) VALUES(?, ?)"
+            sql = "INSERT INTO photo(id, path, batch_id, batch_time) VALUES(?, ?, ?, ?)"
             cur = self.conn.cursor()
             cur.execute(sql, photo)
             self.conn.commit()
