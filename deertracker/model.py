@@ -102,12 +102,18 @@ def model(detector: MegaDetector, photo):
     bbox, _class, score = detector.predict(image)
     results = []
     for i, _ in enumerate(bbox):
+
+        w = bbox[i][3] - bbox[i][1]
+        pw = max(int(w * 0.01), 10)
+        h = bbox[i][2] - bbox[i][0]
+        ph = max(int(h * 0.01), 10)
+
         results.append(
             {
                 "image": Image.fromarray(
                     image[
-                        bbox[i][0] : bbox[i][2],
-                        bbox[i][1] : bbox[i][3],
+                        bbox[i][0] - ph : bbox[i][2] + ph,
+                        bbox[i][1] - pw : bbox[i][3] + pw,
                     ]
                 ),
                 "label": detector.labels[_class[i]],
