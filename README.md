@@ -44,7 +44,8 @@ Go here to find the lat/lon for your trail cam:
     --camera "Turkey Blind"
 ```
 
-Passing the `--ignore-time` flag will process photos that are missing exif Datetime.
+Passing `--training` will flag photos as training data and disable the `--camera` option.
+Training photos do not require EXIF Datetime.
 
 ## show prediction
 
