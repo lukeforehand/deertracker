@@ -38,12 +38,11 @@ def add_camera(name, lat, lon):
 
 class PhotoProcessor:
     def __init__(self, camera_name, ignore_time, file_paths):
-        self.batch_id = hashlib.md5("".join(file_paths).encode()).hexdigest()
-        self.batch_time = datetime.now()
         self.ignore_time = ignore_time
         self.file_paths = file_paths
         with database.conn() as db:
             self.camera = db.select_camera(camera_name)
+            self.batch = db.insert_batch()
         if self.camera is None:
             raise Exception(f"Camera `{camera_name}` not found.")
         self.detector = MegaDetector()
@@ -102,9 +101,7 @@ class PhotoProcessor:
                             self.camera["name"],
                         )
                     )
-                return db.insert_photo(
-                    (photo_hash, file_path, self.batch_id, self.batch_time)
-                )
+                return db.insert_photo((photo_hash, file_path, self.batch["id"]))
         except Exception:
             msg = f"Error processing photo `{file_path}`"
             LOGGER.exception(msg)

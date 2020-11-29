@@ -1,6 +1,7 @@
 import sqlite3
 
 from contextlib import contextmanager
+from datetime import datetime
 
 from deertracker import DEFAULT_DATA_STORE, schema
 
@@ -21,6 +22,7 @@ class Connection:
     def __init__(self, database=DEFAULT_DATABASE):
         conn = sqlite3.connect(database)
         conn.execute(schema.CREATE_TABLE_CAMERA)
+        conn.execute(schema.CREATE_TABLE_BATCH)
         conn.execute(schema.CREATE_TABLE_PHOTO)
         conn.execute(schema.CREATE_TABLE_OBJECT)
         self.conn = conn
@@ -59,9 +61,19 @@ class Connection:
         cur.execute("SELECT * FROM photo WHERE id = ?", [photo_id])
         return cur.fetchone()
 
+    def insert_batch(self):
+        batch_time = datetime.now()
+        sql = "INSERT INTO batch(id, time) VALUES(NULL, ?)"
+        cur = self.conn.cursor()
+        cur.execute(sql, [batch_time])
+        cur.execute("SELECT LAST_INSERT_ROWID()")
+        batch_id = cur.fetchone()[0]
+        self.conn.commit()
+        return {"id": batch_id, "time": batch_time}
+
     def insert_photo(self, photo):
         try:
-            sql = "INSERT INTO photo(id, path, batch_id, batch_time) VALUES(?, ?, ?, ?)"
+            sql = "INSERT INTO photo(id, path, batch_id) VALUES(?, ?, ?)"
             cur = self.conn.cursor()
             cur.execute(sql, photo)
             self.conn.commit()
