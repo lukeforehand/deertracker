@@ -22,6 +22,7 @@ class Connection:
     def __init__(self, database=DEFAULT_DATABASE):
         conn = sqlite3.connect(database)
         conn.execute(schema.CREATE_TABLE_CAMERA)
+        conn.execute(schema.INSERT_TRAINING_CAMERA)
         conn.execute(schema.CREATE_TABLE_BATCH)
         conn.execute(schema.CREATE_TABLE_PHOTO)
         conn.execute(schema.CREATE_TABLE_OBJECT)

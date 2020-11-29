@@ -16,7 +16,7 @@ def plot(image):
 def show_predictions(image_paths):
     detector = MegaDetector()
     for image_path in image_paths:
-        show_prediction(image_path, detector)
+        yield show_prediction(image_path, detector)
 
 
 def show_prediction(image_path: str, md: MegaDetector):

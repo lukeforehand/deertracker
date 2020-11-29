@@ -30,31 +30,47 @@ def main():
 @click.option("--lon", required=True, help="Longitude of camera location")
 def add_camera(name, lat, lon):
     camera = photo.add_camera(name, lat, lon)
-    print(camera)
+    click.echo(camera)
 
 
 @main.command(help="Import photos")
 @click.option("--photos", required=True, help="Location of photos to process")
 @click.option(
-    "--camera", required=True, help="Name of trail cam to associate with photos"
+    "--camera",
+    default=None,
+    required=False,
+    help="Name of trail cam to associate with photos",
 )
 @click.option(
-    "--ignore-time",
+    "--training",
     default=False,
     is_flag=True,
     required=False,
-    help="Process photos that are missing EXIF Datetime",
+    help="Flag photos as training data, they don't require exif datetime data and the --camera option is not required",
 )
-def import_photos(photos, camera, ignore_time):
-    p = PhotoProcessor(camera, ignore_time, find_files(photos))
-    for result in p.import_photos():
-        print(result)
+def import_photos(photos, camera, training):
+    if not camera and not training:
+        click.secho(
+            "--camera option is required unless --training flag is set", bg="red"
+        )
+        return
+
+    file_paths = find_files(photos)
+    imported_photos = PhotoProcessor(camera, training, file_paths).import_photos()
+    with click.progressbar(imported_photos, length=len(file_paths)) as progress:
+        for imported_photo in progress:
+            if "error" in imported_photo:
+                click.secho(str(imported_photo), bg="red")
 
 
 @main.command(help="Show predictions for photos")
 @click.option("--photos", required=True, help="Location of photos to process")
 def show_predictions(photos):
-    visualize.show_predictions(find_files(photos))
+    file_paths = find_files(photos)
+    predictions = visualize.show_predictions(file_paths)
+    with click.progressbar(predictions, length=len(file_paths)) as progress:
+        for prediction in progress:
+            pass
 
 
 if __name__ == "__main__":

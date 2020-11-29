@@ -37,9 +37,11 @@ def add_camera(name, lat, lon):
 
 
 class PhotoProcessor:
-    def __init__(self, camera_name, ignore_time, file_paths):
-        self.ignore_time = ignore_time
+    def __init__(self, camera_name, training, file_paths):
+        self.training = training
         self.file_paths = file_paths
+        if training:
+            camera_name = "training"
         with database.conn() as db:
             self.camera = db.select_camera(camera_name)
             self.batch = db.insert_batch()
@@ -115,7 +117,7 @@ class PhotoProcessor:
                 image.getexif()[EXIF_TAGS["DateTime"]], "%Y:%m:%d %H:%M:%S"
             )
         except KeyError:
-            if self.ignore_time:
+            if self.training:
                 return None
             raise
 

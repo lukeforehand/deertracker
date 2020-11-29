@@ -6,6 +6,12 @@ CREATE TABLE IF NOT EXISTS camera (
 )
 """
 
+INSERT_TRAINING_CAMERA = """
+INSERT INTO camera(name, lat, lon)
+SELECT 'training', 0.0, 0.0
+WHERE NOT EXISTS(SELECT 1 FROM camera WHERE name = 'training')
+"""
+
 CREATE_TABLE_BATCH = """
 CREATE TABLE IF NOT EXISTS batch (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
