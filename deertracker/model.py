@@ -112,8 +112,8 @@ def model(detector: MegaDetector, photo):
             {
                 "image": Image.fromarray(
                     image[
-                        bbox[i][0] - ph : bbox[i][2] + ph,
-                        bbox[i][1] - pw : bbox[i][3] + pw,
+                        max(bbox[i][0] - ph, 0) : min(bbox[i][2] + ph, image.shape[0]),
+                        max(bbox[i][1] - pw, 0) : min(bbox[i][3] + pw, image.shape[1]),
                     ]
                 ),
                 "label": detector.labels[_class[i]],
