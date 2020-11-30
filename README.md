@@ -53,3 +53,14 @@ Training photos do not require EXIF Datetime.
 ./dt show-prediction --photo ~/Google\ Drive/Trail\ Cam/001.jpg
 ```
 
+## show caltech annotations
+
+```bash
+./dt caltech --show
+```
+
+## import caltech crops
+
+```bash
+./dt caltech
+```

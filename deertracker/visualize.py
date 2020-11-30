@@ -5,6 +5,43 @@ import multiprocessing
 
 from deertracker.model import MegaDetector
 
+from deertracker import caltech
+
+colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]
+
+
+def show_caltech():
+
+    bboxes = caltech.load_bboxes()
+
+    for annotation in bboxes:
+        image = cv2.imread(
+            f"/home/lukeforehand/Downloads/caltech/cct_images/{annotation['file_path']}"
+        )
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+        bbox = annotation["bbox"]
+
+        color = colors[annotation["_class"] % 3]
+
+        cv2.rectangle(
+            image,
+            (int(bbox[0]), int(bbox[1])),
+            (int(bbox[0] + bbox[2]), int(bbox[1] + bbox[3])),
+            color,
+            2,
+        )
+        cv2.putText(
+            image,
+            annotation["label"],
+            (int(bbox[0]), int(bbox[1]) - 10),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.5,
+            color,
+            2,
+        )
+        plot(image)
+
 
 def plot(image):
     matplotlib.use("tkagg")

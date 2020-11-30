@@ -1,7 +1,7 @@
 import click
 import pathlib
 
-from deertracker import photo, visualize
+from deertracker import photo, visualize, caltech as ct
 from deertracker.photo import PhotoProcessor
 
 
@@ -71,6 +71,26 @@ def show_predictions(photos):
     with click.progressbar(predictions, length=len(file_paths)) as progress:
         for prediction in progress:
             pass
+
+
+@main.command(help="Process Caltech")
+@click.option(
+    "--show",
+    default=False,
+    is_flag=True,
+    required=False,
+    help="Show caltech annotations",
+)
+def caltech(show):
+    if show:
+        visualize.show_caltech()
+    else:
+        bboxes = ct.load_bboxes()
+        annotations = ct.process_annotations()
+        with click.progressbar(annotations, length=len(bboxes)) as progress:
+            for annotation in progress:
+                if "error" in annotation:
+                    click.secho(str(annotation), bg="red")
 
 
 if __name__ == "__main__":

@@ -36,6 +36,12 @@ def add_camera(name, lat, lon):
         return db.insert_camera((name, lat, lon))
 
 
+def store(photo_hash, photo):
+    dest_path = f"{DEFAULT_PHOTO_STORE}/{photo_hash}.jpg"
+    photo.save(dest_path, "JPEG")
+    return dest_path
+
+
 class PhotoProcessor:
     def __init__(self, camera_name, training, file_paths):
         self.training = training
@@ -120,8 +126,3 @@ class PhotoProcessor:
             if self.training:
                 return None
             raise
-
-    def store(self, photo_hash, photo):
-        dest_path = f"{DEFAULT_PHOTO_STORE}/{photo_hash}.jpg"
-        photo.save(dest_path, "JPEG")
-        return dest_path
