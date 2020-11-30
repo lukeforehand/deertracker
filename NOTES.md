@@ -6,37 +6,21 @@ Trail cameras will be manually geocoded by user.
 
 User chooses geocoded trail camera when importing trail camera photos.
 
-Modify EXIF photo data with trail camera geocode.
+Each photo EXIF should contain DateTime.
 
-User will have option to review object labels from image after AI predictions.
+Each animal class (someday identity?), geolocation, and time will be tracked and visualized.
 
-Each photo EXIF should contain:
-
-* Geolocation
-* Date time
-* Object detection data (model version, object tags, user tags
-
-Each deer identity, geolocation, and time will be tracked and visualized.
-
-Interpolated paths will be drawn on map linking each deer identity's geocoded data points in time order.
+Interpolated paths will be drawn on map linking each animal class (someday identity?) geocoded data point in time order.
 
 Photo import process:
 
-* Choose photos,
-* Associate batch with saved camera location
-* Tag photo with geolocation.
-* Date Times are based on photo metadata
-* Model runs animal tagging, outputs object images, labels, confidence
+* Choose photos
+* Associate photo batch with saved camera location
+* Photo time is based on photo EXIF DateTime
+* Detection model finds animal crops, labels, and confidence
+* Database stores all this information per detected animal
 
-Feature to retrain model based on user feedback?
-
-## Image EXIF extraction / modification
-
-https://pypi.org/project/exif/
-
-## Object detection / Animal Identification
-
-### Datasets
+## Training Datasets
 
 Caltech camera traps:
 http://lila.science/datasets/caltech-camera-traps
