@@ -87,9 +87,11 @@ def caltech(show, photos, bboxes):
     if show:
         visualize.show_caltech(photos, bboxes)
     else:
-        bboxes = ct.load_bboxes(bboxes)
-        annotations = ct.process_annotations(photos, bboxes)
-        with click.progressbar(annotations, length=len(bboxes)) as progress:
+        annotations = ct.load_bboxes(bboxes)
+        processed_annotations = ct.process_annotations(photos, bboxes)
+        with click.progressbar(
+            processed_annotations, length=len(annotations)
+        ) as progress:
             for annotation in progress:
                 if "error" in annotation:
                     click.secho(str(annotation), bg="red")
