@@ -72,6 +72,8 @@ Produces crops into category folders, i.e.:
 
 ## labeling tool
 
+Copyright https://github.com/Serhiy-Shekhovtsov/tkteach
+
 ```bash
 cd tkteach
 # copy crops into ds/<dataset>/
