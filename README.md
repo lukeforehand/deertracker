@@ -69,3 +69,12 @@ Produces crops into category folders, i.e.:
 ./dog/199795365fc783ca6ff3ee88298631a2.jpg
 ...
 ```
+
+## labeling tool
+
+```bash
+cd tkteach
+# copy crops into ds/<dataset>/
+vi categories.txt
+python tkteach
+```
