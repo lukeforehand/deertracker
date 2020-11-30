@@ -1,0 +1,25 @@
+doe
+spike buck
+4-6 pt buck
+8-12 pt buck
+turkey
+bear
+skunk
+raccoon
+squirrel
+skunk
+bird
+blue jay
+fox
+coyote
+bobcat
+wolf
+owl
+rabbit
+opposum
+cat
+dog
+person
+vehicle
+empty
+
