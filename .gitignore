@@ -1,7 +1,7 @@
-deertracker/.data/
+.data/
 .vscode
 __pycache__
 .DS_Store
 deertracker.err
 test/
-deertracker/models/
+models/
