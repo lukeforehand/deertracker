@@ -31,8 +31,8 @@ def crop_image(image, bbox):
     )
 
 
-def load_bboxes():
-    with open("/home/lukeforehand/Downloads/caltech/caltech_bboxes_20200316.json") as j:
+def load_bboxes(bboxes_json):
+    with open(bboxes_json) as j:
         bboxes = json.load(j)
     categories = {category["id"]: category["name"] for category in bboxes["categories"]}
     images = {image["id"]: image for image in bboxes["images"]}
@@ -47,21 +47,23 @@ def load_bboxes():
     ]
 
 
-def process_annotations():
+def process_annotations(photos, bboxes):
     with database.conn() as db:
         batch = db.insert_batch()
-    annotations = load_bboxes()
+    annotations = load_bboxes(bboxes)
     for annotation in annotations:
         yield process_annotation(
-            batch, annotation["file_path"], annotation["label"], annotation["bbox"]
+            batch,
+            photos,
+            annotation["file_path"],
+            annotation["label"],
+            annotation["bbox"],
         )
 
 
-def process_annotation(batch, file_path, label, bbox):
+def process_annotation(batch, photos, file_path, label, bbox):
     with database.conn() as db:
-        image = cv2.imread(
-            f"/home/lukeforehand/Downloads/caltech/cct_images/{file_path}"
-        )
+        image = cv2.imread(f"{photos}/{file_path}")
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image_hash = hashlib.md5(image.tobytes()).hexdigest()
 

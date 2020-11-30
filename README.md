@@ -53,14 +53,12 @@ Training photos do not require EXIF Datetime.
 ./dt show-prediction --photo ~/Google\ Drive/Trail\ Cam/001.jpg
 ```
 
-## show caltech annotations
-
-```bash
-./dt caltech --show
-```
-
 ## import caltech crops
 
 ```bash
-./dt caltech
+./dt caltech \
+  --photos ~/Downloads/caltech/cct_images \
+  --bboxes ~/Downloads/caltech/caltech_bboxes_20200316.json
 ```
+
+Passing `--show` will plot the bounding boxes and visualize, rather than create crops

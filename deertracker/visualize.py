@@ -10,14 +10,12 @@ from deertracker import caltech
 colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]
 
 
-def show_caltech():
+def show_caltech(photos, bboxes):
 
-    bboxes = caltech.load_bboxes()
+    bboxes = caltech.load_bboxes(bboxes)
 
     for annotation in bboxes:
-        image = cv2.imread(
-            f"/home/lukeforehand/Downloads/caltech/cct_images/{annotation['file_path']}"
-        )
+        image = cv2.imread(f"{photos}/{annotation['file_path']}")
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
         bbox = annotation["bbox"]

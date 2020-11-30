@@ -81,12 +81,14 @@ def show_predictions(photos):
     required=False,
     help="Show caltech annotations",
 )
-def caltech(show):
+@click.option("--photos", required=True, help="Location of caltech images")
+@click.option("--bboxes", required=True, help="Location of bboxes json")
+def caltech(show, photos, bboxes):
     if show:
-        visualize.show_caltech()
+        visualize.show_caltech(photos, bboxes)
     else:
-        bboxes = ct.load_bboxes()
-        annotations = ct.process_annotations()
+        bboxes = ct.load_bboxes(bboxes)
+        annotations = ct.process_annotations(photos, bboxes)
         with click.progressbar(annotations, length=len(bboxes)) as progress:
             for annotation in progress:
                 if "error" in annotation:
