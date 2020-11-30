@@ -59,6 +59,13 @@ Training photos do not require EXIF Datetime.
 ./dt caltech \
   --photos ~/Downloads/caltech/cct_images \
   --bboxes ~/Downloads/caltech/caltech_bboxes_20200316.json
+  [--show] plots the bounding boxes instead of creating crops
 ```
 
-Passing `--show` will plot the bounding boxes and visualize, rather than create crops
+Produces crops into category folders, i.e.:
+
+```bash
+./opossum/ecc990e36531d2c517849d4787e30829.jpg
+./dog/199795365fc783ca6ff3ee88298631a2.jpg
+...
+```

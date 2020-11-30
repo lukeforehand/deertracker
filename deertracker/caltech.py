@@ -35,6 +35,9 @@ def load_bboxes(bboxes_json):
     with open(bboxes_json) as j:
         bboxes = json.load(j)
     categories = {category["id"]: category["name"] for category in bboxes["categories"]}
+    (photo.DEFAULT_PHOTO_STORE / "training").mkdir(exist_ok=True)
+    for category in categories.values():
+        (photo.DEFAULT_PHOTO_STORE / "training" / category).mkdir(exist_ok=True)
     images = {image["id"]: image for image in bboxes["images"]}
     return [
         {
@@ -69,9 +72,8 @@ def process_annotation(batch, photos, file_path, label, bbox):
 
         obj_photo = crop_image(image, bbox)
         obj_label = label
-        obj_conf = 1.0
         obj_hash = hashlib.md5(obj_photo.tobytes()).hexdigest()
-        obj_id = f"{obj_label}_{int(obj_conf*100)}_{obj_hash}"
+        obj_id = f"training/{obj_label}/{obj_hash}"
         obj_path = photo.store(obj_id, obj_photo)
         db.insert_object(
             (
@@ -81,7 +83,7 @@ def process_annotation(batch, photos, file_path, label, bbox):
                 0.0,
                 None,
                 obj_label,
-                obj_conf,
+                1.0,
                 image_hash,
                 "training",
             )
