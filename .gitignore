@@ -7,5 +7,6 @@ test/
 .data
 .mypy_cache
 models/
+training_imgs/
 tkteach/ds/
 tkteach/storage.db
