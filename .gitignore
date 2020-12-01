@@ -5,3 +5,5 @@ __pycache__
 deertracker.err
 test/
 deertracker/models/
+.data
+.mypy_cache
