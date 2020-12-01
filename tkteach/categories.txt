@@ -1,4 +1,5 @@
 (s) spike_buck
+(m) fisher
 (d) dog
 (r) raccoon
 (k) skunk
@@ -9,7 +10,6 @@
 (i) bird
 (b) bobcat
 (f) fox
-(g) cougar
 (y) coyote
 doe
 buck
