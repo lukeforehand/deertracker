@@ -298,25 +298,25 @@ class tkteach:
 
         if key.keysym == "Left":
             self.prevImageButton.config(relief=tk.SUNKEN)
-            self.prevImageButton.update_idletasks()
+            #self.prevImageButton.update_idletasks()
             self.prevImage()
             time.sleep(0.05)
             self.prevImageButton.config(relief=tk.RAISED)
         elif key.keysym == "Right":
             self.nextImageButton.config(relief=tk.SUNKEN)
-            self.nextImageButton.update_idletasks()
+            #self.nextImageButton.update_idletasks()
             self.nextImage()
             time.sleep(0.05)
             self.nextImageButton.config(relief=tk.RAISED)
         elif key.char == "+" or key.char == "=":
             self.zoomInButton.config(relief=tk.SUNKEN)
-            self.zoomInButton.update_idletasks()
+            #self.zoomInButton.update_idletasks()
             self.zoomIn()
             time.sleep(0.05)
             self.zoomInButton.config(relief=tk.RAISED)
         elif key.char == "-":
             self.zoomOutButton.config(relief=tk.SUNKEN)
-            self.zoomOutButton.update_idletasks()
+            #self.zoomOutButton.update_idletasks()
             self.zoomOut()
             time.sleep(0.05)
             self.zoomOutButton.config(relief=tk.RAISED)

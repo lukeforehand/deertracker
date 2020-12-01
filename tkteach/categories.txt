@@ -1,25 +1,36 @@
 doe
-spike buck
-4-6 pt buck
-8-12 pt buck
-turkey
 bear
-skunk
-raccoon
+buck
+turkey
+fawn
+person
 squirrel
+raccoon
 skunk
-bird
-blue jay
-fox
+otter
+badger
+bat
+vehicle
+crow
+vehicle
+cougar
 coyote
-bobcat
-wolf
+opossum
 owl
 rabbit
-opposum
+wolf
+porcupine
+blue_jay
+sandhill_crane
+bird
+bobcat
 cat
+cow
 dog
-person
-vehicle
+fox
+mountain_lion
+pig
+insect
+lizard
+rodent
 empty
-
