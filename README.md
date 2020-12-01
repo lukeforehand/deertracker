@@ -1,8 +1,10 @@
 # Deer Tracker
 
-[Development notes](NOTES.md)
+[Development notes](docs/NOTES.md)
 
-[Prediction Examples](EXAMPLES.md)
+[Prediction Examples](docs/EXAMPLES.md)
+
+[Datasets](docs/DATASETS.md)
 
 ## install env
 
