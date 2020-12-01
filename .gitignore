@@ -4,6 +4,8 @@ __pycache__
 .DS_Store
 deertracker.err
 test/
+.data
+.mypy_cache
 models/
 tkteach/ds/
 tkteach/storage.db

@@ -1,7 +1,7 @@
 import click
 import pathlib
 
-from deertracker import photo, visualize, caltech as ct
+from deertracker import photo, visualize, caltech as ct, classifier
 from deertracker.photo import PhotoProcessor
 
 
@@ -95,6 +95,22 @@ def caltech(show, photos, bboxes):
             for annotation in progress:
                 if "error" in annotation:
                     click.secho(str(annotation), bg="red")
+
+
+@main.command(help="Train classifier")
+@click.option(
+    "--images",
+    required=True,
+    help="Location of training images, should contain a folder per class",
+)
+@click.option(
+    "--min-images",
+    default=1000,
+    required=False,
+    help="Minimum number of images per class",
+)
+def train(images, min_images):
+    classifier.train("", data_dir=images, min_images=min_images)
 
 
 if __name__ == "__main__":
