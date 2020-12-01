@@ -83,4 +83,14 @@ cd tkteach
 # copy crops into ds/<dataset>/
 vi categories.txt
 python tkteach
+
+sqlite> .open storage.db
+sqlite> .mode tabs
+sqlite> .once image_paths.txt
+sqlite> SELECT c.categoryName, i.imagePath FROM categories c JOIN labels l ON c.id = l.category_id join images i ON i.id = l.image_id;
+
+for c in $(cat image_paths.txt| cut -f1 | sort | uniq | cut -d' ' -f2)
+do
+  mkdir $c; grep "$c" image_paths.txt | cut -f2 | xargs -I % mv % ./$c/
+done
 ```

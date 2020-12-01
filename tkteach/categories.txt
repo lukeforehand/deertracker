@@ -1,9 +1,8 @@
-doe
-bear
-buck
-turkey
-fawn
-person
+(d) doe
+(b) buck
+(f) fawn
+(e) bear
+(t) turkey
 squirrel
 raccoon
 skunk
@@ -33,4 +32,5 @@ pig
 insect
 lizard
 rodent
+person
 empty
