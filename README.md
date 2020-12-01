@@ -1,5 +1,7 @@
 # Deer Tracker
 
+Identify and track wildlife using trail cameras and object detection.
+
 [Development notes](docs/NOTES.md)
 
 [Prediction Examples](docs/EXAMPLES.md)
