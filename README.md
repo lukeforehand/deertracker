@@ -73,3 +73,11 @@ Produces crops into category folders, i.e.:
 ./dog/199795365fc783ca6ff3ee88298631a2.jpg
 ...
 ```
+
+## run training
+
+```bash
+./dt train \
+ --images ./training_imgs/ \
+ --min-images 1000
+```

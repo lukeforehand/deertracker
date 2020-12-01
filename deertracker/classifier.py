@@ -42,7 +42,8 @@ class Linnaeus(tf.keras.Model):
         return self.d2(x)
 
 
-def train(name: str, data_dir: Path = DEFAULT_DATA_FOLDER):
+def train(name: str, data_dir: Path = DEFAULT_DATA_FOLDER, min_images: int = 1000):
+    # TODO: use the min_images parameter to prune classes with < min_images
     train_ds = tf.keras.preprocessing.image_dataset_from_directory(
         data_dir,
         validation_split=0.2,
@@ -133,6 +134,3 @@ def train(name: str, data_dir: Path = DEFAULT_DATA_FOLDER):
             f"Test Loss: {test_loss.result():.2f}, "
             f"Test Accuracy: {test_accuracy.result() * 100:.2f}"
         )
-
-
-train("")
