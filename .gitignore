@@ -6,3 +6,4 @@ deertracker.err
 test/
 models/
 tkteach/ds/
+tkteach/storage.db

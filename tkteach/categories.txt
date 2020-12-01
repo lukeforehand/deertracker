@@ -1,32 +1,32 @@
-(d) doe
-(b) buck
-(f) fawn
-(e) bear
-(t) turkey
+(s) spike_buck
+(d) dog
+(r) raccoon
+(k) skunk
+(c) crow
+(p) porcupine
+(j) blue_jay
+(h) sandhill_crane
+(i) bird
+(b) bobcat
+(f) fox
+(g) cougar
+(y) coyote
+doe
+buck
+fawn
+bear
+turkey
 squirrel
-raccoon
-skunk
 otter
 badger
 bat
 vehicle
-crow
-vehicle
-cougar
-coyote
 opossum
 owl
 rabbit
 wolf
-porcupine
-blue_jay
-sandhill_crane
-bird
-bobcat
 cat
 cow
-dog
-fox
 mountain_lion
 pig
 insect
