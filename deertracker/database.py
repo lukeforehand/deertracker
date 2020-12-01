@@ -3,9 +3,7 @@ import sqlite3
 from contextlib import contextmanager
 from datetime import datetime
 
-from deertracker import DEFAULT_DATA_STORE, schema
-
-DEFAULT_DATABASE = DEFAULT_DATA_STORE / "deertracker.db"
+from deertracker import DEFAULT_DATABASE, schema
 
 
 @contextmanager

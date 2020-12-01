@@ -11,12 +11,9 @@ from datetime import datetime
 from PIL import Image, UnidentifiedImageError
 from PIL.ExifTags import TAGS
 
-from deertracker import DEFAULT_DATA_STORE, database, model, logger
+from deertracker import DEFAULT_PHOTO_STORE, database, model, logger
 from deertracker.model import MegaDetector
 
-
-DEFAULT_PHOTO_STORE = pathlib.Path(DEFAULT_DATA_STORE / "photos")
-DEFAULT_PHOTO_STORE.mkdir(exist_ok=True)
 
 EXIF_TAGS = dict(((v, k) for k, v in TAGS.items()))
 
@@ -95,7 +92,7 @@ class PhotoProcessor:
                     obj_conf = float(obj["confidence"])
                     obj_hash = hashlib.md5(obj_photo.tobytes()).hexdigest()
                     obj_id = f"{obj_label}_{int(obj_conf*100)}_{obj_hash}"
-                    obj_path = self.store(obj_id, obj_photo)
+                    obj_path = store(obj_id, obj_photo)
                     db.insert_object(
                         (
                             obj_id,

@@ -6,58 +6,75 @@ Trail cameras will be manually geocoded by user.
 
 User chooses geocoded trail camera when importing trail camera photos.
 
-Modify EXIF photo data with trail camera geocode.
+Each photo EXIF should contain DateTime.
 
-User will have option to review object labels from image after AI predictions.
+Each animal class (someday identity?), geolocation, and time will be tracked and visualized.
 
-Each photo EXIF should contain:
-
-* Geolocation
-* Date time
-* Object detection data (model version, object tags, user tags
-
-Each deer identity, geolocation, and time will be tracked and visualized.
-
-Interpolated paths will be drawn on map linking each deer identity's geocoded data points in time order.
+Interpolated paths will be drawn on map linking each animal class (someday identity?) geocoded data point in time order.
 
 Photo import process:
 
-* Choose photos,
-* Associate batch with saved camera location
-* Tag photo with geolocation.
-* Date Times are based on photo metadata
-* Model runs animal tagging, outputs object images, labels, confidence
+* Choose photos
+* Associate photo batch with saved camera location
+* Photo time is based on photo EXIF DateTime
+* Detection model finds animal crops, labels, and confidence
+* Database stores all this information per detected animal
 
-Feature to retrain model based on user feedback?
+## Training Datasets
 
-# Development Notes
+Caltech camera traps:
+http://lila.science/datasets/caltech-camera-traps
 
-## Image EXIF extraction / modification
-https://pypi.org/project/exif/
-
-## Object detection / Animal Identification
-https://towardsdatascience.com/object-detection-with-less-than-10-lines-of-code-using-python-2d28eebc5b11
-
-required libs
-```
-opencv-python
-cvlib
-matplotlib
-tensorflow
+```bash
+~/Downloads/azcopy_linux_amd64_10.7.0/azcopy cp \
+"https://lilablobssc.blob.core.windows.net/caltech-unzipped/cct_images?st=2020-01-01T00%3A00%3A00Z&se=2034-01-01T00%3A00%3A00Z&sp=rl&sv=2019-07-07&sr=c&sig=uNGA5/QrgqpnU4VeT5tBqhx0GN4Tu8jJ7neUyJqIQss%3D" \
+. --recursive
 ```
 
-Simple object detection codecode
+### Caltech crops
+
+https://drive.google.com/file/d/1w637_EcV637L8TxfWdcm6WmEvmBh480G/view?usp=sharing
+
+65112 total crops
+
+Distribution:
+
+```bash
+  12135 opossum
+   7909 raccoon
+   6506 coyote
+   6429 deer
+   6026 rabbit
+   5049 bobcat
+   4392 cat
+   4027 bird
+   2861 dog
+   2649 squirrel
+   2558 car
+   1843 rodent
+   1199 skunk
+   1100 fox
+    187 empty
+    178 lizard
+     45 mountain_lion
+     29 badger
+      8 insect
+      2 bat
+      1 pig
+      1 cow
 ```
-import cv2
-import matplotlib.pyplot as plt
-import cvlib as cv
-from cvlib.object_detection import draw_bbox
-im = cv2.imread('apple-256261_640.jpg')
-bbox, label, conf = cv.detect_common_objects(im)
-output_image = draw_bbox(im, bbox, label, conf)
-plt.imshow(output_image)
-plt.show()
+
+### Wisconsin whitetail deer data set
+
+```bash
+https://drive.google.com/drive/folders/1jjkIPjz0Mv3ETYhafE4maNvtBfAxgRsW?usp=sharing
+https://drive.google.com/drive/folders/1E1bVtDpXvgYpXbO5jpYDV37TYc9sUp2C?usp=sharing
+https://drive.google.com/drive/folders/1ihIpAar8G2kFvC2jOwJFA9GAUSGwT1Tb?usp=sharing
+https://drive.google.com/drive/folders/0B4BRcQQjVlWyVnctaE84Y3dHcDQ?usp=sharing
+https://drive.google.com/drive/folders/0B4BRcQQjVlWyVXNMeHJ4LTdJV2c?usp=sharing
 ```
+
+## Future
 
 Deep Cut
 

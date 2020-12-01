@@ -1,4 +1,4 @@
-deertracker/.data/
+.data/
 .vscode
 __pycache__
 .DS_Store
@@ -7,3 +7,4 @@ test/
 deertracker/models/
 .data
 .mypy_cache
+models/

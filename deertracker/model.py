@@ -6,9 +6,7 @@ import tensorflow as tf
 from PIL import Image
 from typing import Tuple
 
-DEFAULT_MODEL_PATH = str(
-    pathlib.Path(__file__).parent.absolute() / "models/md_v4.1.0.pb"
-)
+from deertracker import DEFAULT_MODEL_PATH
 
 
 class MegaDetector:
