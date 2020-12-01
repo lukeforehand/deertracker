@@ -4,7 +4,6 @@ __pycache__
 .DS_Store
 deertracker.err
 test/
-deertracker/models/
 .data
 .mypy_cache
 models/
