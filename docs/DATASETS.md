@@ -55,30 +55,30 @@ Distribution:
 
 [Download 5](https://drive.google.com/drive/folders/0B4BRcQQjVlWyVXNMeHJ4LTdJV2c?usp=sharing)
 
-[Download crops](https://drive.google.com/file/d/19qN5PnY8PeqQ2mQ6PFyi41wuu7NgLKhH/view?usp=sharing)
+[Download crops](https://drive.google.com/file/d/15VLKtGejxzUg9iNFoCYj-EX2a7-CjkC0/view?usp=sharing)
 
-3285 total crops
+3280 total crops
 Distribution:
 
 ```bash
-1402 buck
- 822 bear
- 330 doe
- 232 turkey
- 166 person
- 113 yearling_buck
- 110 fawn
-  21 vehicle
-  21 coyote
-  20 porcupine
-  15 crow
-  12 fisher
-  12 dog
-   6 sandhill_crane
-   6 mountain_lion
-   4 raccoon
-   4 blue_jay
-   3 skunk
-   3 bobcat
-   3 bird
+   1401 buck
+    822 bear
+    330 doe
+    232 turkey
+    165 person
+    112 yearling_buck
+    110 fawn
+     21 coyote
+     20 vehicle
+     19 porcupine
+     15 crow
+     12 fisher
+     12 dog
+      6 sandhill_crane
+      6 mountain_lion
+      4 raccoon
+      4 blue_jay
+      3 skunk
+      3 bobcat
+      3 bird
 ```
