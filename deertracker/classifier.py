@@ -1,6 +1,5 @@
 from pathlib import Path
 from typing import Tuple, List
-import time
 import sys
 
 from tqdm import tqdm
@@ -49,6 +48,9 @@ class Linnaeus(tf.keras.Model):
 def get_datasets(
     data_dir: Path = DEFAULT_DATA_FOLDER, min_images: int = 1_000
 ) -> Tuple[tf.data.Dataset, tf.data.Dataset, List[str]]:
+    """
+    Get the training dataset, testing dataset, and a list of class labels.
+    """
     train_ds = tf.keras.preprocessing.image_dataset_from_directory(
         data_dir,
         validation_split=0.2,
@@ -80,6 +82,12 @@ def get_datasets(
     if rare_labels:
         print(f"These labels will be ignored due to lack of data: {rare_labels}")
     label_to_ind = dict(map(lambda x: (x[1], x[0]), enumerate(class_names)))
+    # We're going to go through and remove these rare classes, but in order
+    # to do so we need to massage the labels, which are integer indexes.
+    # E.g. since if remove the label corresponding to index 5, then
+    # all labels > 5 need to be reduced by 1.
+    # BUT IMPORTANTLY this reduction only works if we go from largest index
+    # to smallest index.
     for rare_label in sorted(rare_labels, key=label_to_ind.get, reverse=True):
         ind_to_drop = label_to_ind[rare_label]
         train_ds = train_ds.filter(
@@ -103,7 +111,7 @@ def get_datasets(
         image = tf.image.random_crop(image, [IMAGE_SIZE, IMAGE_SIZE, 3])
         image = tf.image.random_flip_left_right(image)
         image = tf.image.random_hue(image, max_delta=0.2)
-        image = tf.image.random_saturation(image, 0.5, 2)
+        image = tf.image.random_saturation(image, 0.2, 2)
         image = tf.image.random_brightness(image, 0.2)
         image = tf.image.random_contrast(image, 0.5, 2)
         return image, label
@@ -124,6 +132,8 @@ def train(
 ):
     train_ds, test_ds, class_names = get_datasets(data_dir, min_images)
     num_classes = len(class_names)
+
+    # class label -> number of examples of that class
     class_to_num = {c: len(list((data_dir / c).glob("*"))) for c in class_names}
 
     model = Linnaeus(num_classes)
@@ -142,11 +152,11 @@ def train(
 
     test_loss = tf.keras.metrics.Mean(name="test_loss")
     test_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name="test_accuracy")
-    accuracies = []
+    tprs = []
+    fprs = []
     for name in class_names:
-        accuracies.append(
-            tf.keras.metrics.SparseCategoricalAccuracy(name=f"test_{name}_accuracy")
-        )
+        tprs.append(tf.keras.metrics.SparseCategoricalAccuracy(name=f"test_{name}_tpr"))
+        fprs.append(tf.keras.metrics.BinaryAccuracy(name=f"test_{name}_fpr"))
 
     @tf.function
     def train_step(images, labels):
@@ -166,8 +176,13 @@ def train(
 
         test_loss(t_loss)
         test_accuracy(labels, predictions)
-        for i in range(num_classes):  # tf.range(num_classes):
-            accuracies[i](labels, predictions, sample_weight=tf.math.equal(labels, i))
+        for i in range(num_classes):
+            tprs[i](labels, predictions, sample_weight=tf.math.equal(labels, i))
+            fprs[i](
+                ~tf.math.equal(labels, i),
+                tf.math.equal(tf.argmax(predictions, axis=1), i),
+                sample_weight=~tf.math.equal(labels, i),
+            )
 
     EPOCHS = 500
     total_train_samples = None
@@ -180,6 +195,8 @@ def train(
         train_accuracy.reset_states()
         test_loss.reset_states()
         test_accuracy.reset_states()
+        for metric in tprs + fprs:
+            metric.reset_states()
 
         for i, (images, labels) in tqdm(
             enumerate(train_ds), total=total_train_samples, file=sys.stdout, ascii=True
@@ -196,19 +213,23 @@ def train(
             tf.summary.scalar("train_accuracy", train_accuracy.result(), step=epoch)
             tf.summary.scalar("test_loss", test_loss.result(), step=epoch)
             tf.summary.scalar("test_accuracy", test_accuracy.result(), step=epoch)
-            for name, acc in zip(class_names, accuracies):
-                tf.summary.scalar(f"test_{name}_accuracy", acc.result(), step=epoch)
+            for name, tpr in zip(class_names, tprs):
+                tf.summary.scalar(f"test_{name}_tpr", tpr.result(), step=epoch)
+            for name, fpr in zip(class_names, fprs):
+                tf.summary.scalar(f"test_{name}_fpr", fpr.result(), step=epoch)
             tb_writer.flush()
         print(
             f"Epoch {epoch + 1: >4}, "
             f"Loss: {train_loss.result():.2f}, "
-            f"Accuracy: {train_accuracy.result(): >6.2%}, "
+            f"Accuracy: {train_accuracy.result(): >7.2%}, "
             f"Test Loss: {test_loss.result():.2f}, "
-            f"Test Accuracy: {test_accuracy.result(): >6.2%}"
+            f"Test Accuracy: {test_accuracy.result(): >7.2%}"
         )
-        for name, acc in zip(class_names, accuracies):
+        print((" " * max(map(len, class_names))) + f"     TPR     FPR   (prevelance)")
+        for name, tpr, fpr in zip(class_names, tprs, fprs):
             print(
-                f"  {name.rjust(max(map(len, class_names)), ' ')},"
-                f" {acc.result(): >6.2%}"
-                f" (prevelance: {class_to_num[name] / sum(class_to_num.values()): >6.2%})"
+                f"  {name.rjust(max(map(len, class_names)), ' ')}"
+                f" {tpr.result(): >7.2%}"
+                f" {fpr.result(): >7.2%}"
+                f" (   {class_to_num[name] / sum(class_to_num.values()): >7.2%})"
             )
