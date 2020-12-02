@@ -102,6 +102,7 @@ def caltech(show, photos, bboxes):
     "--images",
     required=True,
     help="Location of training images, should contain a folder per class",
+    type=pathlib.Path,
 )
 @click.option(
     "--min-images",
