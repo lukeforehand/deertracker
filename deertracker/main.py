@@ -98,7 +98,7 @@ def caltech(show, photos, bboxes):
 
 
 @main.command(help="Train classifier")
-@click.argument('name')
+@click.argument("name")
 @click.option(
     "--images",
     required=True,

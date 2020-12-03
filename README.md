@@ -76,8 +76,10 @@ Produces crops into category folders, i.e.:
 
 ## run training
 
+`$name` is the name of the model
+
 ```bash
-./dt train \
+./dt train $name\
  --images ./training_imgs/ \
  --min-images 1000
 ```
