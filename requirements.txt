@@ -7,5 +7,5 @@ opencv-python
 pathlib
 pillow
 tensorflow
-tqmd
+tqdm
 tensorboard
