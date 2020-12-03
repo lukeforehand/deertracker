@@ -5,6 +5,7 @@ __pycache__
 deertracker.err
 test/
 .data
+.tensorboard
 .mypy_cache
 models/
 training_imgs/
