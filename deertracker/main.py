@@ -98,10 +98,12 @@ def caltech(show, photos, bboxes):
 
 
 @main.command(help="Train classifier")
+@click.argument("name")
 @click.option(
     "--images",
     required=True,
     help="Location of training images, should contain a folder per class",
+    type=pathlib.Path,
 )
 @click.option(
     "--min-images",
@@ -109,8 +111,8 @@ def caltech(show, photos, bboxes):
     required=False,
     help="Minimum number of images per class",
 )
-def train(images, min_images):
-    classifier.train("", data_dir=images, min_images=min_images)
+def train(name, images, min_images):
+    classifier.train(name, data_dir=images, min_images=min_images)
 
 
 if __name__ == "__main__":
