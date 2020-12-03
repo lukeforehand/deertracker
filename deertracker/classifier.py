@@ -10,6 +10,7 @@ from tensorflow.keras import layers
 IMAGE_SIZE = 96
 DEFAULT_DATA_FOLDER = Path(__file__).parents[1] / ".data/imgs"
 DEFAULT_LOGS_FOLDER = Path(__file__).parents[1] / ".tensorboard"
+DEFAULT_MODEL_FOLDER = Path(__file__).parents[1] / "models"
 _AUTOTUNE = tf.data.experimental.AUTOTUNE
 
 
@@ -43,6 +44,10 @@ class Linnaeus(tf.keras.Model):
         x = self.dropout(x)
         x = self.d1(x)
         return self.d2(x)
+
+
+def load_model(model_path):
+    return tf.keras.models.load_model(model_path)
 
 
 def get_datasets(
@@ -125,11 +130,17 @@ def get_datasets(
 
 
 def train(
-    name: str,
+    model_name: str,
     data_dir: Path = DEFAULT_DATA_FOLDER,
     tb_logs: Path = DEFAULT_LOGS_FOLDER,
+    model_dir: Path = DEFAULT_MODEL_FOLDER,
     min_images: int = 1_000,
 ):
+    model_dir = model_dir / model_name
+    if model_dir.exists():
+        raise ValueError(
+            f"{model_dir} already exists, refusing to overwrite saved models."
+        )
     train_ds, test_ds, class_names = get_datasets(data_dir, min_images)
     num_classes = len(class_names)
 
@@ -140,7 +151,7 @@ def train(
     model.build((32, IMAGE_SIZE, IMAGE_SIZE, 3))
     model.summary()
 
-    tb_logs = tb_logs / name
+    tb_logs = tb_logs / model_name
     tb_logs.mkdir(exist_ok=True, parents=True)
     tb_writer = tf.summary.create_file_writer(str(tb_logs))
 
@@ -186,6 +197,7 @@ def train(
 
     EPOCHS = 500
     total_train_samples = None
+    best_test_loss = float("inf")
 
     for epoch in range(EPOCHS):
         if epoch == 0:
@@ -233,3 +245,12 @@ def train(
                 f" {fpr.result(): >7.2%}"
                 f" (   {class_to_num[name] / sum(class_to_num.values()): >7.2%})"
             )
+        if test_loss.result() < best_test_loss:
+            best_test_loss = test_loss.result()
+            epoch_model_dir = (model_dir / f'{model_name}-{epoch:0>4d}')
+            epoch_model_dir.mkdir(parents=True)
+            model_with_prob_outputs = tf.keras.Sequential(
+                [model, layers.Softmax()], name=model_name
+            )
+            model_with_prob_outputs.build((None, IMAGE_SIZE, IMAGE_SIZE, 3))
+            model_with_prob_outputs.save(epoch_model_dir)
