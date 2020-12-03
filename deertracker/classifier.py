@@ -47,7 +47,29 @@ class Linnaeus(tf.keras.Model):
 
 
 def load_model(model_path):
-    return tf.keras.models.load_model(model_path)
+    """
+    Return the model and the list of class names.
+
+    This relies on a file model_path / 'class_names.txt' that
+    is not standard to the tensorflow SavedModel format.
+
+    Inputs
+    ------
+    model_path : Path, str
+        Path to the folder where the model is saved.
+
+    Returns
+    -------
+    model
+        Tensorflow model
+    class_names
+        List of strings of the class names. Should satisfy
+        `len(class_names) == model.output_shape[1]`
+    """
+    model = tf.keras.models.load_model(model_path)
+    with open(Path(model_path) / "class_names.txt") as f:
+        class_names = f.read().split("\n")
+    return model, class_names
 
 
 def get_datasets(
@@ -254,3 +276,5 @@ def train(
             )
             model_with_prob_outputs.build((None, IMAGE_SIZE, IMAGE_SIZE, 3))
             model_with_prob_outputs.save(epoch_model_dir)
+            with open(epoch_model_dir / "class_names.txt", "w") as f:
+                f.write("\n".join(class_names))
