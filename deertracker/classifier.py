@@ -8,7 +8,7 @@ from tensorflow.keras import layers
 
 
 IMAGE_SIZE = 96
-DEFAULT_DATA_FOLDER = Path(__file__).parents[1] / ".data/imgs"
+DEFAULT_DATA_FOLDER = Path(__file__).parents[1] / "training_imgs"
 DEFAULT_LOGS_FOLDER = Path(__file__).parents[1] / ".tensorboard"
 DEFAULT_MODEL_FOLDER = Path(__file__).parents[1] / "models"
 _AUTOTUNE = tf.data.experimental.AUTOTUNE
@@ -247,7 +247,7 @@ def train(
             )
         if test_loss.result() < best_test_loss:
             best_test_loss = test_loss.result()
-            epoch_model_dir = (model_dir / f'{model_name}-{epoch:0>4d}')
+            epoch_model_dir = model_dir / f"{model_name}-{epoch:0>4d}"
             epoch_model_dir.mkdir(parents=True)
             model_with_prob_outputs = tf.keras.Sequential(
                 [model, layers.Softmax()], name=model_name
