@@ -10,6 +10,14 @@ vi categories.txt
 python tkteach
 ```
 
+### use similarity hashing to sort photo files by similarity
+
+This makes labeling quicker as similar images are grouped
+
+```
+python sort.py phash ds/deer/
+```
+
 ### sort into labeled folders
 
 ```bash
