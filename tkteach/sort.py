@@ -3,6 +3,7 @@ import pathlib
 import shutil
 import imagehash
 
+
 def sim_hash_sort(userpaths, hashfunc):
     def is_image(filename):
         f = filename.lower()
@@ -15,6 +16,7 @@ def sim_hash_sort(userpaths, hashfunc):
             or ".jpg" in f
             or f.endswith(".svg")
         )
+
     image_filenames = []
     for userpath in userpaths:
         image_filenames += [
@@ -29,7 +31,13 @@ def sim_hash_sort(userpaths, hashfunc):
             print("Problem:", e, "with", img)
             continue
         src = pathlib.Path(img)
-        shutil.move(src, src.parent / f"{hash}-{src.name}")
+        if src.name.rfind("-") >= 0:
+            dest = src.name[src.name.rfind("-") + 1 :]
+        else:
+            dest = src.name
+        dest = src.parent / f"{hash}-{dest}"
+        shutil.move(src, dest)
+
 
 if __name__ == "__main__":
     import sys, os

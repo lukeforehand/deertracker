@@ -15,7 +15,7 @@ python tkteach
 This makes labeling quicker as similar images are grouped
 
 ```
-python sort.py phash ds/deer/
+python sort.py dhash ds/deer/
 ```
 
 ### sort into labeled folders
