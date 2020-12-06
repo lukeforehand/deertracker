@@ -26,7 +26,7 @@ def sim_hash_sort(userpaths, hashfunc):
         ]
     for img in sorted(image_filenames):
         try:
-            hash = hashfunc(Image.open(img))
+            hash = hashfunc(Image.open(img), 4)
         except Exception as e:
             print("Problem:", e, "with", img)
             continue
