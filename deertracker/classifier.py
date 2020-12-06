@@ -25,8 +25,8 @@ class Linnaeus(tf.keras.Model):
 
     def __init__(self, num_classes):
         super().__init__()
-        self.preprocess_input = tf.keras.applications.mobilenet_v2.preprocess_input
-        self.base_model = tf.keras.applications.MobileNetV2(
+        self.preprocess_input = tf.keras.applications.densenet.preprocess_input
+        self.base_model = tf.keras.applications.DenseNet201(
             input_shape=[IMAGE_SIZE, IMAGE_SIZE, 3],
             include_top=False,
             weights="imagenet",
