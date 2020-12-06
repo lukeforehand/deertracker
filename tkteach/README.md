@@ -15,16 +15,14 @@ python tkteach
 This makes labeling quicker as similar images are grouped
 
 ```
-python sort.py dhash ds/deer/
+python sim_sort.py dhash ds/deer/
 ```
 
 ### sort into labeled folders
 
+Extract labels and paths from database and sort into label folders
+
 ```bash
-cat extract.sql | sqlite3 storage.db
-for c in $(cat image_paths.txt| cut -f1 | sort | uniq | cut -d' ' -f2)
-do
-  mkdir -p ds/$c; grep "$c" image_paths.txt | cut -f2 | xargs -I % mv % ./ds/$c/
-done
+./file_sort.sh
 ```
 
