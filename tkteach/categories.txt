@@ -1,7 +1,10 @@
-(s) yearling_buck
+(y) yearling_buck
+(f) fawn
 (b) buck
+(d) doe
+(e) empty
 (m) fisher
-(d) dog
+(g) dog
 (r) raccoon
 (k) skunk
 (c) crow
@@ -10,10 +13,8 @@
 (h) sandhill_crane
 (i) bird
 (t) bobcat
-(f) fox
-(y) coyote
-doe
-fawn
+(x) fox
+coyote
 bear
 turkey
 squirrel
@@ -33,4 +34,3 @@ insect
 lizard
 rodent
 person
-empty
