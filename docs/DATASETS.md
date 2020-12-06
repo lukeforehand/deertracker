@@ -55,19 +55,19 @@ Distribution:
 
 [Download 5](https://drive.google.com/drive/folders/0B4BRcQQjVlWyVXNMeHJ4LTdJV2c?usp=sharing)
 
-[Download crops](https://drive.google.com/file/d/15VLKtGejxzUg9iNFoCYj-EX2a7-CjkC0/view?usp=sharing)
+[Download crops](https://drive.google.com/file/d/1gp5rq7qPyX1QHu1wYzAzq954U-8oWFwK/view?usp=sharing)
 
-3280 total crops
+4692 total crops
 Distribution:
 
 ```bash
-   1401 buck
+   1727 buck
+   1411 doe
     822 bear
-    330 doe
     232 turkey
     165 person
+    115 fawn
     112 yearling_buck
-    110 fawn
      21 coyote
      20 vehicle
      19 porcupine
