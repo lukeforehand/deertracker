@@ -1,9 +1,9 @@
 
-## Training Datasets
+# Training Datasets
 
 [View Species classes](../tkteach/categories.txt)
 
-### Caltech camera traps
+## Caltech camera traps
 
 [Reference](http://lila.science/datasets/caltech-camera-traps)
 
@@ -43,7 +43,7 @@ Distribution:
       1 cow
 ```
 
-### Wisconsin whitetail data set
+## Wisconsin whitetail data set
 
 [Download 1](https://drive.google.com/drive/folders/1jjkIPjz0Mv3ETYhafE4maNvtBfAxgRsW?usp=sharing)
 

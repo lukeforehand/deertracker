@@ -8,7 +8,7 @@ Identify and track wildlife using trail cameras and object detection.
 
 [Datasets](docs/DATASETS.md)
 
-## install env
+## Install env
 
 ```bash
 sudo apt-get install -y tk-dev
@@ -18,7 +18,7 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-## add camera
+## Add camera
 
 ```bash
 ./dt add-camera \
@@ -36,7 +36,7 @@ Go here to find the lat/lon for your trail cam:
 
 [Find lat/lon](https://www.latlong.net/)
 
-## run import
+## Run import
 
 ```bash
 ./dt import-photos \
@@ -51,13 +51,13 @@ Go here to find the lat/lon for your trail cam:
 Passing `--training` will flag photos as training data and disable the `--camera` option.
 Training photos do not require EXIF Datetime.
 
-## show prediction
+## Show prediction
 
 ```bash
 ./dt show-prediction --photo ~/Google\ Drive/Trail\ Cam/001.jpg
 ```
 
-## import caltech crops
+## Import caltech crops
 
 ```bash
 ./dt caltech \
@@ -66,15 +66,23 @@ Training photos do not require EXIF Datetime.
   [--show] plots the bounding boxes instead of creating crops
 ```
 
-Produces crops into category folders, i.e.:
+* Output is to `.data/photos/training/`
+
+## Sort caltech labeled photos
+
+Sort caltech photos into label folders, these uncropped images can be selectively
+imported back into the databsae as crops using th `import-photos --training` command.
 
 ```bash
-./opossum/ecc990e36531d2c517849d4787e30829.jpg
-./dog/199795365fc783ca6ff3ee88298631a2.jpg
-...
+./dt caltech \
+  --photos ~/Downloads/caltech/cct_images \
+  --bboxes ~/Downloads/caltech/caltech_bboxes_20200316.json
+  --labels ~/Downloads/caltech/caltech_images_20200316.json
 ```
 
-## run training
+* Output is to `.data/photos/uncropped/`
+
+## Run training
 
 `$name` is the name of the model
 

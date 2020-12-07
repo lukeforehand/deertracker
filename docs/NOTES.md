@@ -27,6 +27,7 @@ Deep Cut
 https://pypi.org/project/deeplabcut/
 
 ## Geotracking / Geocoding trail cameras
+
 https://towardsdatascience.com/a-complete-guide-to-an-interactive-geographical-map-using-python-f4c5197e23e0
 
 Simple shapefile rendering
@@ -39,7 +40,7 @@ Other shapefiles
 
 https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html
 
-```
+```bash
 import geopandas as gpd
 shapefile = 'data/countries_110m/ne_110m_admin_0_countries.shp'
 #Read shapefile using Geopandas

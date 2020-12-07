@@ -4,6 +4,7 @@ import itertools
 import json
 import numpy as np
 import pathlib
+import shutil
 import string
 
 from datetime import datetime
@@ -31,6 +32,41 @@ def crop_image(image, bbox):
     )
 
 
+def load_labels(bboxes_json, labels_json):
+    with open(bboxes_json) as j:
+        bboxes = json.load(j)
+        bbox_image_ids = {
+            annotation["image_id"] for annotation in bboxes["annotations"]
+        }
+
+    with open(labels_json) as j:
+        labels = json.load(j)
+    categories = {category["id"]: category["name"] for category in labels["categories"]}
+    (photo.DEFAULT_PHOTO_STORE / "uncropped").mkdir(exist_ok=True)
+    for category in categories.values():
+        (photo.DEFAULT_PHOTO_STORE / "uncropped" / category).mkdir(exist_ok=True)
+    images = {image["id"]: image for image in labels["images"]}
+    return [
+        {
+            "file_path": images[label["image_id"]]["file_name"],
+            "label": categories[label["category_id"]],
+        }
+        for label in labels["annotations"]
+        if label["image_id"] not in bbox_image_ids
+    ]
+
+
+def process_labels(photos, labels):
+    for label in labels:
+        yield shutil.copy(
+            pathlib.Path(photos) / pathlib.Path(label["file_path"]).name,
+            photo.DEFAULT_PHOTO_STORE
+            / "uncropped"
+            / label["label"]
+            / pathlib.Path(label["file_path"]).name,
+        )
+
+
 def load_bboxes(bboxes_json):
     with open(bboxes_json) as j:
         bboxes = json.load(j)
@@ -50,10 +86,9 @@ def load_bboxes(bboxes_json):
     ]
 
 
-def process_annotations(photos, bboxes):
+def process_annotations(photos, annotations):
     with database.conn() as db:
         batch = db.insert_batch()
-    annotations = load_bboxes(bboxes)
     for annotation in annotations:
         yield process_annotation(
             batch,

@@ -73,7 +73,13 @@ def show_predictions(photos):
             pass
 
 
-@main.command(help="Process Caltech")
+@main.command(
+    help="""
+    Process Caltech bounding boxes or labels.
+    If bboxes, will store crops in the database.
+    If labels, will categorize the images into labeled folders.
+"""
+)
 @click.option(
     "--show",
     default=False,
@@ -82,13 +88,23 @@ def show_predictions(photos):
     help="Show caltech annotations",
 )
 @click.option("--photos", required=True, help="Location of caltech images")
-@click.option("--bboxes", required=True, help="Location of bboxes json")
-def caltech(show, photos, bboxes):
-    if show:
+@click.option("--bboxes", required=True, default=None, help="Location of bboxes json")
+@click.option(
+    "--labels", required=False, default=None, help="Location of image labels json"
+)
+def caltech(show, photos, bboxes, labels):
+    if bboxes and show:
         visualize.show_caltech(photos, bboxes)
+    elif labels:
+        labels = ct.load_labels(bboxes, labels)
+        processed_labels = ct.process_labels(photos, labels)
+        with click.progressbar(processed_labels, length=len(labels)) as progress:
+            for annotation in progress:
+                if "error" in annotation:
+                    click.secho(str(annotation), bg="red")
     else:
         annotations = ct.load_bboxes(bboxes)
-        processed_annotations = ct.process_annotations(photos, bboxes)
+        processed_annotations = ct.process_annotations(photos, annotations)
         with click.progressbar(
             processed_annotations, length=len(annotations)
         ) as progress:
