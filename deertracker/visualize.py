@@ -3,7 +3,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import multiprocessing
 
-from deertracker.model import MegaDetector
+from deertracker.detector import MegaDetector
 
 from deertracker import caltech
 

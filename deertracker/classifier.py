@@ -1,11 +1,12 @@
-from pathlib import Path
-from typing import Tuple, List
 import sys
-
-from tqdm import tqdm
 import tensorflow as tf
-from tensorflow.keras import layers
 
+from pathlib import Path
+from tensorflow.keras import layers
+from tqdm import tqdm
+from typing import Tuple, List
+
+from deertracker import DEFAULT_CLASSIFIER_PATH
 
 IMAGE_SIZE = 96
 DEFAULT_DATA_FOLDER = Path(__file__).parents[1] / "training_imgs"
@@ -46,7 +47,7 @@ class Linnaeus(tf.keras.Model):
         return self.d2(x)
 
 
-def load_model(model_path):
+def load_model(model_path=DEFAULT_CLASSIFIER_PATH):
     """
     Return the model and the list of class names.
 
