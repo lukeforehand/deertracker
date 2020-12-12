@@ -69,7 +69,7 @@ def show_predictions(photos):
     file_paths = find_files(photos)
     predictions = visualize.show_predictions(file_paths)
     with click.progressbar(predictions, length=len(file_paths)) as progress:
-        for prediction in progress:
+        for _ in progress:
             pass
 
 
@@ -127,8 +127,14 @@ def caltech(show, photos, bboxes, labels):
     required=False,
     help="Minimum number of images per class",
 )
-def train(name, images, min_images):
-    classifier.train(name, data_dir=images, min_images=min_images)
+@click.option(
+    "--epochs",
+    default=500,
+    required=False,
+    help="Number of training epochs",
+)
+def train(name, images, min_images, epochs):
+    classifier.train(name, data_dir=images, min_images=min_images, epochs=epochs)
 
 
 if __name__ == "__main__":

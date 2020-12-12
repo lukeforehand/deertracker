@@ -158,6 +158,7 @@ def train(
     tb_logs: Path = DEFAULT_LOGS_FOLDER,
     model_dir: Path = DEFAULT_MODEL_FOLDER,
     min_images: int = 1_000,
+    epochs: int = 500,
 ):
     model_dir = model_dir / model_name
     if model_dir.exists():
@@ -218,11 +219,10 @@ def train(
                 sample_weight=~tf.math.equal(labels, i),
             )
 
-    EPOCHS = 500
     total_train_samples = None
     best_test_loss = float("inf")
 
-    for epoch in range(EPOCHS):
+    for epoch in range(epochs):
         if epoch == 0:
             model.base_model.trainable = True
         # Reset the metrics at the start of the next epoch
