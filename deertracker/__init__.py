@@ -10,5 +10,4 @@ DEFAULT_DATABASE = DEFAULT_DATA_STORE / "deertracker.db"
 
 DEFAULT_DETECTOR_PATH = "models/md_v4.1.0.pb"
 
-# FIXME:
-DEFAULT_CLASSIFIER_PATH = "models/#FIXME"
+DEFAULT_CLASSIFIER_PATH = "models/deertracker-0482"

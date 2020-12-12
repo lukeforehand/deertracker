@@ -1,12 +1,17 @@
 import cv2
 import numpy as np
+import tensorflow as tf
 
 from PIL import Image
 
+from deertracker.classifier import IMAGE_SIZE
+
 
 def model(detector, classifier, photo):
+    classifier_labels = classifier[1]
+    classifier = classifier[0]
     image = np.array(photo)
-    bbox, _class, score = detector.predict(image)
+    bbox, _class, scores = detector.predict(image)
     results = []
     for i, _ in enumerate(bbox):
 
@@ -21,18 +26,22 @@ def model(detector, classifier, photo):
         ]
 
         label = detector.labels[_class[i]]
+        score = scores[i]
+
         if label == "animal":
-            # TODO: verify
-            prediction = classifier(crop[np.newaxis, :, :]).numpy()[0]
-            # FIXME: remove print
-            print(prediction)
-            # TODO: pull label and confidence from prediction
+            resized_crop = tf.keras.preprocessing.image.smart_resize(
+                crop, (IMAGE_SIZE, IMAGE_SIZE)
+            )
+            predictions = classifier(tf.expand_dims(resized_crop, 0)).numpy()[0]
+            high_score = np.argmax(predictions)
+            score = predictions[high_score]
+            label = classifier_labels[high_score]
 
         results.append(
             {
                 "image": Image.fromarray(crop),
                 "label": label,
-                "confidence": score[i],
+                "confidence": score,
             }
         )
     return results
