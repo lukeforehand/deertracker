@@ -91,3 +91,27 @@ imported back into the databsae as crops using th `import-photos --training` com
  --images ./training_imgs/ \
  --min-images 1000
 ```
+
+Training can be done in a python notebook like colab.research.google.com with a small amount of code:
+
+```notebook
+! git clone https://github.com/lukeforehand/deertracker
+% cd /content/deertracker/
+! git pull
+! git checkout main
+% pip install --quiet -r requirements.txt
+
+#%load_ext tensorboard
+#%tensorboard --logdir .tensorboard/deertracker
+
+import tarfile
+import shutil
+import pathlib
+from google.colab import drive
+drive.mount("/content/drive", force_remount=True)
+shutil.rmtree(pathlib.Path("training_imgs"), ignore_errors=True)
+with tarfile.open("../drive/My Drive/whitetail_crops.tar.gz", "r") as tar:
+    tar.extractall()
+
+! python -m deertracker.main train deertracker --images "training_imgs" --min-images 1000 --epochs 500
+```
