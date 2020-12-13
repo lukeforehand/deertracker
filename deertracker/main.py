@@ -132,6 +132,12 @@ def caltech(show, photos, bboxes, labels):
     type=pathlib.Path,
 )
 @click.option(
+    "--model-dir",
+    default=classifier.DEFAULT_MODEL_FOLDER,
+    required=False,
+    help="Directory to store model snapshots",
+)
+@click.option(
     "--min-images",
     default=1000,
     required=False,
@@ -143,8 +149,10 @@ def caltech(show, photos, bboxes, labels):
     required=False,
     help="Number of training epochs",
 )
-def train(name, images, min_images, epochs):
-    classifier.train(name, data_dir=images, min_images=min_images, epochs=epochs)
+def train(name, images, model_dir, min_images, epochs):
+    classifier.train(
+        name, data_dir=images, model_dir=model_dir, min_images=min_images, epochs=epochs
+    )
 
 
 if __name__ == "__main__":

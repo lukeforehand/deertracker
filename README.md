@@ -84,14 +84,15 @@ imported back into the databsae as crops using th `import-photos --training` com
 
 ## Run training
 
-`$name` is the name of the model
-
 ```bash
 ./dt train $name\
  --images ./training_imgs/ \
+ --model-dir ./models/ \
  --min-images 1000 \
  --epochs 500
 ```
+
+`$name` is the name of the model, the rest of the flags are optional
 
 Training can be done in a python notebook like colab.research.google.com with a small amount of code:
 
