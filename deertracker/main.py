@@ -151,7 +151,11 @@ def caltech(show, photos, bboxes, labels):
 )
 def train(name, images, model_dir, min_images, epochs):
     classifier.train(
-        name, data_dir=images, model_dir=model_dir, min_images=min_images, epochs=epochs
+        name,
+        data_dir=images,
+        model_dir=pathlib.Path(model_dir),
+        min_images=min_images,
+        epochs=epochs,
     )
 
 
