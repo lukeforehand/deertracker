@@ -110,8 +110,8 @@ import pathlib
 from google.colab import drive
 drive.mount("/content/drive", force_remount=True)
 shutil.rmtree(pathlib.Path("training_imgs"), ignore_errors=True)
-with tarfile.open("../drive/My Drive/whitetail_crops.tar.gz", "r") as tar:
+with tarfile.open("../drive/My Drive/deertracker_crops.tar.gz", "r") as tar:
     tar.extractall()
 
-! python -m deertracker.main train deertracker --images "training_imgs" --min-images 1000 --epochs 500
+! python -m deertracker.main train dt --images "training_imgs" --min-images 1000 --epochs 500
 ```

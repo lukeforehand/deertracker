@@ -13,36 +13,6 @@
 . --recursive
 ```
 
-[Download crops](https://drive.google.com/file/d/1w637_EcV637L8TxfWdcm6WmEvmBh480G/view?usp=sharing)
-
-65112 total crops
-Distribution:
-
-```bash
-  12135 opossum
-   7909 raccoon
-   6506 coyote
-   6429 deer
-   6026 rabbit
-   5049 bobcat
-   4392 cat
-   4027 bird
-   2861 dog
-   2649 squirrel
-   2558 car
-   1843 rodent
-   1199 skunk
-   1100 fox
-    187 empty
-    178 lizard
-     45 mountain_lion
-     29 badger
-      8 insect
-      2 bat
-      1 pig
-      1 cow
-```
-
 ## Wisconsin whitetail data set
 
 [Download 1](https://drive.google.com/drive/folders/1jjkIPjz0Mv3ETYhafE4maNvtBfAxgRsW?usp=sharing)
@@ -55,30 +25,43 @@ Distribution:
 
 [Download 5](https://drive.google.com/drive/folders/0B4BRcQQjVlWyVXNMeHJ4LTdJV2c?usp=sharing)
 
-[Download crops](https://drive.google.com/file/d/1X9fzfCIAkSo3-_7WN5-cQLG7V5tl_FJa/view?usp=sharing)
+## Deer tracker crops
 
-9764 total crops
+This is a merging of crops from caltech and whitetail datasets
+
+* Caltech bounding boxes were used for crops when available
+* Mega Detector was used on caltech images with no bounding box, and manually curated
+* Mega Detector was used on whitetail images and manually curated
+* Deer crops from both datasets were manually separated into `buck, doe, yearling, fawn`
+
+[Download crops](https://drive.google.com/file/d/1HyeHr4ugxi0DhKkSQQxOFLC56SbzKjUh/view?usp=sharing)
+
+66,327 total crops
 Distribution:
 
 ```bash
-   3018 doe
-   2431 bobcat
-   2134 buck
+  12135 opossum
+  10933 raccoon
+   7600 coyote
+   7479 bobcat
+   6026 rabbit
+   5308 doe
+   4029 bird
+   2872 dog
+   2763 buck
+   2649 squirrel
+   1730 skunk
+   1100 fox
     822 bear
-    532 skunk
     232 turkey
+    186 fawn
     165 person
-    123 fawn
+    134 mountain_lion
     112 yearling_buck
-     90 mountain_lion
-     28 coyote
      20 vehicle
      19 porcupine
      15 crow
      12 fisher
-     12 dog
       6 sandhill_crane
-      6 raccoon
       4 blue_jay
-      3 bird
 ```
