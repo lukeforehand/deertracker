@@ -94,26 +94,31 @@ imported back into the databsae as crops using th `import-photos --training` com
 
 `$name` is the name of the model, the rest of the flags are optional
 
-Training can be done in a python notebook like colab.research.google.com with a small amount of code:
+### Training can be done in a python notebook like colab.research.google.com with a small amount of code
 
 ```notebook
+
+# pull down the training code
 ! git clone https://github.com/lukeforehand/deertracker
 % cd /content/deertracker/
 ! git pull
 ! git checkout main
+
+# install requirements
 % pip install --quiet -r requirements.txt
 
-#%load_ext tensorboard
-#%tensorboard --logdir .tensorboard/deertracker
-
-import tarfile
-import shutil
-import pathlib
+# mount google drive to load training data and save model output
 from google.colab import drive
 drive.mount("/content/drive", force_remount=True)
-shutil.rmtree(pathlib.Path("training_imgs"), ignore_errors=True)
-with tarfile.open("../drive/My Drive/deertracker_crops.tar.gz", "r") as tar:
-    tar.extractall()
 
-! python -m deertracker.main train dt --images "training_imgs" --min-images 1000 --epochs 500
+# untar the training dataset from google drive
+! tar xfz --keep-old-files ../drive/MyDrive/deertracker_crops.tar.gz
+
+# train, saving the model checkpoints to google drive incase google colab disconnects.
+! python -m deertracker.main train dt \
+  --images "training_imgs" \
+  --model-dir ../drive/MyDrive/deertracker \
+  --min-images 200 \
+  --epochs 1000
+
 ```
