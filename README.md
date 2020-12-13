@@ -89,7 +89,8 @@ imported back into the databsae as crops using th `import-photos --training` com
 ```bash
 ./dt train $name\
  --images ./training_imgs/ \
- --min-images 1000
+ --min-images 1000 \
+ --epochs 500
 ```
 
 Training can be done in a python notebook like colab.research.google.com with a small amount of code:

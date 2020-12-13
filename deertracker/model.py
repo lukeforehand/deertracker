@@ -4,12 +4,8 @@ import tensorflow as tf
 
 from PIL import Image
 
-from deertracker.classifier import IMAGE_SIZE
-
 
 def model(detector, classifier, photo):
-    classifier_labels = classifier[1]
-    classifier = classifier[0]
     image = np.array(photo)
     bbox, _class, scores = detector.predict(image)
     results = []
@@ -29,13 +25,10 @@ def model(detector, classifier, photo):
         score = scores[i]
 
         if label == "animal":
-            resized_crop = tf.keras.preprocessing.image.smart_resize(
-                crop, (IMAGE_SIZE, IMAGE_SIZE)
-            )
-            predictions = classifier(tf.expand_dims(resized_crop, 0)).numpy()[0]
+            predictions = classifier.predict(crop)
             high_score = np.argmax(predictions)
             score = predictions[high_score]
-            label = classifier_labels[high_score]
+            label = classifier.classes[high_score]
 
         results.append(
             {

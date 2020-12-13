@@ -30,8 +30,8 @@
 This is a merging of crops from caltech and whitetail datasets
 
 * Caltech bounding boxes were used for crops when available
-* Mega Detector was used on caltech images with no bounding box, and manually curated
-* Mega Detector was used on whitetail images and manually curated
+* Mega Detector was used on Caltech images with no bounding box, and manually curated
+* Mega Detector was used on whitetail dataset and manually curated
 * Deer crops from both datasets were manually separated into `buck, doe, yearling, fawn`
 
 [Download crops](https://drive.google.com/file/d/1HyeHr4ugxi0DhKkSQQxOFLC56SbzKjUh/view?usp=sharing)

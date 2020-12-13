@@ -47,6 +47,13 @@ class Linnaeus(tf.keras.Model):
         return self.d2(x)
 
 
+def predict(classifier, crop):
+    resized_crop = tf.keras.preprocessing.image.smart_resize(
+        crop, (IMAGE_SIZE, IMAGE_SIZE)
+    )
+    return classifier(tf.expand_dims(resized_crop, 0)).numpy()[0]
+
+
 def load_model(model_path=DEFAULT_CLASSIFIER_PATH):
     """
     Return the model and the list of class names.
@@ -70,7 +77,9 @@ def load_model(model_path=DEFAULT_CLASSIFIER_PATH):
     model = tf.keras.models.load_model(model_path)
     with open(Path(model_path) / "class_names.txt") as f:
         class_names = f.read().split("\n")
-    return model, class_names
+    model.classes = class_names
+    model.predict = lambda x: predict(model, x)
+    return model
 
 
 def get_datasets(

@@ -73,6 +73,16 @@ def show_predictions(photos):
             pass
 
 
+@main.command(help="Show classifications for photo crops")
+@click.option("--photos", required=True, help="Location of photo crops to process")
+def show_classes(photos):
+    file_paths = find_files(photos)
+    classes = visualize.show_classes(file_paths)
+    with click.progressbar(classes, length=len(file_paths)) as progress:
+        for _ in progress:
+            pass
+
+
 @main.command(
     help="""
     Process Caltech bounding boxes or labels.

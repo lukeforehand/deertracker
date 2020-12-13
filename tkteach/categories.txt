@@ -5,8 +5,7 @@
 (e) empty
 (r) raccoon
 (s) skunk
-(o) bobcat
-(c) coyote
+(o) coyote
 (t) turkey
 (m) mountain_lion
 squirrel
