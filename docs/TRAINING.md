@@ -61,14 +61,13 @@ deertracker ena24 \
 ## Run training
 
 ```bash
-deertracker train $name\
+deertracker train \
+ --name $model_name \
  --images ./training_imgs/ \
  --model-dir ./models/ \
  --min-images 1000 \
  --epochs 500
 ```
-
-`$name` is the name of the model, the rest of the flags are optional
 
 ### Training can be done in a python notebook like colab.research.google.com with a small amount of code
 

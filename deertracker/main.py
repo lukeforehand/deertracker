@@ -159,7 +159,7 @@ def ena24(photos, bboxes):
 
 
 @main.command(help="Train classifier")
-@click.argument("name")
+@click.option("--name", required=True, help="Model identifier")
 @click.option(
     "--images",
     required=True,
