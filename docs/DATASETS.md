@@ -5,34 +5,34 @@ This is a merging of crops from verious datasets, referenced below.
 * Bounding boxes were used for crops when provided with dataset.
 * Mega Detector was used on images with no bounding box, and manually curated.
 
-[Download crops](https://drive.google.com/file/d/1HyeHr4ugxi0DhKkSQQxOFLC56SbzKjUh/view?usp=sharing)
+[Download crops]()
 
-66,144 total crops
+66,536 total crops
 Distribution:
 
 ```bash
-  12135 opossum
-  10933 raccoon
-   7600 coyote
-   7479 bobcat
-   6026 rabbit
+  12860 opossum
+  11225 raccoon
+   7944 coyote
+   7812 bobcat
+   6366 rabbit
    5308 doe
-   4029 bird
-   2872 dog
+   2968 squirrel
    2763 buck
-   2649 squirrel
-   1730 skunk
-   1100 fox
-    822 bear
-    232 turkey
+   2027 skunk
+   1951 fox
+   1781 bear
+   1290 crow
+    779 turkey
+    770 owl
     186 fawn
     134 mountain_lion
-    112 yearling_buck
+    124 blue_jay
+    121 eagle
+    112 yearling_deer
      19 porcupine
-     15 crow
      12 fisher
       6 sandhill_crane
-      4 blue_jay
 ```
 
 ## Caltech camera traps
@@ -62,14 +62,14 @@ buck, doe, yearling deer, fawn, bear, turkey, mountain_lion
 ## NA Birds data set
 
 This data set was used to curate images of:
-turkey
+turkey, blue_jay, owl, eagle, crow
 
 [Reference](https://dl.allaboutbirds.org/nabirds)
 
 ## ENA24-detection
 
 This data set was used to curate images of:
-bear
+bear, turkey, bobcat, coyote, raccoon, skunk, squirrel, rabbit, deer, fox, opossum
 
 [Reference](http://lila.science/datasets/ena24detection)
 
