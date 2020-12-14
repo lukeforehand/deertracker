@@ -5,7 +5,7 @@ import tensorflow as tf
 from PIL import Image
 
 
-def model(detector, classifier, photo):
+def model(detector, classifier, photo, confidence=0.98):
     image = np.array(photo)
     bbox, _class, scores = detector.predict(image)
     results = []
@@ -30,13 +30,14 @@ def model(detector, classifier, photo):
             score = predictions[high_score]
             label = classifier.classes[high_score]
 
-        results.append(
-            {
-                "image": Image.fromarray(crop),
-                "label": label,
-                "confidence": score,
-            }
-        )
+        if score > confidence:
+            results.append(
+                {
+                    "image": Image.fromarray(crop),
+                    "label": label,
+                    "confidence": score,
+                }
+            )
     return results
 
 
