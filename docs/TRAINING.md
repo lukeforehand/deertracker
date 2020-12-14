@@ -88,7 +88,7 @@ from google.colab import drive
 drive.mount("/content/drive", force_remount=True)
 
 # untar the training dataset from google drive
-! tar xfz --keep-old-files ../drive/MyDrive/deertracker/deertracker_crops.tar.gz
+! tar xfz ../drive/MyDrive/deertracker/deertracker_crops.tar.gz
 
 # train, saving the model checkpoints to google drive incase google colab disconnects.
 ! python -m deertracker.main train dt \
