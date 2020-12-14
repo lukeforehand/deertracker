@@ -80,7 +80,10 @@ def show_class(image_path: str, classifier: Classifier):
                 2,
             )
             label_y += newline_step
-    multiprocessing.Process(target=plot, args=(image,)).start()
+    pool = multiprocessing.Pool(8)
+    pool.map(plot, (image,))
+    pool.close()
+    pool.join()
 
 
 def show_predictions(image_paths):
@@ -112,4 +115,7 @@ def show_prediction(image_path: str, detector: MegaDetector):
             color,
             2,
         )
-    multiprocessing.Process(target=plot, args=(image,)).start()
+    pool = multiprocessing.Pool(8)
+    pool.map(plot, (image,))
+    pool.close()
+    pool.join()
