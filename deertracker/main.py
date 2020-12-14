@@ -1,7 +1,7 @@
 import click
 import pathlib
 
-from deertracker import photo, visualize, caltech as ct, classifier
+from deertracker import photo, visualize, caltech as ct, classifier, nabirds as nab
 from deertracker.photo import PhotoProcessor
 
 
@@ -69,7 +69,23 @@ def show_predictions(photos):
     file_paths = find_files(photos)
     predictions = visualize.show_predictions(file_paths)
     with click.progressbar(predictions, length=len(file_paths)) as progress:
-        for prediction in progress:
+        for _ in progress:
+            pass
+
+
+@main.command(help="Show classifications for photo crops")
+@click.option("--photos", required=True, help="Location of photo crops to process")
+@click.option(
+    "--model-dir",
+    default=classifier.DEFAULT_MODEL_FOLDER,
+    required=False,
+    help="Path to saved classifier model",
+)
+def show_classes(photos, model_dir):
+    file_paths = find_files(photos)
+    classes = visualize.show_classes(file_paths, model_dir)
+    with click.progressbar(classes, length=len(file_paths)) as progress:
+        for _ in progress:
             pass
 
 
@@ -88,7 +104,7 @@ def show_predictions(photos):
     help="Show caltech annotations",
 )
 @click.option("--photos", required=True, help="Location of caltech images")
-@click.option("--bboxes", required=True, default=None, help="Location of bboxes json")
+@click.option("--bboxes", required=True, help="Location of bboxes json")
 @click.option(
     "--labels", required=False, default=None, help="Location of image labels json"
 )
@@ -113,6 +129,35 @@ def caltech(show, photos, bboxes, labels):
                     click.secho(str(annotation), bg="red")
 
 
+@main.command(help="Process NA Birds bounding boxes")
+@click.option("--photos", required=True, help="Location of photos")
+@click.option("--image-ids", required=True, help="Location of image ids txt")
+@click.option("--bboxes", required=True, help="Location of bboxes txt")
+@click.option("--classes", required=True, help="Location of classes txt")
+@click.option("--labels", required=True, help="Location of image labels txt")
+def nabirds(photos, image_ids, bboxes, classes, labels):
+    length = len(open(image_ids).readlines())
+    processed_annotations = nab.process_annotations(
+        photos, image_ids, bboxes, classes, labels
+    )
+    with click.progressbar(processed_annotations, length=length) as progress:
+        for annotation in progress:
+            if "error" in annotation:
+                click.secho(str(annotation), bg="red")
+
+
+@main.command(help="Process ENA-24 bounding boxes.")
+@click.option("--photos", required=True, help="Location of photos")
+@click.option("--bboxes", required=True, help="Location of bboxes json")
+def ena24(photos, bboxes):
+    annotations = ct.load_bboxes(bboxes)
+    processed_annotations = ct.process_annotations(photos, annotations)
+    with click.progressbar(processed_annotations, length=len(annotations)) as progress:
+        for annotation in progress:
+            if "error" in annotation:
+                click.secho(str(annotation), bg="red")
+
+
 @main.command(help="Train classifier")
 @click.argument("name")
 @click.option(
@@ -122,13 +167,31 @@ def caltech(show, photos, bboxes, labels):
     type=pathlib.Path,
 )
 @click.option(
+    "--model-dir",
+    default=classifier.DEFAULT_MODEL_FOLDER,
+    required=False,
+    help="Directory to store model snapshots",
+)
+@click.option(
     "--min-images",
     default=1000,
     required=False,
     help="Minimum number of images per class",
 )
-def train(name, images, min_images):
-    classifier.train(name, data_dir=images, min_images=min_images)
+@click.option(
+    "--epochs",
+    default=500,
+    required=False,
+    help="Number of training epochs",
+)
+def train(name, images, model_dir, min_images, epochs):
+    classifier.train(
+        name,
+        data_dir=images,
+        model_dir=pathlib.Path(model_dir),
+        min_images=min_images,
+        epochs=epochs,
+    )
 
 
 if __name__ == "__main__":

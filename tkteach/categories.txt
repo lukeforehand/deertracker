@@ -3,20 +3,11 @@
 (b) buck
 (d) doe
 (e) empty
-(m) fisher
-(g) dog
 (r) raccoon
-(k) skunk
-(c) crow
-(p) porcupine
-(j) blue_jay
-(h) sandhill_crane
-(i) bird
-(t) bobcat
-(x) fox
-coyote
-bear
-turkey
+(s) skunk
+(o) coyote
+(t) turkey
+(m) mountain_lion
 squirrel
 otter
 badger
@@ -28,9 +19,3 @@ rabbit
 wolf
 cat
 cow
-mountain_lion
-pig
-insect
-lizard
-rodent
-person

@@ -1,11 +1,12 @@
-from pathlib import Path
-from typing import Tuple, List
 import sys
-
-from tqdm import tqdm
 import tensorflow as tf
-from tensorflow.keras import layers
 
+from pathlib import Path
+from tensorflow.keras import layers
+from tqdm import tqdm
+from typing import Tuple, List
+
+from deertracker import DEFAULT_CLASSIFIER_PATH
 
 IMAGE_SIZE = 96
 DEFAULT_DATA_FOLDER = Path(__file__).parents[1] / "training_imgs"
@@ -46,7 +47,14 @@ class Linnaeus(tf.keras.Model):
         return self.d2(x)
 
 
-def load_model(model_path):
+def predict(classifier, crop):
+    resized_crop = tf.keras.preprocessing.image.smart_resize(
+        crop, (IMAGE_SIZE, IMAGE_SIZE)
+    )
+    return classifier(tf.expand_dims(resized_crop, 0)).numpy()[0]
+
+
+def load_model(model_path=DEFAULT_CLASSIFIER_PATH):
     """
     Return the model and the list of class names.
 
@@ -69,7 +77,9 @@ def load_model(model_path):
     model = tf.keras.models.load_model(model_path)
     with open(Path(model_path) / "class_names.txt") as f:
         class_names = f.read().split("\n")
-    return model, class_names
+    model.classes = class_names
+    model.predict = lambda x: predict(model, x)
+    return model
 
 
 def get_datasets(
@@ -157,6 +167,7 @@ def train(
     tb_logs: Path = DEFAULT_LOGS_FOLDER,
     model_dir: Path = DEFAULT_MODEL_FOLDER,
     min_images: int = 1_000,
+    epochs: int = 500,
 ):
     model_dir = model_dir / model_name
     if model_dir.exists():
@@ -217,11 +228,10 @@ def train(
                 sample_weight=~tf.math.equal(labels, i),
             )
 
-    EPOCHS = 500
     total_train_samples = None
     best_test_loss = float("inf")
 
-    for epoch in range(EPOCHS):
+    for epoch in range(epochs):
         if epoch == 0:
             model.base_model.trainable = True
         # Reset the metrics at the start of the next epoch

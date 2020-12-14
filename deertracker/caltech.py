@@ -90,13 +90,16 @@ def process_annotations(photos, annotations):
     with database.conn() as db:
         batch = db.insert_batch()
     for annotation in annotations:
-        yield process_annotation(
-            batch,
-            photos,
-            annotation["file_path"],
-            annotation["label"],
-            annotation["bbox"],
-        )
+        try:
+            yield process_annotation(
+                batch,
+                photos,
+                annotation["file_path"],
+                annotation["label"],
+                annotation["bbox"],
+            )
+        except Exception as e:
+            print(e)
 
 
 def process_annotation(batch, photos, file_path, label, bbox):

@@ -1,9 +1,44 @@
+# Training dataset
 
-# Training Datasets
+This is a merging of crops from verious datasets, referenced below.
 
-[View Species classes](../tkteach/categories.txt)
+* Bounding boxes were used for crops when provided with dataset.
+* Mega Detector was used on images with no bounding box, and manually curated.
+
+[Download crops]()
+
+66,536 total crops
+Distribution:
+
+```bash
+  12860 opossum
+  11225 raccoon
+   7944 coyote
+   7812 bobcat
+   6366 rabbit
+   5308 doe
+   2968 squirrel
+   2763 buck
+   2027 skunk
+   1951 fox
+   1781 bear
+   1290 crow
+    779 turkey
+    770 owl
+    186 fawn
+    134 mountain_lion
+    124 blue_jay
+    121 eagle
+    112 yearling_deer
+     19 porcupine
+     12 fisher
+      6 sandhill_crane
+```
 
 ## Caltech camera traps
+
+This data set was used to curate images of:
+opossum, raccoon, coyote, bobcat, rabbit, deer, squirrel, skunk, mountain_lion
 
 [Reference](http://lila.science/datasets/caltech-camera-traps)
 
@@ -13,73 +48,33 @@
 . --recursive
 ```
 
-[Download crops](https://drive.google.com/file/d/1w637_EcV637L8TxfWdcm6WmEvmBh480G/view?usp=sharing)
-
-65112 total crops
-Distribution:
-
-```bash
-  12135 opossum
-   7909 raccoon
-   6506 coyote
-   6429 deer
-   6026 rabbit
-   5049 bobcat
-   4392 cat
-   4027 bird
-   2861 dog
-   2649 squirrel
-   2558 car
-   1843 rodent
-   1199 skunk
-   1100 fox
-    187 empty
-    178 lizard
-     45 mountain_lion
-     29 badger
-      8 insect
-      2 bat
-      1 pig
-      1 cow
-```
-
 ## Wisconsin whitetail data set
 
+This data set was used to curate images of:
+buck, doe, yearling deer, fawn, bear, turkey, mountain_lion
+
 [Download 1](https://drive.google.com/drive/folders/1jjkIPjz0Mv3ETYhafE4maNvtBfAxgRsW?usp=sharing)
-
 [Download 2](https://drive.google.com/drive/folders/1E1bVtDpXvgYpXbO5jpYDV37TYc9sUp2C?usp=sharing)
-
 [Download 3](https://drive.google.com/drive/folders/1ihIpAar8G2kFvC2jOwJFA9GAUSGwT1Tb?usp=sharing)
-
 [Download 4](https://drive.google.com/drive/folders/0B4BRcQQjVlWyVnctaE84Y3dHcDQ?usp=sharing)
-
 [Download 5](https://drive.google.com/drive/folders/0B4BRcQQjVlWyVXNMeHJ4LTdJV2c?usp=sharing)
 
-[Download crops](https://drive.google.com/file/d/1MR123gAmJgfFRwWPy63h6MfcIJtUStBV/view?usp=sharing)
+## NA Birds data set
 
-4692 total crops
-Distribution:
+This data set was used to curate images of:
+turkey, blue_jay, owl, eagle, crow
+
+[Reference](https://dl.allaboutbirds.org/nabirds)
+
+## ENA24-detection
+
+This data set was used to curate images of:
+bear, turkey, bobcat, coyote, raccoon, skunk, squirrel, rabbit, deer, fox, opossum
+
+[Reference](http://lila.science/datasets/ena24detection)
 
 ```bash
-   2859 doe
-   2114 buck
-    822 bear
-    232 turkey
-    165 person
-    123 fawn
-    112 yearling_buck
-     21 coyote
-     20 vehicle
-     19 porcupine
-     15 crow
-     12 fisher
-     12 dog
-      6 sandhill_crane
-      6 mountain_lion
-      4 raccoon
-      4 blue_jay
-      3 skunk
-      3 bobcat
-      3 bird
-
+~/Downloads/azcopy_linux_amd64_10.7.0/azcopy cp \
+"https://lilablobssc.blob.core.windows.net/ena24/images?st=2020-01-01T00%3A00%3A00Z&se=2034-01-01T00%3A00%3A00Z&sp=rl&sv=2019-07-07&sr=c&sig=BBgrO%2BYQKOVHh1zytS9umFv3Fa956F1%2Bb6bU3VhHSqg%3D" \
+. --recursive
 ```

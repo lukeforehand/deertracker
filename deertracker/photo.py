@@ -12,7 +12,9 @@ from PIL import Image, UnidentifiedImageError
 from PIL.ExifTags import TAGS
 
 from deertracker import DEFAULT_PHOTO_STORE, database, model, logger
-from deertracker.model import MegaDetector
+
+from deertracker.classifier import load_model
+from deertracker.detector import MegaDetector
 
 
 EXIF_TAGS = dict(((v, k) for k, v in TAGS.items()))
@@ -51,6 +53,7 @@ class PhotoProcessor:
         if self.camera is None:
             raise Exception(f"Camera `{camera_name}` not found.")
         self.detector = MegaDetector()
+        self.classifier = load_model()
 
     def import_photos(
         self,
@@ -86,7 +89,7 @@ class PhotoProcessor:
                 if db.select_photo(photo_hash) is not None:
                     return {"error": f"Photo `{file_path}` already exists."}
                 photo_time = self.get_time(image)
-                for obj in model.model(self.detector, image):
+                for obj in model.model(self.detector, self.classifier, image):
                     obj_photo = obj["image"]
                     obj_label = obj["label"]
                     obj_conf = float(obj["confidence"])

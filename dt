@@ -1,3 +1,0 @@
-#!/bin/bash
-
-python -m deertracker.main "$@" 2>> deertracker.err

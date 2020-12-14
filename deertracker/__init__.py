@@ -8,4 +8,6 @@ DEFAULT_PHOTO_STORE.mkdir(exist_ok=True)
 
 DEFAULT_DATABASE = DEFAULT_DATA_STORE / "deertracker.db"
 
-DEFAULT_MODEL_PATH = "models/md_v4.1.0.pb"
+DEFAULT_DETECTOR_PATH = "models/md_v4.1.0.pb"
+
+DEFAULT_CLASSIFIER_PATH = "models/dt-0129"
