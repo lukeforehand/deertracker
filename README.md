@@ -16,17 +16,18 @@ pyenv install 3.8.2
 pyenv global 3.8.2
 pip install --upgrade pip
 pip install -r requirements.txt
+pip install --editable .
 ```
 
 ## Add camera
 
 ```bash
-./dt add-camera \
+deertracker add-camera \
     --name "Southwest Stand" \
     --lat 46.399995 \
     --lon -90.772639
 
-./dt add-camera \
+deertracker add-camera \
     --name "Turkey Blind" \
     --lat 46.400041 \
     --lon -90.768497
@@ -39,11 +40,11 @@ Go here to find the lat/lon for your trail cam:
 ## Run import
 
 ```bash
-./dt import-photos \
+deertracker import-photos \
     --photos ~/Google\ Drive/Trail\ Cam \
     --camera "Soutwest Stand"
 
-./dt import-photos \
+deertracker import-photos \
     --photos ~/Google\ Drive/Trail\ Cam \
     --camera "Turkey Blind"
 ```
@@ -54,13 +55,13 @@ Training photos do not require EXIF Datetime.
 ## Show prediction
 
 ```bash
-./dt show-prediction --photo ~/Google\ Drive/Trail\ Cam/001.jpg
+deertracker show-prediction --photo ~/Google\ Drive/Trail\ Cam/001.jpg
 ```
 
 ## Show classification
 
 ```bash
-./dt show-classes --photo ~/Google\ Drive/Trail\ Cam/001.jpg --model-dir ./models/dt-0094/
+deertracker show-classes --photo ~/Google\ Drive/Trail\ Cam/001.jpg --model-dir ./models/dt-0094/
 ```
 
 `--model-dir` is optional
@@ -69,7 +70,7 @@ Training photos do not require EXIF Datetime.
 ## Import caltech crops
 
 ```bash
-./dt caltech \
+deertracker caltech \
   --photos ~/Downloads/caltech/cct_images \
   --bboxes ~/Downloads/caltech/caltech_bboxes_20200316.json
   [--show] plots the bounding boxes instead of creating crops
@@ -83,7 +84,7 @@ Sort caltech photos into label folders, these uncropped images can be selectivel
 imported back into the databsae as crops using th `import-photos --training` command.
 
 ```bash
-./dt caltech \
+deertracker caltech \
   --photos ~/Downloads/caltech/cct_images \
   --bboxes ~/Downloads/caltech/caltech_bboxes_20200316.json
   --labels ~/Downloads/caltech/caltech_images_20200316.json
@@ -94,7 +95,7 @@ imported back into the databsae as crops using th `import-photos --training` com
 ## Run training
 
 ```bash
-./dt train $name\
+deertracker train $name\
  --images ./training_imgs/ \
  --model-dir ./models/ \
  --min-images 1000 \
