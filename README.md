@@ -66,7 +66,6 @@ deertracker show-classes --photo ~/Google\ Drive/Trail\ Cam/001.jpg --model-dir 
 
 `--model-dir` is optional
 
-
 ## Import caltech crops
 
 ```bash
@@ -91,6 +90,25 @@ deertracker caltech \
 ```
 
 * Output is to `.data/photos/uncropped/`
+
+## Import NA Bird crops
+
+```bash
+deertracker nabirds \
+  --image-ids nabirds/images.txt \
+  --bboxes nabirds/bounding_boxes.txt \
+  --labels nabirds/image_class_labels.txt \
+  --classes nabirds/classes.txt \
+  --photos nabirds/images/
+```
+
+## Import ENA-24 crops
+
+```bash
+deertracker ena24 \
+  --photos ena24/images/
+  --bboxes ena24/ena24.json
+```
 
 ## Run training
 

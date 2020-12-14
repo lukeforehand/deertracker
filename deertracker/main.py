@@ -1,7 +1,7 @@
 import click
 import pathlib
 
-from deertracker import photo, visualize, caltech as ct, classifier
+from deertracker import photo, visualize, caltech as ct, classifier, nabirds as nab
 from deertracker.photo import PhotoProcessor
 
 
@@ -104,7 +104,7 @@ def show_classes(photos, model_dir):
     help="Show caltech annotations",
 )
 @click.option("--photos", required=True, help="Location of caltech images")
-@click.option("--bboxes", required=True, default=None, help="Location of bboxes json")
+@click.option("--bboxes", required=True, help="Location of bboxes json")
 @click.option(
     "--labels", required=False, default=None, help="Location of image labels json"
 )
@@ -127,6 +127,35 @@ def caltech(show, photos, bboxes, labels):
             for annotation in progress:
                 if "error" in annotation:
                     click.secho(str(annotation), bg="red")
+
+
+@main.command(help="Process NA Birds bounding boxes")
+@click.option("--photos", required=True, help="Location of photos")
+@click.option("--image-ids", required=True, help="Location of image ids txt")
+@click.option("--bboxes", required=True, help="Location of bboxes txt")
+@click.option("--classes", required=True, help="Location of classes txt")
+@click.option("--labels", required=True, help="Location of image labels txt")
+def nabirds(photos, image_ids, bboxes, classes, labels):
+    length = len(open(image_ids).readlines())
+    processed_annotations = nab.process_annotations(
+        photos, image_ids, bboxes, classes, labels
+    )
+    with click.progressbar(processed_annotations, length=length) as progress:
+        for annotation in progress:
+            if "error" in annotation:
+                click.secho(str(annotation), bg="red")
+
+
+@main.command(help="Process ENA-24 bounding boxes.")
+@click.option("--photos", required=True, help="Location of photos")
+@click.option("--bboxes", required=True, help="Location of bboxes json")
+def ena24(photos, bboxes):
+    annotations = ct.load_bboxes(bboxes)
+    processed_annotations = ct.process_annotations(photos, annotations)
+    with click.progressbar(processed_annotations, length=len(annotations)) as progress:
+        for annotation in progress:
+            if "error" in annotation:
+                click.secho(str(annotation), bg="red")
 
 
 @main.command(help="Train classifier")
