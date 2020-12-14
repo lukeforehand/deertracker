@@ -1,7 +1,14 @@
 import click
 import pathlib
 
-from deertracker import photo, visualize, caltech as ct, classifier, nabirds as nab
+from deertracker import (
+    DEFAULT_CLASSIFIER_PATH,
+    photo,
+    visualize,
+    caltech as ct,
+    classifier,
+    nabirds as nab,
+)
 from deertracker.photo import PhotoProcessor
 
 
@@ -77,7 +84,7 @@ def show_predictions(photos):
 @click.option("--photos", required=True, help="Location of photo crops to process")
 @click.option(
     "--model-dir",
-    default=classifier.DEFAULT_MODEL_FOLDER,
+    default=DEFAULT_CLASSIFIER_PATH,
     required=False,
     help="Path to saved classifier model",
 )
