@@ -50,8 +50,8 @@ def plot(image):
     plt.show()
 
 
-def show_classes(image_paths):
-    classifier = Classifier()
+def show_classes(image_paths, model_dir):
+    classifier = Classifier(model_dir)
     for image_path in image_paths:
         yield show_class(image_path, classifier)
 

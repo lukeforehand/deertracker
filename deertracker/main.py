@@ -75,9 +75,15 @@ def show_predictions(photos):
 
 @main.command(help="Show classifications for photo crops")
 @click.option("--photos", required=True, help="Location of photo crops to process")
-def show_classes(photos):
+@click.option(
+    "--model-dir",
+    default=classifier.DEFAULT_MODEL_FOLDER,
+    required=False,
+    help="Path to saved classifier model",
+)
+def show_classes(photos, model_dir):
     file_paths = find_files(photos)
-    classes = visualize.show_classes(file_paths)
+    classes = visualize.show_classes(file_paths, model_dir)
     with click.progressbar(classes, length=len(file_paths)) as progress:
         for _ in progress:
             pass
