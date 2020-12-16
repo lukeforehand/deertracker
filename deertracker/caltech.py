@@ -6,7 +6,7 @@ import shutil
 
 from PIL import Image
 
-from deertracker import photo, database
+from deertracker import photo, database, DEFAULT_PHOTO_STORE
 
 
 def crop_image(image, bbox):
@@ -74,17 +74,14 @@ def load_bboxes(bboxes_json):
     ]
 
 
-def process_annotations(photos, annotations, output_path=pathlib.Path("caltech")):
-    output_path.mkdir(exist_ok=True)
+def process_annotations(photos, annotations):
     with database.conn() as db:
         batch = db.insert_batch()
     for annotation in annotations:
         try:
-            (output_path / annotation["label"]).mkdir(exist_ok=True)
             yield process_annotation(
                 batch,
                 photos,
-                output_path,
                 annotation["file_path"],
                 annotation["label"],
                 annotation["bbox"],
@@ -93,7 +90,8 @@ def process_annotations(photos, annotations, output_path=pathlib.Path("caltech")
             print(e)
 
 
-def process_annotation(batch, photos, output_path, filename, label, bbox):
+def process_annotation(batch, photos, filename, label, bbox):
+    (DEFAULT_PHOTO_STORE / label).mkdir(exist_ok=True)
     with database.conn() as db:
         image = cv2.imread(f"{photos}/{filename}")
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -103,7 +101,7 @@ def process_annotation(batch, photos, output_path, filename, label, bbox):
         obj_label = label
         obj_hash = hashlib.md5(obj_photo.tobytes()).hexdigest()
         obj_id = f"{obj_label}/{obj_hash}"
-        obj_path = photo.store(obj_id, obj_photo, output_path)
+        obj_path = photo.store(obj_id, obj_photo)
         db.insert_object(
             (
                 obj_id,

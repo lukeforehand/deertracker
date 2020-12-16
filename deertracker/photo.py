@@ -35,8 +35,8 @@ def add_camera(name, lat, lon):
         return db.insert_camera((name, lat, lon))
 
 
-def store(filename, photo, dest_path=DEFAULT_PHOTO_STORE):
-    dest_path = f"{dest_path}/{filename}.jpg"
+def store(filename, photo):
+    dest_path = f"{DEFAULT_PHOTO_STORE}/{filename}.jpg"
     photo.save(dest_path, "JPEG")
     return dest_path
 

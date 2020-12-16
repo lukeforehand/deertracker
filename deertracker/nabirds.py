@@ -3,10 +3,7 @@ import pathlib
 from deertracker import database, caltech
 
 
-def process_annotations(
-    photos, image_ids, bboxes, classes, labels, output_path=pathlib.Path("nabirds")
-):
-    output_path.mkdir(exist_ok=True)
+def process_annotations(photos, image_ids, bboxes, classes, labels):
     image_map = {}
     with open(image_ids) as f:
         for line in f:
@@ -34,8 +31,6 @@ def process_annotations(
             image_id = pieces[0]
             class_id = pieces[1]
             label_map[image_id] = class_map[class_id]
-    for category in label_map.values():
-        (output_path / category).mkdir(exist_ok=True)
     with database.conn() as db:
         batch = db.insert_batch()
     for image_id, path in image_map.items():
@@ -48,7 +43,6 @@ def process_annotations(
             yield caltech.process_annotation(
                 batch,
                 photos,
-                output_path,
                 annotation["file_path"],
                 annotation["label"],
                 annotation["bbox"],
