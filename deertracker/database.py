@@ -82,7 +82,7 @@ class Connection:
 
     def insert_object(self, obj):
         try:
-            sql = "INSERT INTO object(id, path, lat, lon, time, label, confidence, photo_id, camera_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            sql = "INSERT INTO object(id, path, lat, lon, time, label, confidence, ground_truth, photo_id, camera_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             cur = self.conn.cursor()
             cur.execute(sql, obj)
             self.conn.commit()
@@ -94,8 +94,9 @@ class Connection:
                 "time": obj[4],
                 "label": obj[5],
                 "confidence": obj[6],
-                "photo_id": obj[7],
-                "camera_id": obj[8],
+                "ground_truth": obj[7],
+                "photo_id": obj[8],
+                "camera_id": obj[9],
             }
         except sqlite3.IntegrityError:
             return {"error": f"Object `{obj[1]}` already exists."}

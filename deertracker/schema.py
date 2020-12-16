@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS object (
     time DATETIME,
     label VARCHAR(255) NOT NULL,
     confidence FLOAT NOT NULL,
+    ground_truth BOOLEAN NOT NULL,
     camera_id VARCHAR(255) NOT NULL,
     photo_id CHARACTER(32) NOT NULL,
     FOREIGN KEY(camera_id) REFERENCES camera(name),

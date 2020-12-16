@@ -35,8 +35,8 @@ def add_camera(name, lat, lon):
         return db.insert_camera((name, lat, lon))
 
 
-def store(photo_hash, photo):
-    dest_path = f"{DEFAULT_PHOTO_STORE}/{photo_hash}.jpg"
+def store(filename, photo, dest_path=DEFAULT_PHOTO_STORE):
+    dest_path = f"{dest_path}/{filename}.jpg"
     photo.save(dest_path, "JPEG")
     return dest_path
 
@@ -53,7 +53,11 @@ class PhotoProcessor:
         if self.camera is None:
             raise Exception(f"Camera `{camera_name}` not found.")
         self.detector = MegaDetector()
+        for label in self.detector.labels.values():
+            (DEFAULT_PHOTO_STORE / label).mkdir(exist_ok=True)
         self.classifier = load_model()
+        for label in self.classifier.classes:
+            (DEFAULT_PHOTO_STORE / label).mkdir(exist_ok=True)
 
     def import_photos(
         self,
@@ -94,7 +98,7 @@ class PhotoProcessor:
                     obj_label = obj["label"]
                     obj_conf = float(obj["confidence"])
                     obj_hash = hashlib.md5(obj_photo.tobytes()).hexdigest()
-                    obj_id = f"{obj_label}_{int(obj_conf*100)}_{obj_hash}"
+                    obj_id = f"{obj_label}/{int(obj_conf*100)}_{obj_hash}"
                     obj_path = store(obj_id, obj_photo)
                     db.insert_object(
                         (
@@ -105,6 +109,7 @@ class PhotoProcessor:
                             photo_time,
                             obj_label,
                             obj_conf,
+                            False,
                             photo_hash,
                             self.camera["name"],
                         )

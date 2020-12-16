@@ -11,18 +11,18 @@ class MegaDetector:
     Microsoft's MegaDetector. https://github.com/microsoft/CameraTraps
     """
 
-    def __init__(self, filepath: str = DEFAULT_DETECTOR_PATH):
+    def __init__(self, filepath=DEFAULT_DETECTOR_PATH):
         """
         Load the protobuf file, massage from TF 1.13.1 to TF 2.x
 
         Inputs
         ------
-        filepath : str
+        filepath
             Path to the saved megadetector protobuf file. See download links in
             https://github.com/microsoft/CameraTraps/blob/master/megadetector.md
             This was tested with version 4.1
         """
-        with tf.io.gfile.GFile(filepath, "rb") as f:
+        with tf.io.gfile.GFile(str(filepath), "rb") as f:
             graph_def = tf.compat.v1.GraphDef()
             graph_def.ParseFromString(f.read())
 
