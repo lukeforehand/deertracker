@@ -12,7 +12,9 @@ deertracker import-photos \
   --photos ~/myphotos \
 ```
 
-* Output is to `.data/photos/training/`
+* Output is to `.data/photos/{category}/`
+* Crops will NOT be marked as `ground_truth`
+* DateTime EXIF validation is disabled
 
 ## Import caltech crops
 
@@ -23,12 +25,13 @@ deertracker caltech \
   [--show] plots the bounding boxes instead of creating crops
 ```
 
-* Output is to `.data/photos/training/`
+* Output is to `.data/photos/{category}/`
+* Crops will be marked as `ground_truth`
 
 ## Sort caltech labeled photos
 
-Sort caltech photos into label folders, these uncropped images can be selectively
-imported back into the databsae as crops using th `import-photos --training` command.
+Sort caltech photos without bounding boxes into label folders, these uncropped images can be
+selectively imported back into the database as crops using the `import-photos --training` command.
 
 ```bash
 deertracker caltech \
@@ -37,7 +40,7 @@ deertracker caltech \
   --labels ~/Downloads/caltech/caltech_images_20200316.json
 ```
 
-* Output is to `.data/photos/uncropped/`
+* Output is to `./caltech/uncropped/{category}`
 
 ## Import NA Bird crops
 
@@ -50,6 +53,9 @@ deertracker nabirds \
   --photos nabirds/images/
 ```
 
+* Output is to `.data/photos/{category}/`
+* Crops will be marked as `ground_truth`
+
 ## Import ENA-24 crops
 
 ```bash
@@ -57,6 +63,9 @@ deertracker ena24 \
   --photos ena24/images/
   --bboxes ena24/ena24.json
 ```
+
+* Output is to `.data/photos/{category}/`
+* Crops will be marked as `ground_truth`
 
 ## Run training
 

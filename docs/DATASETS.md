@@ -1,8 +1,8 @@
-# Training dataset
+# Datasets
 
-This is a merging of crops from verious datasets, referenced below.
+Models are trained on crops extracted from various datasets, referenced below.
 
-* Bounding boxes were used for crops when provided with dataset.
+* Bounding boxes were used for crops when provided by data source.
 * Mega Detector was used on images with no bounding box, and manually curated.
 
 [Download crops]()
