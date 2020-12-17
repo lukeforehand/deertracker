@@ -191,13 +191,19 @@ def ena24(photos, bboxes):
     required=False,
     help="Number of training epochs",
 )
-def train(name, images, model_dir, min_images, epochs):
+@click.option(
+    "--resume",
+    is_flag=True,
+    help="Resume training from latest checkpoint.",
+)
+def train(name, images, model_dir, min_images, epochs, resume):
     classifier.train(
         name,
         data_dir=images,
         model_dir=pathlib.Path(model_dir),
         min_images=min_images,
         epochs=epochs,
+        resume=resume,
     )
 
 
