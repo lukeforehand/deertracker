@@ -19,7 +19,7 @@ deertracker import-photos \
 ## Import caltech crops
 
 ```bash
-deertracker caltech \
+deertracker label caltech \
   --photos ~/Downloads/caltech/cct_images \
   --bboxes ~/Downloads/caltech/caltech_bboxes_20200316.json
   [--show] plots the bounding boxes instead of creating crops
@@ -34,7 +34,7 @@ Sort caltech photos without bounding boxes into label folders, these uncropped i
 selectively imported back into the database as crops using the `import-photos --training` command.
 
 ```bash
-deertracker caltech \
+deertracker label caltech \
   --photos ~/Downloads/caltech/cct_images \
   --bboxes ~/Downloads/caltech/caltech_bboxes_20200316.json
   --labels ~/Downloads/caltech/caltech_images_20200316.json
@@ -45,7 +45,7 @@ deertracker caltech \
 ## Import NA Bird crops
 
 ```bash
-deertracker nabirds \
+deertracker label nabirds \
   --image-ids nabirds/images.txt \
   --bboxes nabirds/bounding_boxes.txt \
   --labels nabirds/image_class_labels.txt \
@@ -59,7 +59,7 @@ deertracker nabirds \
 ## Import ENA-24 crops
 
 ```bash
-deertracker ena24 \
+deertracker label ena24 \
   --photos ena24/images/
   --bboxes ena24/ena24.json
 ```
