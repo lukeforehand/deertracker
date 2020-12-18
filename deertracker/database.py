@@ -100,3 +100,32 @@ class Connection:
             }
         except sqlite3.IntegrityError:
             return {"error": f"Object `{obj[1]}` already exists."}
+
+    def select_objects(self):
+        return [
+            self._object_from_tuple(obj)
+            for obj in self.conn.cursor()
+            .execute("SELECT * FROM object WHERE ground_truth IS FALSE")
+            .fetchall()
+        ]
+
+    def _object_from_tuple(self, obj):
+        if obj is None:
+            return None
+        return {
+            "id": obj[0],
+            "path": obj[1],
+            "lat": obj[2],
+            "lon": obj[3],
+            "time": obj[4],
+            "label": obj[5],
+            "confidence": obj[6],
+            "ground_truth": obj[7],
+            "camera_id": obj[8],
+            "photo_id": obj[9],
+        }
+
+    def set_object_ground_truth(self):
+        cur = self.conn.cursor()
+        cur.execute("UPDATE object SET ground_truth = TRUE")
+        self.conn.commit()

@@ -86,13 +86,13 @@ def show_class(image_path: str, classifier: Classifier):
     pool.join()
 
 
-def show_predictions(image_paths):
+def show_detection(image_paths):
     detector = MegaDetector()
     for image_path in image_paths:
-        yield show_prediction(image_path, detector)
+        yield show_detection(image_path, detector)
 
 
-def show_prediction(image_path: str, detector: MegaDetector):
+def show_detection(image_path: str, detector: MegaDetector):
     """
     Visualize Microsoft's MegaDetector bounding boxes.
     """

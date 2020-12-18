@@ -21,40 +21,35 @@ pip install -r requirements.txt
 pip install --editable .
 ```
 
-## Add camera
+## CLI
+
+Before starting, you need the gps coords of your trail cameras. [Find lat/lon](https://www.latlong.net/)
 
 ```bash
-deertracker add-camera \
-  --name "Turkey Blind" \
-  --lat 46.400041 \
-  --lon -90.768497
+deertracker --help
+
+Commands:
+  add-camera     Add camera location
+  import-photos  Import photos
+  label          Labeling tools
+  train          Train classifier
+  viz            Visualize detections, classes
 ```
-
-Go here to find the lat/lon for your trail cam:
-
-[Find lat/lon](https://www.latlong.net/)
-
-## Run import
 
 ```bash
-deertracker import-photos \
-  --photos ~/myphotos \
-  --camera "Turkey Blind"
-```
+deertracker label --help
 
-## Show prediction
+Commands:
+  caltech        Process Caltech bounding boxes or labels.
+  ena24          Process ENA-24 bounding boxes.
+  export-photos  Export photos that have not yet been labeled ground_truth
+  nabirds        Process NA Birds bounding boxes
+```
 
 ```bash
-deertracker show-predictions \
-  --photos ~/myphotos
+deertracker viz --help
+
+Commands:
+  classes     Show classifications for photo crops
+  detections  Show object detections for photos
 ```
-
-## Show classification
-
-```bash
-deertracker show-classes \
-  --photos ~/myphotos \
-  --model-dir ./models/dt-0094/
-```
-
-`--model-dir` is optional

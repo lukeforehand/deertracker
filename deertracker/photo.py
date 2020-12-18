@@ -4,7 +4,7 @@ import itertools
 import multiprocessing
 import numpy as np
 import pathlib
-import string
+import shutil
 import tensorflow as tf
 
 from datetime import datetime
@@ -39,6 +39,22 @@ def store(filename, photo):
     dest_path = f"{DEFAULT_PHOTO_STORE}/{filename}.jpg"
     photo.save(dest_path, "JPEG")
     return dest_path
+
+
+def export_photos(output_dir):
+    with database.conn() as db:
+        objects = db.select_objects()
+        for obj in objects:
+            file_path = pathlib.Path(obj["path"])
+            filename = file_path.relative_to(file_path.parent.parent)
+            dest_path = output_dir / filename.parent
+            dest_path.mkdir(exist_ok=True)
+            shutil.copy(
+                DEFAULT_PHOTO_STORE / filename,
+                dest_path,
+            )
+            print(f"Copied {filename} to {dest_path}/")
+        db.set_object_ground_truth()
 
 
 class PhotoProcessor:

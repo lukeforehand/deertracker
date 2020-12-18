@@ -2,6 +2,7 @@ import click
 import pathlib
 
 from deertracker import (
+    ROOT,
     DEFAULT_CLASSIFIER_PATH,
     photo,
     visualize,
@@ -26,6 +27,7 @@ def find_files(photos):
     ]
 
 
+# API commands
 @click.group()
 def main():
     pass
@@ -70,33 +72,24 @@ def import_photos(photos, camera, training):
                 click.secho(str(imported_photo), bg="red")
 
 
-@main.command(help="Show predictions for photos")
-@click.option("--photos", required=True, help="Location of photos to process")
-def show_predictions(photos):
-    file_paths = find_files(photos)
-    predictions = visualize.show_predictions(file_paths)
-    with click.progressbar(predictions, length=len(file_paths)) as progress:
-        for _ in progress:
-            pass
+# Labeling subcommands
+@main.group(help="Labeling tools")
+def label():
+    pass
 
 
-@main.command(help="Show classifications for photo crops")
-@click.option("--photos", required=True, help="Location of photo crops to process")
+@label.command(help="Export photos that have not yet been labeled ground_truth")
 @click.option(
-    "--model-dir",
-    default=DEFAULT_CLASSIFIER_PATH,
+    "--output",
+    default=ROOT / "tkteach/ds",
     required=False,
-    help="Path to saved classifier model",
+    help="Location to saved exported photos",
 )
-def show_classes(photos, model_dir):
-    file_paths = find_files(photos)
-    classes = visualize.show_classes(file_paths, model_dir)
-    with click.progressbar(classes, length=len(file_paths)) as progress:
-        for _ in progress:
-            pass
+def export_photos(output):
+    photo.export_photos(output)
 
 
-@main.command(
+@label.command(
     help="""
     Process Caltech bounding boxes or labels.
     If bboxes, will store crops in the database.
@@ -136,7 +129,7 @@ def caltech(show, photos, bboxes, labels):
                     click.secho(str(annotation), bg="red")
 
 
-@main.command(help="Process NA Birds bounding boxes")
+@label.command(help="Process NA Birds bounding boxes")
 @click.option("--photos", required=True, help="Location of photos")
 @click.option("--image-ids", required=True, help="Location of image ids txt")
 @click.option("--bboxes", required=True, help="Location of bboxes txt")
@@ -153,7 +146,7 @@ def nabirds(photos, image_ids, bboxes, classes, labels):
                 click.secho(str(annotation), bg="red")
 
 
-@main.command(help="Process ENA-24 bounding boxes.")
+@label.command(help="Process ENA-24 bounding boxes.")
 @click.option("--photos", required=True, help="Location of photos")
 @click.option("--bboxes", required=True, help="Location of bboxes json")
 def ena24(photos, bboxes):
@@ -199,6 +192,38 @@ def train(name, images, model_dir, min_images, epochs):
         min_images=min_images,
         epochs=epochs,
     )
+
+
+# Visualization subcommands
+@main.group(help="Visualize detections, classes")
+def viz():
+    pass
+
+
+@viz.command(help="Show object detections for photos")
+@click.option("--photos", required=True, help="Location of photos to process")
+def detections(photos):
+    file_paths = find_files(photos)
+    detected = visualize.show_detections(file_paths)
+    with click.progressbar(detected, length=len(file_paths)) as progress:
+        for _ in progress:
+            pass
+
+
+@viz.command(help="Show classifications for photo crops")
+@click.option("--photos", required=True, help="Location of photo crops to process")
+@click.option(
+    "--model-dir",
+    default=DEFAULT_CLASSIFIER_PATH,
+    required=False,
+    help="Path to saved classifier model",
+)
+def classes(photos, model_dir):
+    file_paths = find_files(photos)
+    classes = visualize.show_classes(file_paths, model_dir)
+    with click.progressbar(classes, length=len(file_paths)) as progress:
+        for _ in progress:
+            pass
 
 
 if __name__ == "__main__":
