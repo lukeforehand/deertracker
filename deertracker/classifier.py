@@ -32,7 +32,7 @@ class Linnaeus(tf.keras.Model):
             include_top=False,
             weights="imagenet",
         )
-        self.base_model.trainable = False
+        self.base_model.trainable = True
         self.avg_pool = layers.GlobalAveragePooling2D()
         self.dropout = layers.Dropout(0.1)
         self.d1 = layers.Dense(32, activation="relu")
@@ -168,11 +168,13 @@ def train(
     model_dir: Path = DEFAULT_MODEL_FOLDER,
     min_images: int = 1_000,
     epochs: int = 500,
+    resume: bool = False,
 ):
     model_dir = model_dir / model_name
-    if model_dir.exists():
+    if model_dir.exists() and not resume:
         raise ValueError(
             f"{model_dir} already exists, refusing to overwrite saved models."
+            " If you wanted to resume, please set resume to True."
         )
     train_ds, test_ds, class_names = get_datasets(data_dir, min_images)
     num_classes = len(class_names)
@@ -190,6 +192,11 @@ def train(
 
     loss_object = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
     optimizer = tf.keras.optimizers.Adam()
+
+    checkpoint = tf.train.Checkpoint(optimizer=optimizer, model=model)
+    ckpt_mgr = tf.train.CheckpointManager(
+        checkpoint, directory=model_dir / "ckpts", max_to_keep=5
+    )
 
     train_loss = tf.keras.metrics.Mean(name="train_loss")
     train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name="train_accuracy")
@@ -231,9 +238,18 @@ def train(
     total_train_samples = None
     best_test_loss = float("inf")
 
-    for epoch in range(epochs):
-        if epoch == 0:
-            model.base_model.trainable = True
+    start = 0
+    if resume:
+        # Need to run one step of training to populate optimizer values,
+        # otherwise checkpoint loading won't work as expected.
+        # https://github.com/tensorflow/tensorflow/issues/33150#issuecomment-574517363
+        imgs, labels = next(iter(train_ds))
+        train_step(imgs, labels)
+        status = checkpoint.restore(ckpt_mgr.latest_checkpoint)
+        status.assert_consumed()
+        start = checkpoint.save_counter.numpy()
+
+    for epoch in range(start, epochs):
         # Reset the metrics at the start of the next epoch
         train_loss.reset_states()
         train_accuracy.reset_states()
@@ -277,6 +293,7 @@ def train(
                 f" {fpr.result(): >7.2%}"
                 f" (   {class_to_num[name] / sum(class_to_num.values()): >7.2%})"
             )
+        ckpt_mgr.save()
         if test_loss.result() < best_test_loss:
             best_test_loss = test_loss.result()
             epoch_model_dir = model_dir / f"{model_name}-{epoch:0>4d}"
