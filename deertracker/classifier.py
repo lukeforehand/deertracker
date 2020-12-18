@@ -176,6 +176,12 @@ def train(
             f"{model_dir} already exists, refusing to overwrite saved models."
             " If you wanted to resume, please set resume to True."
         )
+    if resume and not (model_dir / "ckpts").exists():
+        raise ValueError(
+            f"Resuming but no checkpoint exists."
+            " Run one iteration of training before using --resume flag."
+        )
+
     train_ds, test_ds, class_names = get_datasets(data_dir, min_images)
     num_classes = len(class_names)
 
