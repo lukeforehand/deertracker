@@ -251,6 +251,7 @@ def train(
         # https://github.com/tensorflow/tensorflow/issues/33150#issuecomment-574517363
         imgs, labels = next(iter(train_ds))
         train_step(imgs, labels)
+        print(f"Restoring checkpoint {ckpt_mgr.latest_checkpoint}")
         status = checkpoint.restore(ckpt_mgr.latest_checkpoint)
         status.assert_consumed()
         start = checkpoint.save_counter.numpy()
