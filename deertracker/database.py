@@ -27,6 +27,7 @@ class Connection:
         self.conn = conn
 
     def close(self):
+        self.conn.commit()
         self.conn.close()
 
     def insert_camera(self, camera):
@@ -34,7 +35,6 @@ class Connection:
             sql = "INSERT INTO camera(name, lat, lon) VALUES(?, ?, ?)"
             cur = self.conn.cursor()
             cur.execute(sql, camera)
-            self.conn.commit()
             return self._camera_from_tuple(camera)
         except sqlite3.IntegrityError:
             return {"error": f"Camera `{camera[0]}` already exists."}
@@ -67,7 +67,6 @@ class Connection:
         cur.execute(sql, [batch_time])
         cur.execute("SELECT LAST_INSERT_ROWID()")
         batch_id = cur.fetchone()[0]
-        self.conn.commit()
         return {"id": batch_id, "time": batch_time}
 
     def insert_photo(self, photo):
@@ -75,7 +74,6 @@ class Connection:
             sql = "INSERT INTO photo(id, path, batch_id) VALUES(?, ?, ?)"
             cur = self.conn.cursor()
             cur.execute(sql, photo)
-            self.conn.commit()
             return {"id": photo[0], "path": photo[1]}
         except sqlite3.IntegrityError:
             return {"error": f"Photo `{photo[1]}` already exists."}
@@ -85,7 +83,6 @@ class Connection:
             sql = "INSERT INTO object(id, path, lat, lon, time, label, confidence, ground_truth, photo_id, camera_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             cur = self.conn.cursor()
             cur.execute(sql, obj)
-            self.conn.commit()
             return {
                 "id": obj[0],
                 "path": obj[1],
@@ -101,11 +98,11 @@ class Connection:
         except sqlite3.IntegrityError:
             return {"error": f"Object `{obj[1]}` already exists."}
 
-    def select_objects(self):
+    def select_ground_truth(self):
         return [
             self._object_from_tuple(obj)
             for obj in self.conn.cursor()
-            .execute("SELECT * FROM object WHERE ground_truth IS FALSE")
+            .execute("SELECT * FROM object WHERE ground_truth IS TRUE")
             .fetchall()
         ]
 
@@ -124,8 +121,3 @@ class Connection:
             "camera_id": obj[8],
             "photo_id": obj[9],
         }
-
-    def set_object_ground_truth(self):
-        cur = self.conn.cursor()
-        cur.execute("UPDATE object SET ground_truth = TRUE")
-        self.conn.commit()

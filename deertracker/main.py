@@ -2,7 +2,6 @@ import click
 import pathlib
 
 from deertracker import (
-    ROOT,
     DEFAULT_CLASSIFIER_PATH,
     photo,
     visualize,
@@ -65,15 +64,9 @@ def label():
     pass
 
 
-@label.command(help="Export photos that have not yet been labeled ground_truth")
-@click.option(
-    "--output",
-    default=ROOT / "tkteach/ds",
-    required=False,
-    help="Location to saved exported photos",
-)
-def export_photos(output):
-    photo.export_photos(output)
+@label.command(help="Export ground truth photos tarball")
+def export_ground_truth():
+    photo.export_ground_truth()
 
 
 @label.command(

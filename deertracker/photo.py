@@ -4,7 +4,7 @@ import itertools
 import multiprocessing
 import numpy as np
 import pathlib
-import shutil
+import tarfile
 import tensorflow as tf
 
 from datetime import datetime
@@ -41,20 +41,16 @@ def store(filename, photo):
     return dest_path
 
 
-def export_photos(output_dir):
+def export_ground_truth(output="./deertracker_crops.tar.gz"):
     with database.conn() as db:
-        objects = db.select_objects()
+        objects = db.select_ground_truth()
+    dest_folder = "training_imgs"
+    with tarfile.open(output, "w:gz") as tarball:
         for obj in objects:
             file_path = pathlib.Path(obj["path"])
             filename = file_path.relative_to(file_path.parent.parent)
-            dest_path = output_dir / filename.parent
-            dest_path.mkdir(exist_ok=True)
-            shutil.copy(
-                DEFAULT_PHOTO_STORE / filename,
-                dest_path,
-            )
-            print(f"Copied {filename} to {dest_path}/")
-        db.set_object_ground_truth()
+            tarball.add(DEFAULT_PHOTO_STORE / filename, dest_folder / filename)
+            print(f"Adding {dest_folder / filename} to {output}")
 
 
 class PhotoProcessor:
