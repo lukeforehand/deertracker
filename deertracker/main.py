@@ -46,26 +46,13 @@ def add_camera(name, lat, lon):
 @click.option("--photos", required=True, help="Location of photos to process")
 @click.option(
     "--camera",
-    default=None,
+    default="training",
     required=False,
     help="Name of trail cam to associate with photos",
 )
-@click.option(
-    "--training",
-    default=False,
-    is_flag=True,
-    required=False,
-    help="Flag photos as training data, they don't require exif datetime data and the --camera option is not required",
-)
-def import_photos(photos, camera, training):
-    if not camera and not training:
-        click.secho(
-            "--camera option is required unless --training flag is set", bg="red"
-        )
-        return
-
+def import_photos(photos, camera):
     file_paths = find_files(photos)
-    imported_photos = PhotoProcessor(camera, training, file_paths).import_photos()
+    imported_photos = PhotoProcessor(file_paths, camera).import_photos()
     with click.progressbar(imported_photos, length=len(file_paths)) as progress:
         for imported_photo in progress:
             if "error" in imported_photo:

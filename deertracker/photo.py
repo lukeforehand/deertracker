@@ -58,11 +58,8 @@ def export_photos(output_dir):
 
 
 class PhotoProcessor:
-    def __init__(self, camera_name, training, file_paths):
-        self.training = training
+    def __init__(self, file_paths, camera_name):
         self.file_paths = file_paths
-        if training:
-            camera_name = "training"
         with database.conn() as db:
             self.camera = db.select_camera(camera_name)
             self.batch = db.insert_batch()
@@ -136,14 +133,11 @@ class PhotoProcessor:
             LOGGER.exception(msg)
             return {"error": msg}
 
-    # TODO: do we want to override lat/lon from EXIF if available?
-
     def get_time(self, image):
         try:
             return datetime.strptime(
                 image.getexif()[EXIF_TAGS["DateTime"]], "%Y:%m:%d %H:%M:%S"
             )
         except KeyError:
-            if self.training:
-                return None
-            raise
+            LOGGER.warn("Image is missing DateTime")
+            return None
