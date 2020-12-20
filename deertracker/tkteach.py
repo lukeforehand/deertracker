@@ -277,7 +277,7 @@ class tkteach:
             self.prevImage()
             time.sleep(0.05)
             self.prevImageButton.config(relief=tk.RAISED)
-        elif key.keysym == "Right":
+        elif key.keysym in ["Right", "Return"]:
             self.nextImageButton.config(relief=tk.SUNKEN)
             # self.nextImageButton.update_idletasks()
             self.nextImage()
@@ -298,17 +298,12 @@ class tkteach:
         else:
             # Check if this is an ad-hoc keybind for a category selection...
             try:
-                if self.categoriesListbox.selection_includes(
+                # test key binding
+                self.keyBindings.index(key.char.lower())
+                self.categoriesListbox.selection_clear(0, tk.END)
+                self.categoriesListbox.selection_set(
                     self.keyBindings.index(key.char.lower())
-                ):
-                    self.categoriesListbox.selection_clear(
-                        self.keyBindings.index(key.char.lower())
-                    )
-                else:
-                    self.categoriesListbox.selection_set(
-                        self.keyBindings.index(key.char.lower())
-                    )
-                    self.nextImage()
+                )
             except ValueError:
                 pass
 
@@ -361,9 +356,13 @@ class tkteach:
 
         # Read from db and update starting categories in listbox if data exists:
         self.categoriesListbox.selection_clear(0, len(self.categories))
+
+        image_path = str(
+            pathlib.Path(self.imageListDir[self.imageSelection]).relative_to(self.ds)
+        )
         categoryName = self.cursor.execute(
             "SELECT label FROM object WHERE path = ?",
-            (self.imageListDir[self.imageSelection],),
+            (image_path,),
         ).fetchone()[0]
         try:
             self.categoriesListbox.selection_set(self.categories.index(categoryName))
@@ -382,26 +381,20 @@ class tkteach:
     def saveImageCategorization(self):
         print("-->saveImageCategorization")
 
-        # TODO: select object from database, if
-        print(self.categories[self.categoriesListbox.curselection()[0]])
-        print(self.imageListDir[self.imageSelection])
-        raise Exception("STOP HERE")
-
-        # Clear out existing category labels for the image...
-        self.cursor.execute(
-            "DELETE FROM labels WHERE image_id = ?",
-            (self.db_getImageID(self.imageListDir[self.imageSelection]),),
+        label = self.categories[self.categoriesListbox.curselection()[0]]
+        image_path = pathlib.Path(self.imageListDir[self.imageSelection]).relative_to(
+            self.ds
         )
-
-        # Insert new category labels for the image...
-        for cati in self.categoriesListbox.curselection():
-            self.cursor.execute(
-                "INSERT INTO labels(image_id, category_id) VALUES(?, ?)",
-                (
-                    self.db_getImageID(self.imageListDir[self.imageSelection]),
-                    self.db_getCategoryID(self.categories[cati]),
-                ),
-            )
+        obj_id = self.cursor.execute(
+            "SELECT id FROM object WHERE path = ?",
+            (str(image_path),),
+        ).fetchone()[0]
+        new_image_path = f"{label}/100_{obj_id}.jpg"
+        self.cursor.execute(
+            "UPDATE object SET path = ?, label = ?, confidence = 1.0, ground_truth = TRUE WHERE id = ?",
+            (new_image_path, label, obj_id),
+        )
+        (self.ds / image_path).replace(self.ds / new_image_path)
         self.db.commit()
 
     def skipToImage(self):

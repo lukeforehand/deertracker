@@ -36,9 +36,9 @@ def add_camera(name, lat, lon):
 
 
 def store(filename, photo):
-    dest_path = f"{DEFAULT_PHOTO_STORE}/{filename}.jpg"
+    dest_path = f"{DEFAULT_PHOTO_STORE}/{filename}"
     photo.save(dest_path, "JPEG")
-    return f"{filename}.jpg"
+    return f"{filename}"
 
 
 def export_ground_truth(output="./deertracker_crops.tar.gz"):
@@ -107,7 +107,7 @@ class PhotoProcessor:
                     obj_conf = float(obj["confidence"])
                     obj_id = hashlib.md5(obj_photo.tobytes()).hexdigest()
                     obj_path = store(
-                        f"{obj_label}/{int(obj_conf*100)}_{obj_id}", obj_photo
+                        f"{obj_label}/{int(obj_conf*100)}_{obj_id}.jpg", obj_photo
                     )
                     db.insert_object(
                         (

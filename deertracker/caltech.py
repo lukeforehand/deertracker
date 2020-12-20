@@ -99,7 +99,7 @@ def process_annotation(batch, photos, filename, label, bbox):
 
         crop = crop_image(image, bbox)
         obj_id = hashlib.md5(crop.tobytes()).hexdigest()
-        obj_path = photo.store(f"{label}/{obj_id}", crop)
+        obj_path = photo.store(f"{label}/{obj_id}.jpg", crop)
         db.insert_object(
             (
                 obj_id,
