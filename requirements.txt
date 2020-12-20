@@ -2,7 +2,6 @@ black
 click
 colorama
 cvlib
-imagehash
 matplotlib
 opencv-python
 pathlib

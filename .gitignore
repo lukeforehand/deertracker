@@ -10,6 +10,4 @@ test/
 .mypy_cache
 models/
 training_imgs/
-tkteach/ds/
-tkteach/storage.db
-tkteach/image_paths.txt
+ds/

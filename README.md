@@ -53,3 +53,9 @@ Commands:
   classes     Show classifications for photo crops
   detections  Show object detections for photos
 ```
+
+## Labeling tool tkteach
+
+Copyright https://github.com/Serhiy-Shekhovtsov/tkteach
+
+* Ported tkteach to use the deertracker database as its datastore.
