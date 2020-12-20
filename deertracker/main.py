@@ -168,7 +168,7 @@ def ena24(photos, bboxes):
 )
 @click.option(
     "--model-dir",
-    default=classifier.DEFAULT_MODEL_FOLDER,
+    default=dt.DEFAULT_MODELS_PATH,
     required=False,
     help="Directory to store model snapshots",
 )
