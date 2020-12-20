@@ -241,7 +241,7 @@ class tkteach:
         self.dataSetsListDir = [
             d[0]
             for d in self.cursor.execute(
-                "SELECT DISTINCT SUBSTR(path, 0, INSTR(path, '/')) dataset FROM object WHERE ground_truth IS FALSE ORDER BY dataset ASC",
+                "SELECT DISTINCT label FROM object WHERE ground_truth IS FALSE ORDER BY label ASC",
             ).fetchall()
         ]
         self.dataSetsListStr = [x for x in self.dataSetsListDir]
@@ -437,7 +437,7 @@ class tkteach:
             self.imageListDir = [
                 str(self.ds / f[0])
                 for f in self.cursor.execute(
-                    "SELECT path FROM object WHERE ground_truth IS FALSE AND SUBSTR(path, 0, INSTR(path, '/')) = ? ORDER BY path ASC",
+                    "SELECT path FROM object WHERE ground_truth IS FALSE AND label = ? ORDER BY path ASC",
                     (str(self.dataSetsListStr[self.dataSetSelection]),),
                 ).fetchall()
             ]
