@@ -1,31 +1,8 @@
-import cv2
-import hashlib
 import json
 import pathlib
 import shutil
 
-from PIL import Image
-
 from deertracker import photo, database, DEFAULT_PHOTO_STORE
-
-
-def crop_image(image, bbox):
-    x = int(bbox[0])
-    y = int(bbox[1])
-    w = int(bbox[2])
-    h = int(bbox[3])
-    pw = max(int(w * 0.01), 10)
-    ph = max(int(h * 0.01), 10)
-    x1 = int(max(y - ph, 0))
-    x2 = int(min(y + h + ph, image.shape[0]))
-    y1 = int(max(x - pw, 0))
-    y2 = int(min(x + w + pw, image.shape[1]))
-    return Image.fromarray(
-        image[
-            x1:x2,
-            y1:y2,
-        ]
-    )
 
 
 def load_labels(bboxes_json, labels_json):
@@ -79,7 +56,7 @@ def process_annotations(photos, annotations):
         batch = db.insert_batch()
     for annotation in annotations:
         try:
-            yield process_annotation(
+            yield photo.process_annotation(
                 batch,
                 photos,
                 annotation["file_path"],
@@ -88,31 +65,3 @@ def process_annotations(photos, annotations):
             )
         except Exception as e:
             print(e)
-
-
-def process_annotation(batch, photos, filename, label, bbox):
-    (DEFAULT_PHOTO_STORE / label).mkdir(exist_ok=True)
-    with database.conn() as db:
-        image = cv2.imread(f"{photos}/{filename}")
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        image_hash = hashlib.md5(image.tobytes()).hexdigest()
-
-        crop = crop_image(image, bbox)
-        obj_id = hashlib.md5(crop.tobytes()).hexdigest()
-        obj_path = photo.store(f"{label}/{obj_id}.jpg", crop)
-        db.insert_object(
-            (
-                obj_id,
-                obj_path,
-                0.0,
-                0.0,
-                None,
-                label,
-                1.0,
-                True,
-                image_hash,
-                "training",
-            )
-        )
-        db.insert_photo((image_hash, filename, batch["id"]))
-        return {"id": obj_id}

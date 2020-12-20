@@ -1,6 +1,6 @@
 import pathlib
 
-from deertracker import database, caltech
+from deertracker import database, photo
 
 
 def process_annotations(photos, image_ids, bboxes, classes, labels):
@@ -40,7 +40,7 @@ def process_annotations(photos, image_ids, bboxes, classes, labels):
             "bbox": bbox_map[image_id],
         }
         try:
-            yield caltech.process_annotation(
+            yield photo.process_annotation(
                 batch,
                 photos,
                 annotation["file_path"],

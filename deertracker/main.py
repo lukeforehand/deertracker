@@ -71,6 +71,19 @@ def export_ground_truth():
     photo.export_ground_truth()
 
 
+@label.command(
+    help="Import ground truth photos that are organized by a separate folder per class."
+)
+@click.option("--photos", required=True, help="Location of ground truth images")
+def import_ground_truth(photos):
+    file_paths = find_files(photos)
+    imported_photos = photo.import_ground_truth(photos, file_paths)
+    with click.progressbar(imported_photos, length=len(file_paths)) as progress:
+        for annotation in progress:
+            if "error" in annotation:
+                click.secho(str(annotation), bg="red")
+
+
 @label.command(help="Review and correct labels")
 def tool():
     tkteach.main(dt.DEFAULT_DATABASE, dt.DEFAULT_PHOTO_STORE)
