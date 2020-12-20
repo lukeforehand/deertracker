@@ -33,6 +33,7 @@
 
 from PIL import Image, ImageTk
 import os
+import pathlib
 import time
 import sqlite3 as sq
 
@@ -54,8 +55,11 @@ except NameError:
 
 
 class tkteach:
-    def __init__(self, master):
+    def __init__(self, master, db_path, ds):
         print("-->__init__")
+
+        self.db_path = db_path
+        self.ds = ds
 
         self.master = master
         self.default_size = (800, 400)
@@ -189,7 +193,7 @@ class tkteach:
 
         self.categoriesListbox = tk.Listbox(
             self.frameRIGHT,
-            selectmode=tk.MULTIPLE,
+            selectmode=tk.SINGLE,
             selectbackground="#119911",
             relief=tk.FLAT,
             bd=2,
@@ -226,33 +230,21 @@ class tkteach:
         print("-->initializeDatabase")
 
         # Load/create database:
-        self.db = sq.connect("storage.db")
+        self.db = sq.connect(self.db_path)
         self.cursor = self.db.cursor()
-        self.cursor.execute(
-            "CREATE TABLE IF NOT EXISTS dataSets(id INTEGER NOT NULL PRIMARY KEY, dataSetName TEXT, dataSetPath TEXT UNIQUE)"
-        )
-        self.cursor.execute(
-            "CREATE TABLE IF NOT EXISTS images(id INTEGER NOT NULL PRIMARY KEY, dataSet_id INTEGER, imageName TEXT, imagePath TEXT UNIQUE, FOREIGN KEY(dataSet_id) REFERENCES dataSets(id))"
-        )
-        self.cursor.execute(
-            "CREATE TABLE IF NOT EXISTS categories(id INTEGER NOT NULL PRIMARY KEY, categoryName TEXT UNIQUE)"
-        )
-        self.cursor.execute(
-            "CREATE TABLE IF NOT EXISTS labels(category_id INTEGER, image_id INTEGER, FOREIGN KEY(category_id) REFERENCES categories(id), FOREIGN KEY(image_id) REFERENCES images(id))"
-        )
-        self.db.commit()
 
     def initializeDatasets(self):
         print("-->initializeDatasets")
 
         # Get Datasets:
-        d = "./ds"
+        d = str(self.ds)
         self.dataSetsListDir = [
-            os.path.join(d, o)
+            o
             for o in os.listdir(d)
             if os.path.isdir(os.path.join(d, o))
+            and len(os.listdir(os.path.join(d, o))) > 0
         ]
-        self.dataSetsListStr = [x[2:] for x in self.dataSetsListDir]
+        self.dataSetsListStr = [x for x in self.dataSetsListDir]
         if len(self.dataSetsListDir) == 0:
             self.statusBar.config(text="ERROR! No datasets found.")
             print("ERROR! No datasets found.")
@@ -260,38 +252,21 @@ class tkteach:
     def initializeCategories(self):
         print("-->initializeCategories")
 
-        # Get Categories from categories.txt file:
-        try:
-            catFile = open("categories.txt", "r")
-            self.categories = [o.strip() for o in catFile.readlines()]
-            catFile.close()
-        except IOError:
-            self.categories = []
-            self.statusBar.config(text="ERROR! No categories found.")
-            print("ERROR! No categories found.")
+        d = str(self.ds)
+        self.categories = [
+            o for o in os.listdir(d) if os.path.isdir(os.path.join(d, o))
+        ]
         if len(self.categories) == 0:
             self.statusBar.config(text="ERROR! No categories found.")
             print("ERROR! No categories found.")
 
-        # Populate db table for categories:
-        for category in self.categories:
-            self.cursor.execute(
-                "INSERT OR IGNORE INTO categories(categoryName) VALUES(?)", (category,)
-            )
-        self.db.commit()
-
         # Parse Categories, set ad-hoc category key bindings:
         self.keyBindings = []
-        for keyi in self.categories:
-            if keyi[0] == "(" and keyi[2] == ")":
-                if keyi[1] in self.keyBindings:
-                    self.statusBar.config(
-                        text="ERROR! Multiple categories with the same key binding!"
-                    )
-                    print("ERROR! Multiple categories with the same key binding!")
-                    exit()
-                else:
-                    self.keyBindings.append(keyi[1].lower())
+        for category in self.categories:
+            for c in category:
+                if c not in self.keyBindings:
+                    self.keyBindings.append(c.lower())
+                    break
 
     def keyPressed(self, key):
         print("-->keyPressed: " + str(key.char))
@@ -386,34 +361,27 @@ class tkteach:
 
         # Read from db and update starting categories in listbox if data exists:
         self.categoriesListbox.selection_clear(0, len(self.categories))
-        self.cursor.execute(
-            "SELECT category_id FROM labels WHERE image_id = ?",
-            (self.db_getImageID(self.imageListDir[self.imageSelection]),),
-        )
-        for category_id in self.cursor.fetchall():
-            self.cursor.execute(
-                "SELECT categoryName FROM categories WHERE id = ?", (category_id[0],)
+        categoryName = self.cursor.execute(
+            "SELECT label FROM object WHERE path = ?",
+            (self.imageListDir[self.imageSelection]),
+        ).fetchone()[0]
+        try:
+            self.categoriesListbox.selection_set(self.categories.index(categoryName))
+        except ValueError:
+            self.statusBar.config(
+                text="FATAL ERROR! Image is saved with invalid category."
             )
-            categoryName = self.cursor.fetchone()[0]
-            try:
-                self.categoriesListbox.selection_set(
-                    self.categories.index(categoryName)
-                )
-            except ValueError:
-                self.statusBar.config(
-                    text="FATAL ERROR! Image is saved with invalid category."
-                )
-                print(
-                    "FATAL ERROR! Image is saved with invalid category: "
-                    + str(categoryName)
-                )
-                print("image Name: " + self.imageListStr[self.imageSelection])
-                print("This category must be listed in the categories.txt file.")
-                exit()
+            print(
+                "FATAL ERROR! Image is saved with invalid category: "
+                + str(categoryName)
+            )
+            print("image Name: " + self.imageListStr[self.imageSelection])
+            print("This category must be listed in the categories.txt file.")
+            exit()
 
     def saveImageCategorization(self):
         print("-->saveImageCategorization")
-
+        raise Exception("TODO")
         # Clear out existing category labels for the image...
         self.cursor.execute(
             "DELETE FROM labels WHERE image_id = ?",
@@ -461,7 +429,7 @@ class tkteach:
         if self.dataSetSelection >= 0:
 
             # Load images in dataset:
-            d = self.dataSetsListDir[self.dataSetSelection]
+            d = self.ds / self.dataSetsListDir[self.dataSetSelection]
             self.imageListDir = sorted(
                 [
                     os.path.join(d, o)
@@ -473,30 +441,6 @@ class tkteach:
             self.dataSetStatusLabel.config(
                 text="Dataset: " + str(self.dataSetsListStr[self.dataSetSelection])
             )
-
-            # Create db table entry for this dataSet:
-            self.cursor.execute(
-                "INSERT OR IGNORE INTO dataSets(dataSetName, dataSetPath) VALUES(?, ?)",
-                (
-                    self.dataSetsListStr[self.dataSetSelection],
-                    self.dataSetsListDir[self.dataSetSelection],
-                ),
-            )
-
-            # Populate db table entries for all images in this dataSet (this can take a few seconds if over ~2,000 images):
-            dataSet_id = self.db_getDataSetID(
-                self.dataSetsListStr[self.dataSetSelection]
-            )
-            for imagei in range(len(self.imageListStr)):
-                self.cursor.execute(
-                    "INSERT OR IGNORE INTO images(dataSet_id, imageName, imagePath) VALUES(?, ?, ?)",
-                    (
-                        dataSet_id,
-                        str(self.imageListStr[imagei]),
-                        str(self.imageListDir[imagei]),
-                    ),
-                )
-            self.db.commit()
 
             # Prepare image stage:
             self.imageNumberInput.delete(0, tk.END)
@@ -542,27 +486,12 @@ class tkteach:
             self.currentZoomLabel.config(text=f" {self.imgScaleFactor:.2f}X ")
             self.loadImage()
 
-    def db_getImageID(self, imageStr):
-        # Get from database the image id
-        self.cursor.execute("SELECT id FROM images WHERE imagePath = ?", (imageStr,))
-        return self.cursor.fetchone()[0]
 
-    def db_getCategoryID(self, categoryStr):
-        # Get from database the category id
-        self.cursor.execute(
-            "SELECT id FROM categories WHERE categoryName = ?", (categoryStr,)
-        )
-        return self.cursor.fetchone()[0]
-
-    def db_getDataSetID(self, dataSetStr):
-        # Select from database the dataset id
-        self.cursor.execute(
-            "SELECT id FROM dataSets WHERE dataSetName = ?", (dataSetStr,)
-        )
-        return self.cursor.fetchone()[0]
+def main(database, photos_dir):
+    root = tk.Tk()
+    my_gui = tkteach(root, database, photos_dir)
+    root.mainloop()
 
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    my_gui = tkteach(root)
-    root.mainloop()
+    main()

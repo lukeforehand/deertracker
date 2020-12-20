@@ -1,13 +1,15 @@
 import click
 import pathlib
 
+import deertracker as dt
+
 from deertracker import (
-    DEFAULT_CLASSIFIER_PATH,
-    photo,
-    visualize,
     caltech as ct,
     classifier,
     nabirds as nab,
+    photo,
+    tkteach,
+    visualize,
 )
 from deertracker.photo import PhotoProcessor
 
@@ -67,6 +69,11 @@ def label():
 @label.command(help="Export ground truth photos tarball")
 def export_ground_truth():
     photo.export_ground_truth()
+
+
+@label.command(help="Review and correct labels")
+def tool():
+    tkteach.main(dt.DEFAULT_DATABASE, dt.DEFAULT_PHOTO_STORE)
 
 
 @label.command(
@@ -200,7 +207,7 @@ def detections(photos):
 @click.option("--photos", required=True, help="Location of photo crops to process")
 @click.option(
     "--model-dir",
-    default=DEFAULT_CLASSIFIER_PATH,
+    default=dt.DEFAULT_CLASSIFIER_PATH,
     required=False,
     help="Path to saved classifier model",
 )

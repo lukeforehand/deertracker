@@ -86,7 +86,7 @@ def show_class(image_path: str, classifier: Classifier):
     pool.join()
 
 
-def show_detection(image_paths):
+def show_detections(image_paths):
     detector = MegaDetector()
     for image_path in image_paths:
         yield show_detection(image_path, detector)

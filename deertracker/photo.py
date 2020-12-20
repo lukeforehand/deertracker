@@ -53,6 +53,15 @@ def export_ground_truth(output="./deertracker_crops.tar.gz"):
             print(f"Adding {dest_folder / filename} to {output}")
 
 
+def select_unlabeled():
+    with database.conn() as db:
+        objects = db.select_unlabeled()
+    for obj in objects:
+        print(obj)
+    # TODO: pass back a collection of file paths per folder
+    # for tkteach
+
+
 class PhotoProcessor:
     def __init__(self, file_paths, camera_name):
         self.file_paths = file_paths
@@ -106,9 +115,10 @@ class PhotoProcessor:
                     obj_photo = obj["image"]
                     obj_label = obj["label"]
                     obj_conf = float(obj["confidence"])
-                    obj_hash = hashlib.md5(obj_photo.tobytes()).hexdigest()
-                    obj_id = f"{obj_label}/{int(obj_conf*100)}_{obj_hash}"
-                    obj_path = store(obj_id, obj_photo)
+                    obj_id = hashlib.md5(obj_photo.tobytes()).hexdigest()
+                    obj_path = store(
+                        f"{obj_label}/{int(obj_conf*100)}_{obj_id}", obj_photo
+                    )
                     db.insert_object(
                         (
                             obj_id,

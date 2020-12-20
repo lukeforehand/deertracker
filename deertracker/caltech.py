@@ -97,11 +97,9 @@ def process_annotation(batch, photos, filename, label, bbox):
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image_hash = hashlib.md5(image.tobytes()).hexdigest()
 
-        obj_photo = crop_image(image, bbox)
-        obj_label = label
-        obj_hash = hashlib.md5(obj_photo.tobytes()).hexdigest()
-        obj_id = f"{obj_label}/{obj_hash}"
-        obj_path = photo.store(obj_id, obj_photo)
+        crop = crop_image(image, bbox)
+        obj_id = hashlib.md5(crop.tobytes()).hexdigest()
+        obj_path = photo.store(f"{label}/{obj_id}", crop)
         db.insert_object(
             (
                 obj_id,
@@ -109,7 +107,7 @@ def process_annotation(batch, photos, filename, label, bbox):
                 0.0,
                 0.0,
                 None,
-                obj_label,
+                label,
                 1.0,
                 True,
                 image_hash,
