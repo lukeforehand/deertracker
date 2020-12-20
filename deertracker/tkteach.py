@@ -238,12 +238,11 @@ class tkteach:
         print("-->initializeDatasets")
 
         # Get Datasets:
-        d = str(self.ds)
         self.dataSetsListDir = [
-            o
-            for o in os.listdir(d)
-            if os.path.isdir(os.path.join(d, o))
-            and len(os.listdir(os.path.join(d, o))) > 0
+            d[0]
+            for d in self.cursor.execute(
+                "SELECT DISTINCT SUBSTR(path, 0, INSTR(path, '/')) dataset FROM object WHERE ground_truth IS FALSE ORDER BY dataset ASC",
+            ).fetchall()
         ]
         self.dataSetsListStr = [x for x in self.dataSetsListDir]
         if len(self.dataSetsListDir) == 0:
@@ -435,15 +434,16 @@ class tkteach:
         if self.dataSetSelection >= 0:
 
             # Load images in dataset:
-            d = self.ds / self.dataSetsListDir[self.dataSetSelection]
-            self.imageListDir = sorted(
-                [
-                    os.path.join(d, o)
-                    for o in os.listdir(d)
-                    if os.path.isdir(os.path.join(d, o)) == False
-                ]
-            )
-            self.imageListStr = [o.split("\\")[-1] for o in self.imageListDir]
+            self.imageListDir = [
+                str(self.ds / f[0])
+                for f in self.cursor.execute(
+                    "SELECT path FROM object WHERE ground_truth IS FALSE AND SUBSTR(path, 0, INSTR(path, '/')) = ? ORDER BY path ASC",
+                    (str(self.dataSetsListStr[self.dataSetSelection]),),
+                ).fetchall()
+            ]
+            self.imageListStr = [
+                pathlib.Path(f).relative_to(self.ds) for f in self.imageListDir
+            ]
             self.dataSetStatusLabel.config(
                 text="Dataset: " + str(self.dataSetsListStr[self.dataSetSelection])
             )
