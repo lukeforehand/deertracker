@@ -46,6 +46,7 @@ def process_annotations(photos, image_ids, bboxes, classes, labels):
                 annotation["file_path"],
                 annotation["label"],
                 annotation["bbox"],
+                ground_truth=True,
             )
         except Exception as e:
             print(e)

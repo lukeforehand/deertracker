@@ -95,11 +95,18 @@ def export_data(training, assets, models):
     dt.export_data(assets, models)
 
 
-@label.command(help="Import ground truth photos organized by class")
-@click.option("--photos", required=True, help="Location of ground truth images")
-def import_ground_truth(photos):
+@label.command(help="Import photo crops organized by class")
+@click.option("--photos", required=True, help="Location of photo crops")
+@click.option(
+    "--ground-truth",
+    default=False,
+    is_flag=True,
+    required=False,
+    help="Set flag if photos have already been labeled",
+)
+def import_training_photos(photos, ground_truth):
     file_paths = find_files(photos)
-    imported_photos = photo.import_ground_truth(photos, file_paths)
+    imported_photos = photo.import_training_photos(photos, file_paths, ground_truth)
     with click.progressbar(imported_photos, length=len(file_paths)) as progress:
         for annotation in progress:
             if "error" in annotation:

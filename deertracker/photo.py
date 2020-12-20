@@ -53,7 +53,7 @@ def export_ground_truth(output="./deertracker_crops.tar.gz"):
             print(f"Added {dest_folder / file_path} to {output}")
 
 
-def import_ground_truth(input_dir, file_paths):
+def import_training_photos(input_dir, file_paths, ground_truth):
     with database.conn() as db:
         batch = db.insert_batch()
     file_paths = [x for x in pathlib.Path(input_dir).glob(f"**/*") if x.is_file()]
@@ -61,7 +61,9 @@ def import_ground_truth(input_dir, file_paths):
         file_path = file_path.relative_to(input_dir)
         label = file_path.parts[0]
         try:
-            yield process_annotation(batch, input_dir, file_path, label)
+            yield process_annotation(
+                batch, input_dir, file_path, label, ground_truth=ground_truth
+            )
         except Exception as e:
             print(e)
 
@@ -86,7 +88,7 @@ def crop_image(photo, bbox):
     )
 
 
-def process_annotation(batch, photos, filename, label, bbox=None):
+def process_annotation(batch, photos, filename, label, bbox=None, ground_truth=False):
     (DEFAULT_PHOTO_STORE / label).mkdir(exist_ok=True)
     image = Image.open(f"{photos}/{filename}")
     image_hash = hashlib.md5(image.tobytes()).hexdigest()
@@ -101,7 +103,18 @@ def process_annotation(batch, photos, filename, label, bbox=None):
     obj_path = store(f"{label}/{obj_id}.jpg", image)
     with database.conn() as db:
         db.insert_object(
-            (obj_id, obj_path, 0.0, 0.0, None, label, 1.0, True, image_hash, "training")
+            (
+                obj_id,
+                obj_path,
+                0.0,
+                0.0,
+                None,
+                label,
+                1.0 if ground_truth else 0.0,
+                ground_truth,
+                image_hash,
+                "training",
+            )
         )
         db.insert_photo((image_hash, str(filename), batch["id"]))
     return {"id": obj_id}

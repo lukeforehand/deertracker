@@ -62,6 +62,7 @@ def process_annotations(photos, annotations):
                 annotation["file_path"],
                 annotation["label"],
                 annotation["bbox"],
+                ground_truth=True,
             )
         except Exception as e:
             print(e)
