@@ -91,7 +91,7 @@ class tkteach:
         self.datasetTitleLabel = tk.Label(self.frameLEFT, text="Data Set Selection:")
         self.datasetTitleLabel.pack()
 
-        self.dataSetsListbox = tk.Listbox(self.frameLEFT, relief=tk.FLAT)
+        self.dataSetsListbox = tk.Listbox(self.frameLEFT, relief=tk.FLAT, height=20)
         for item in self.dataSetsListStr:
             self.dataSetsListbox.insert(tk.END, item)
         self.dataSetsListbox.pack()
@@ -197,6 +197,7 @@ class tkteach:
             selectbackground="#119911",
             relief=tk.FLAT,
             bd=2,
+            height=20,
         )
         for item in self.categories:
             self.categoriesListbox.insert(tk.END, item)
@@ -248,6 +249,12 @@ class tkteach:
         if len(self.dataSetsListDir) == 0:
             self.statusBar.config(text="ERROR! No datasets found.")
             print("ERROR! No datasets found.")
+
+        if hasattr(self, "dataSetsListbox"):
+            self.dataSetsListbox.delete(0, tk.END)
+            for item in self.dataSetsListStr:
+                self.dataSetsListbox.insert(tk.END, item)
+            self.dataSetsListbox.pack()
 
     def initializeCategories(self):
         print("-->initializeCategories")
@@ -396,6 +403,7 @@ class tkteach:
         )
         (self.ds / image_path).replace(self.ds / new_image_path)
         self.db.commit()
+        self.initializeDatasets()
 
     def skipToImage(self):
         print("-->skipToImage")
