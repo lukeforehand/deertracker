@@ -95,9 +95,7 @@ def export_data(training, assets, models):
     dt.export_data(assets, models)
 
 
-@label.command(
-    help="Import ground truth photos that are organized by a separate folder per class."
-)
+@label.command(help="Import ground truth photos organized by class")
 @click.option("--photos", required=True, help="Location of ground truth images")
 def import_ground_truth(photos):
     file_paths = find_files(photos)

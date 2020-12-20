@@ -40,10 +40,12 @@ Commands:
 deertracker label --help
 
 Commands:
-  caltech        Process Caltech bounding boxes or labels.
-  ena24          Process ENA-24 bounding boxes.
-  export-photos  Export photos that have not yet been labeled ground_truth
-  nabirds        Process NA Birds bounding boxes
+  caltech              Process Caltech bounding boxes or labels.
+  ena24                Process ENA-24 bounding boxes.
+  export-data          Export data store
+  import-ground-truth  Import ground truth photos organized by class
+  nabirds              Process NA Birds bounding boxes
+  tool                 Review and correct labels
 ```
 
 ```bash
