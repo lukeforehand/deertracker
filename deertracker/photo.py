@@ -50,7 +50,7 @@ def export_ground_truth(output="./deertracker_crops.tar.gz"):
         for obj in objects:
             file_path = pathlib.Path(obj["path"])
             tarball.add(DEFAULT_PHOTO_STORE / file_path, dest_folder / file_path)
-            print(f"Adding {dest_folder / file_path} to {output}")
+            print(f"Added {dest_folder / file_path} to {output}")
 
 
 def import_ground_truth(input_dir, file_paths):

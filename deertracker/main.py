@@ -1,5 +1,6 @@
 import click
 import pathlib
+import tarfile
 
 import deertracker as dt
 
@@ -66,9 +67,32 @@ def label():
     pass
 
 
-@label.command(help="Export ground truth photos tarball")
-def export_ground_truth():
-    photo.export_ground_truth()
+@label.command(help="Export data store")
+@click.option(
+    "--training",
+    default=False,
+    is_flag=True,
+    required=False,
+    help="export training images",
+)
+@click.option(
+    "--assets",
+    default=False,
+    is_flag=True,
+    required=False,
+    help="export all datastore assets (database, models, photos)",
+)
+@click.option(
+    "--models",
+    default=False,
+    is_flag=True,
+    required=False,
+    help="export models required to run deertracker",
+)
+def export_data(training, assets, models):
+    if training:
+        photo.export_ground_truth()
+    dt.export_data(assets, models)
 
 
 @label.command(
