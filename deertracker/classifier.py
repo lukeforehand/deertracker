@@ -6,12 +6,11 @@ from tensorflow.keras import layers
 from tqdm import tqdm
 from typing import Tuple, List
 
-from deertracker import DEFAULT_CLASSIFIER_PATH
+from deertracker import DEFAULT_CLASSIFIER_PATH, DEFAULT_MODELS_PATH
 
 IMAGE_SIZE = 96
 DEFAULT_DATA_FOLDER = Path(__file__).parents[1] / "training_imgs"
 DEFAULT_LOGS_FOLDER = Path(__file__).parents[1] / ".tensorboard"
-DEFAULT_MODEL_FOLDER = Path(__file__).parents[1] / "models"
 _AUTOTUNE = tf.data.experimental.AUTOTUNE
 
 
@@ -165,7 +164,7 @@ def train(
     model_name: str,
     data_dir: Path = DEFAULT_DATA_FOLDER,
     tb_logs: Path = DEFAULT_LOGS_FOLDER,
-    model_dir: Path = DEFAULT_MODEL_FOLDER,
+    model_dir: Path = DEFAULT_MODELS_PATH,
     min_images: int = 1_000,
     epochs: int = 500,
     resume: bool = False,

@@ -8,6 +8,3 @@ test/
 .data
 .tensorboard
 .mypy_cache
-models/
-training_imgs/
-ds/
