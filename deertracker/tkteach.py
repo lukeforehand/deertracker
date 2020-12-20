@@ -363,7 +363,7 @@ class tkteach:
         self.categoriesListbox.selection_clear(0, len(self.categories))
         categoryName = self.cursor.execute(
             "SELECT label FROM object WHERE path = ?",
-            (self.imageListDir[self.imageSelection]),
+            (self.imageListDir[self.imageSelection],),
         ).fetchone()[0]
         try:
             self.categoriesListbox.selection_set(self.categories.index(categoryName))
@@ -381,7 +381,12 @@ class tkteach:
 
     def saveImageCategorization(self):
         print("-->saveImageCategorization")
-        raise Exception("TODO")
+
+        # TODO: select object from database, if
+        print(self.categories[self.categoriesListbox.curselection()[0]])
+        print(self.imageListDir[self.imageSelection])
+        raise Exception("STOP HERE")
+
         # Clear out existing category labels for the image...
         self.cursor.execute(
             "DELETE FROM labels WHERE image_id = ?",

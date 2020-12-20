@@ -38,7 +38,7 @@ def add_camera(name, lat, lon):
 def store(filename, photo):
     dest_path = f"{DEFAULT_PHOTO_STORE}/{filename}.jpg"
     photo.save(dest_path, "JPEG")
-    return dest_path
+    return f"{filename}.jpg"
 
 
 def export_ground_truth(output="./deertracker_crops.tar.gz"):
@@ -48,18 +48,8 @@ def export_ground_truth(output="./deertracker_crops.tar.gz"):
     with tarfile.open(output, "w:gz") as tarball:
         for obj in objects:
             file_path = pathlib.Path(obj["path"])
-            filename = file_path.relative_to(file_path.parent.parent)
-            tarball.add(DEFAULT_PHOTO_STORE / filename, dest_folder / filename)
-            print(f"Adding {dest_folder / filename} to {output}")
-
-
-def select_unlabeled():
-    with database.conn() as db:
-        objects = db.select_unlabeled()
-    for obj in objects:
-        print(obj)
-    # TODO: pass back a collection of file paths per folder
-    # for tkteach
+            tarball.add(DEFAULT_PHOTO_STORE / file_path, dest_folder / file_path)
+            print(f"Adding {dest_folder / file_path} to {output}")
 
 
 class PhotoProcessor:
