@@ -56,6 +56,16 @@ Commands:
   detections  Show object detections for photos
 ```
 
+## Bash auto-completion
+
+```bash
+# generate auto-complete script
+_DEERTRACKER_COMPLETE=source_zsh deertracker > deertracker-complete.sh
+
+# add this line to ~/.zshrc
+. deertracker-complete.sh
+```
+
 ## Labeling tool tkteach
 
 Copyright https://github.com/Serhiy-Shekhovtsov/tkteach
