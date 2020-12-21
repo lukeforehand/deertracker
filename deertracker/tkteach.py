@@ -48,7 +48,7 @@ except ImportError:
     pass
 
 try:
-    print("tkinter imported, version: " + str(tk.TkVersion))
+    tk.TkVersion
 except NameError:
     print("FATAL ERROR! Unable to import tkinter.")
     exit()
