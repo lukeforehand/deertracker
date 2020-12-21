@@ -90,7 +90,7 @@ class tkteach:
         self.datasetTitleLabel = tk.Label(self.frameLEFT, text="Data Set Selection:")
         self.datasetTitleLabel.pack()
 
-        self.dataSetsListbox = tk.Listbox(self.frameLEFT, relief=tk.FLAT, height=20)
+        self.dataSetsListbox = tk.Listbox(self.frameLEFT, relief=tk.FLAT, height=30)
         for item in self.dataSetsListStr:
             self.dataSetsListbox.insert(tk.END, item)
         self.dataSetsListbox.pack()
@@ -196,7 +196,7 @@ class tkteach:
             selectbackground="#119911",
             relief=tk.FLAT,
             bd=2,
-            height=20,
+            height=30,
         )
         for item in self.categories:
             self.categoriesListbox.insert(tk.END, item)
@@ -227,7 +227,7 @@ class tkteach:
     def initializeDatabase(self):
 
         # Load/create database:
-        self.db = sq.connect(self.db_path)
+        self.db = sq.connect(str(self.db_path))
         self.cursor = self.db.cursor()
 
     def initializeDatasets(self):
@@ -242,7 +242,6 @@ class tkteach:
         self.dataSetsListStr = [x for x in self.dataSetsListDir]
         if len(self.dataSetsListDir) == 0:
             self.statusBar.config(text="ERROR! No datasets found.")
-            print("ERROR! No datasets found.")
 
         if hasattr(self, "dataSetsListbox"):
             self.dataSetsListbox.delete(0, tk.END)
@@ -258,7 +257,6 @@ class tkteach:
         ]
         if len(self.categories) == 0:
             self.statusBar.config(text="ERROR! No categories found.")
-            print("ERROR! No categories found.")
 
         # Parse Categories, set ad-hoc category key bindings:
         self.keyBindings = []
@@ -314,7 +312,6 @@ class tkteach:
             self.loadImage()
         else:
             self.statusBar.config(text="ERROR! Already at first image.")
-            print("ERROR! Already at first image.")
 
     def nextImage(self):
         # Go to next image
@@ -325,12 +322,16 @@ class tkteach:
             self.loadImage()
         else:
             self.statusBar.config(text="ERROR! Already at last image.")
-            print("ERROR! Already at last image.")
 
     def loadImage(self):
 
+        image_id = self.imageListDir[self.imageSelection]
+        image_path, categoryName = self.cursor.execute(
+            "SELECT path, label FROM object WHERE id = ?", (image_id,)
+        ).fetchone()
+
         # Draw image to screen:
-        imageFile = Image.open(self.imageListDir[self.imageSelection])
+        imageFile = Image.open(self.ds / image_path)
 
         imageFile.thumbnail(self.default_size, Image.ANTIALIAS)
 
@@ -345,48 +346,41 @@ class tkteach:
         )
         self.imgStage.config(image=canvasImage)
         self.imgStage.image = canvasImage
-        self.imgFileName.config(text=str(self.imageListStr[self.imageSelection]))
+        self.imgFileName.config(text=image_path)
         self.imageNumberInput.delete(0, tk.END)
         self.imageNumberInput.insert(0, str(self.imageSelection))
-        self.statusBar.config(text="")
+        self.statusBar.config(
+            text="Dataset loaded: "
+            + str(self.dataSetsListStr[self.dataSetSelection])
+            + " , Number of images: "
+            + str(len(self.imageListDir))
+        )
 
         # Read from db and update starting categories in listbox if data exists:
         self.categoriesListbox.selection_clear(0, len(self.categories))
 
-        image_path = str(
-            pathlib.Path(self.imageListDir[self.imageSelection]).relative_to(self.ds)
-        )
-        categoryName = self.cursor.execute(
-            "SELECT label FROM object WHERE path = ?",
-            (image_path,),
-        ).fetchone()[0]
         try:
             self.categoriesListbox.selection_set(self.categories.index(categoryName))
         except ValueError:
-            self.statusBar.config(
-                text="FATAL ERROR! Image is saved with invalid category."
-            )
             print(
                 "FATAL ERROR! Image is saved with invalid category: "
                 + str(categoryName)
             )
-            print("image Name: " + self.imageListStr[self.imageSelection])
+            print("image Name: " + self.imageListDir[self.imageSelection])
             exit()
 
     def saveImageCategorization(self):
 
         label = self.categories[self.categoriesListbox.curselection()[0]]
-        image_path = pathlib.Path(self.imageListDir[self.imageSelection]).relative_to(
-            self.ds
-        )
-        obj_id = self.cursor.execute(
-            "SELECT id FROM object WHERE path = ?",
-            (str(image_path),),
+        image_id = self.imageListDir[self.imageSelection]
+        image_path = self.cursor.execute(
+            "SELECT path FROM object WHERE id = ?", (image_id,)
         ).fetchone()[0]
-        new_image_path = f"{label}/100_{obj_id}.jpg"
+
+        new_image_path = f"{label}/100_{image_id}.jpg"
         self.cursor.execute(
             "UPDATE object SET path = ?, label = ?, confidence = 1.0, ground_truth = TRUE WHERE id = ?",
-            (new_image_path, label, obj_id),
+            (new_image_path, label, image_id),
         )
         (self.ds / image_path).replace(self.ds / new_image_path)
         self.db.commit()
@@ -402,10 +396,8 @@ class tkteach:
                 self.loadImage()
             else:
                 self.statusBar.config(text="ERROR! Image does not exist.")
-                print("ERROR! Image does not exist.")
         except:
             self.statusBar.config(text="ERROR! Invalid image selection.")
-            print("ERROR! Invalid image selection.")
 
     def loadDataSet(self):
 
@@ -421,14 +413,11 @@ class tkteach:
 
             # Load images in dataset:
             self.imageListDir = [
-                str(self.ds / f[0])
+                f[0]
                 for f in self.cursor.execute(
-                    "SELECT path FROM object WHERE ground_truth IS FALSE AND label = ? ORDER BY path ASC",
+                    "SELECT id FROM object WHERE ground_truth IS FALSE AND label = ? ORDER BY path, id ASC",
                     (str(self.dataSetsListStr[self.dataSetSelection]),),
                 ).fetchall()
-            ]
-            self.imageListStr = [
-                pathlib.Path(f).relative_to(self.ds) for f in self.imageListDir
             ]
             self.dataSetStatusLabel.config(
                 text="Dataset: " + str(self.dataSetsListStr[self.dataSetSelection])
@@ -450,12 +439,6 @@ class tkteach:
             # Communicate:
             self.statusBar.config(
                 text="Dataset loaded: "
-                + str(self.dataSetsListStr[self.dataSetSelection])
-                + " , Number of images: "
-                + str(len(self.imageListDir))
-            )
-            print(
-                "---->Dataset loaded: "
                 + str(self.dataSetsListStr[self.dataSetSelection])
                 + " , Number of images: "
                 + str(len(self.imageListDir))
