@@ -56,7 +56,6 @@ except NameError:
 
 class tkteach:
     def __init__(self, master, db_path, ds):
-        print("-->__init__")
 
         self.db_path = db_path
         self.ds = ds
@@ -210,14 +209,12 @@ class tkteach:
         self.select_defaults()
 
     def select_defaults(self):
-        print("-->select_defaults")
 
         if len(self.dataSetsListStr) == 1:
             self.dataSetsListbox.selection_set(0)
             self.loadDataSet()
 
     def initialize(self):
-        print("-->initialize")
 
         # Set parameters:
         self.imgScaleFactor = 1
@@ -228,14 +225,12 @@ class tkteach:
         self.initializeCategories()
 
     def initializeDatabase(self):
-        print("-->initializeDatabase")
 
         # Load/create database:
         self.db = sq.connect(self.db_path)
         self.cursor = self.db.cursor()
 
     def initializeDatasets(self):
-        print("-->initializeDatasets")
 
         # Get Datasets:
         self.dataSetsListDir = [
@@ -256,7 +251,6 @@ class tkteach:
             self.dataSetsListbox.pack()
 
     def initializeCategories(self):
-        print("-->initializeCategories")
 
         d = str(self.ds)
         self.categories = [
@@ -275,7 +269,6 @@ class tkteach:
                     break
 
     def keyPressed(self, key):
-        print("-->keyPressed: " + str(key.char))
 
         if key.keysym == "Left":
             self.prevImageButton.config(relief=tk.SUNKEN)
@@ -315,7 +308,6 @@ class tkteach:
 
     def prevImage(self):
         # Go to previous image
-        print("-->prevImage")
         self.saveImageCategorization()
         if self.imageSelection > 0:
             self.imageSelection -= 1
@@ -326,7 +318,6 @@ class tkteach:
 
     def nextImage(self):
         # Go to next image
-        print("-->nextImage")
         self.saveImageCategorization()
         if self.imageSelection < (len(self.imageListDir) - 1):
             self.imageSelection += 1
@@ -337,7 +328,6 @@ class tkteach:
             print("ERROR! Already at last image.")
 
     def loadImage(self):
-        print("-->loadImage")
 
         # Draw image to screen:
         imageFile = Image.open(self.imageListDir[self.imageSelection])
@@ -381,11 +371,9 @@ class tkteach:
                 + str(categoryName)
             )
             print("image Name: " + self.imageListStr[self.imageSelection])
-            print("This category must be listed in the categories.txt file.")
             exit()
 
     def saveImageCategorization(self):
-        print("-->saveImageCategorization")
 
         label = self.categories[self.categoriesListbox.curselection()[0]]
         image_path = pathlib.Path(self.imageListDir[self.imageSelection]).relative_to(
@@ -405,7 +393,6 @@ class tkteach:
         self.initializeDatasets()
 
     def skipToImage(self):
-        print("-->skipToImage")
         try:
             tryImageSelection = int(self.imageNumberInput.get())
             if (tryImageSelection >= 0) and (
@@ -421,7 +408,6 @@ class tkteach:
             print("ERROR! Invalid image selection.")
 
     def loadDataSet(self):
-        print("-->loadDataSet")
 
         # Check to see if selection has been made
         try:
@@ -478,7 +464,6 @@ class tkteach:
     def zoomIn(self):
         # Make image display larger.
         # Since anti-aliasing is NOT used, only integer zoom factors are permitted.
-        print("-->zoomIn")
         self.imgScaleFactor += 0.2
         self.currentZoomLabel.config(text=f" {self.imgScaleFactor:.2f}X ")
         self.loadImage()
@@ -486,7 +471,6 @@ class tkteach:
     def zoomOut(self):
         # Make image display smaller
         # Since anti-aliasing is NOT used, only integer zoom factors are permitted.
-        print("-->zoomOut")
         if self.imgScaleFactor > 0.2:
             self.imgScaleFactor -= 0.2
             self.currentZoomLabel.config(text=f" {self.imgScaleFactor:.2f}X ")
