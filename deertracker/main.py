@@ -7,6 +7,7 @@ import deertracker as dt
 from deertracker import (
     caltech as ct,
     classifier,
+    database,
     nabirds as nab,
     photo,
     tkteach,
@@ -90,9 +91,21 @@ def label():
     help="export models required to run deertracker",
 )
 def export_data(training, assets, models):
-    if training:
-        photo.export_ground_truth()
     dt.export_data(assets, models)
+    if training:
+        with database.conn() as db:
+            print(db.training_dataset_report())
+            total = db.training_dataset_count()
+            results = photo.export_ground_truth()
+        with click.progressbar(results, length=total) as progress:
+            for _ in progress:
+                pass
+
+
+@label.command(help="Print training data counts per class")
+def training_report():
+    with database.conn() as db:
+        print(db.training_dataset_report())
 
 
 @label.command(help="Import photo crops organized by class")

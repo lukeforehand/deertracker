@@ -17,7 +17,7 @@ def conn():
 
 # FIXME: foreign key constraints don't work
 class Connection:
-    def __init__(self, database=DEFAULT_DATABASE):
+    def __init__(self, database=str(DEFAULT_DATABASE)):
         conn = sqlite3.connect(database)
         conn.execute(schema.CREATE_TABLE_CAMERA)
         conn.execute(schema.INSERT_TRAINING_CAMERA)
@@ -102,7 +102,9 @@ class Connection:
         return [
             self._object_from_tuple(obj)
             for obj in self.conn.cursor()
-            .execute("SELECT * FROM object WHERE ground_truth IS TRUE")
+            .execute(
+                "SELECT * FROM object WHERE ground_truth IS TRUE AND label NOT IN ('animal', 'vehicle', 'person')"
+            )
             .fetchall()
         ]
 
@@ -121,3 +123,28 @@ class Connection:
             "camera_id": obj[8],
             "photo_id": obj[9],
         }
+
+    def training_dataset_report(self):
+        total = self.training_dataset_count()
+        result = [
+            f"{x[0]}\t{x[1]}".expandtabs(20)
+            for x in self.conn.cursor()
+            .execute(
+                """
+                SELECT label, COUNT(*) cnt FROM object WHERE ground_truth IS TRUE AND label
+                NOT IN ('animal', 'vehicle', 'person') GROUP BY label ORDER BY cnt DESC
+                """
+            )
+            .fetchall()
+        ]
+        result = [f"total\t{total}".expandtabs(20), *result]
+        return "\n".join(result)
+
+    def training_dataset_count(self):
+        return (
+            self.conn.cursor()
+            .execute(
+                "SELECT COUNT(*) FROM object WHERE ground_truth IS TRUE AND label NOT IN ('animal', 'vehicle', 'person')"
+            )
+            .fetchone()[0]
+        )

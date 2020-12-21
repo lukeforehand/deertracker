@@ -42,18 +42,15 @@ def store(filename, photo):
     return f"{filename}"
 
 
-def export_ground_truth(
-    output="./deertracker_crops.tar.gz", excludes=["animal", "person", "vehicle"]
-):
+def export_ground_truth(output="./deertracker_crops.tar.gz"):
     with database.conn() as db:
         objects = db.select_ground_truth()
     dest_folder = "training_imgs"
     with tarfile.open(output, "w:gz") as tarball:
         for obj in objects:
             file_path = pathlib.Path(obj["path"])
-            if file_path.parts[0] not in excludes:
-                tarball.add(DEFAULT_PHOTO_STORE / file_path, dest_folder / file_path)
-                print(f"Added {dest_folder / file_path} to {output}")
+            tarball.add(DEFAULT_PHOTO_STORE / file_path, dest_folder / file_path)
+            yield f"Added {dest_folder / file_path} to {output}"
 
 
 def import_training_photos(input_dir, file_paths, ground_truth):
