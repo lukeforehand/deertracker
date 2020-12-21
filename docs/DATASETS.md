@@ -7,32 +7,32 @@ Models are trained on crops extracted from various datasets, referenced below.
 
 [Download crops]()
 
-66,536 total crops
 Distribution:
 
 ```bash
-  12860 opossum
-  11225 raccoon
-   7944 coyote
-   7812 bobcat
+  67628 total
+  12859 opossum
+  11224 raccoon
+   7945 coyote
+   7811 bobcat
    6366 rabbit
-   5308 doe
-   2968 squirrel
-   2763 buck
-   2027 skunk
-   1951 fox
+   6176 doe
+   3020 squirrel
+   2863 buck
+   2026 skunk
+   1950 fox
    1781 bear
    1290 crow
-    779 turkey
-    770 owl
-    186 fawn
-    134 mountain_lion
-    124 blue_jay
-    121 eagle
-    112 yearling_deer
-     19 porcupine
-     12 fisher
-      6 sandhill_crane
+    829 turkey
+    769 owl
+    185 fawn
+    133 mountain_lion
+    123 blue_jay
+    120 eagle
+    111 yearling_deer
+     18 porcupine
+     11 fisher
+      5 sandhill_crane
 ```
 
 ## Caltech camera traps

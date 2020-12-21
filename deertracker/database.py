@@ -125,19 +125,19 @@ class Connection:
         }
 
     def training_dataset_report(self):
-        total = self.training_dataset_count()
+        total = str(self.training_dataset_count())
         result = [
-            f"{x[0]}\t{x[1]}".expandtabs(20)
+            f"{str(x[0]).rjust(7)} {x[1]}"
             for x in self.conn.cursor()
             .execute(
                 """
-                SELECT label, COUNT(*) cnt FROM object WHERE ground_truth IS TRUE AND label
+                SELECT COUNT(*) cnt, label FROM object WHERE ground_truth IS TRUE AND label
                 NOT IN ('animal', 'vehicle', 'person') GROUP BY label ORDER BY cnt DESC
                 """
             )
             .fetchall()
         ]
-        result = [f"total\t{total}".expandtabs(20), *result]
+        result = [f"{total.rjust(7)} total", *result]
         return "\n".join(result)
 
     def training_dataset_count(self):
