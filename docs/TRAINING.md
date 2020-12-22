@@ -99,7 +99,8 @@ drive.mount("/content/drive", force_remount=True)
 ! tar xfz ../drive/MyDrive/deertracker/deertracker_crops.tar.gz
 
 # train, saving the model checkpoints to google drive incase google colab disconnects.
-! python -m deertracker.main train dt \
+! python -m deertracker.main train \
+  --name dt \
   --images "training_imgs" \
   --model-dir ../drive/MyDrive/deertracker/models \
   --min-images 500 \
