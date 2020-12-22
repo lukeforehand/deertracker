@@ -1,26 +1,12 @@
-# SUPPRESSING DEBUGGING OUTPUT FROM VARIOUS C LIBRARIES
-import warnings
-
-warnings.filterwarnings("ignore")
-
-import os
-
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-
-import tensorflow as tf
-
-tf.get_logger().setLevel("INFO")
-# END
-
 import click
 import pathlib
-import tarfile
+import os
+import warnings
 
 import deertracker as dt
 
 from deertracker import (
     caltech as ct,
-    classifier,
     database,
     nabirds as nab,
     photo,
@@ -28,6 +14,9 @@ from deertracker import (
     visualize,
 )
 from deertracker.photo import PhotoProcessor
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+warnings.filterwarnings("ignore")
 
 
 def find_files(photos):
@@ -246,7 +235,9 @@ def ena24(photos, bboxes):
     help="Resume training from latest checkpoint.",
 )
 def train(name, images, model_dir, min_images, epochs, resume):
-    classifier.train(
+    from deertracker.classifier import train
+
+    train(
         name,
         data_dir=images,
         model_dir=pathlib.Path(model_dir),

@@ -6,16 +6,12 @@ import multiprocessing
 import numpy as np
 import pathlib
 import tarfile
-import tensorflow as tf
 
 from datetime import datetime
 from PIL import Image, UnidentifiedImageError
 from PIL.ExifTags import TAGS
 
 from deertracker import DEFAULT_PHOTO_STORE, database, model, logger
-
-from deertracker.classifier import load_model
-from deertracker.detector import MegaDetector
 
 
 EXIF_TAGS = dict(((v, k) for k, v in TAGS.items()))
@@ -128,16 +124,24 @@ class PhotoProcessor:
             self.batch = db.insert_batch()
         if self.camera is None:
             raise Exception(f"Camera `{camera_name}` not found.")
+
+        from deertracker.detector import MegaDetector
+
         self.detector = MegaDetector()
         for label in self.detector.labels.values():
             (DEFAULT_PHOTO_STORE / label).mkdir(exist_ok=True)
-        self.classifier = load_model()
+
+        from deertracker.classifier import load_model as Classifier
+
+        self.classifier = Classifier()
         for label in self.classifier.classes:
             (DEFAULT_PHOTO_STORE / label).mkdir(exist_ok=True)
 
     def import_photos(
         self,
     ):
+        import tensorflow as tf
+
         if CPUS <= 1 or tf.test.is_gpu_available():
             return self._import_photos(True, self.file_paths)
         pool = multiprocessing.Pool(CPUS)

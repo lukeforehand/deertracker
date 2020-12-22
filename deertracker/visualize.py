@@ -3,10 +3,6 @@ import matplotlib
 import matplotlib.pyplot as plt
 import multiprocessing
 
-from deertracker.classifier import load_model as Classifier
-
-from deertracker.detector import MegaDetector
-
 from deertracker import caltech
 
 colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]
@@ -51,12 +47,14 @@ def plot(image):
 
 
 def show_classes(image_paths, model_dir):
+    from deertracker.classifier import load_model as Classifier
+
     classifier = Classifier(model_dir)
     for image_path in image_paths:
         yield show_class(image_path, classifier)
 
 
-def show_class(image_path: str, classifier: Classifier):
+def show_class(image_path: str, classifier):
     """
     Visualize Microsoft's MegaDetector bounding boxes.
     """
@@ -87,12 +85,14 @@ def show_class(image_path: str, classifier: Classifier):
 
 
 def show_detections(image_paths):
+    from deertracker.detector import MegaDetector
+
     detector = MegaDetector()
     for image_path in image_paths:
         yield show_detection(image_path, detector)
 
 
-def show_detection(image_path: str, detector: MegaDetector):
+def show_detection(image_path: str, detector):
     """
     Visualize Microsoft's MegaDetector bounding boxes.
     """
