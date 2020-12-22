@@ -3,7 +3,7 @@ import logging
 
 def get_logger():
     logger = logging.getLogger("deertracker")
-    handler = logging.FileHandler("deertracker.err")
+    handler = logging.StreamHandler()
     formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
     handler.setFormatter(formatter)
     logger.addHandler(handler)

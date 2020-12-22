@@ -1,0 +1,16 @@
+
+# path to application data directory
+# if relative path, will be to application root
+data: .data
+
+# database filename
+# file should exist under $data/
+database: deertracker.db
+
+# detector filename
+# file should exist under $data/models/
+detector: md_v4.1.0.pb
+
+# path to classifier directory
+# directory should exist under $data/models/
+classifier: dt-0684

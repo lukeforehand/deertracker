@@ -27,6 +27,8 @@ Before starting, you need the gps coords of your trail cameras. [Find lat/lon](h
 
 If you use bash or zsh then tab completion for commands and options is supported.
 
+Advanced configuration is available in `config.yaml`
+
 ```bash
 deertracker --help
 
