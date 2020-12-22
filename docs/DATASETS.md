@@ -10,20 +10,20 @@ Models are trained on crops extracted from various datasets, referenced below.
 Distribution:
 
 ```bash
-  67628 total
+  67656 total
   12859 opossum
   11224 raccoon
    7945 coyote
    7811 bobcat
    6366 rabbit
-   6176 doe
-   3020 squirrel
-   2863 buck
+   6205 doe
+   3021 squirrel
+   2867 buck
    2026 skunk
    1950 fox
    1781 bear
    1290 crow
-    829 turkey
+    836 turkey
     769 owl
     185 fawn
     133 mountain_lion
