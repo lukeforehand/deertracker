@@ -25,6 +25,8 @@ pip install --editable .
 
 Before starting, you need the gps coords of your trail cameras. [Find lat/lon](https://www.latlong.net/)
 
+If you use bash or zsh then tab completion for commands and options is supported.
+
 ```bash
 deertracker --help
 
@@ -54,16 +56,6 @@ deertracker viz --help
 Commands:
   classes     Show classifications for photo crops
   detections  Show object detections for photos
-```
-
-## Bash auto-completion
-
-```bash
-# generate auto-complete script
-_DEERTRACKER_COMPLETE=source_zsh deertracker > deertracker-complete.sh
-
-# add this line to ~/.zshrc
-. deertracker-complete.sh
 ```
 
 ## Labeling tool tkteach
