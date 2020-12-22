@@ -2,6 +2,7 @@ import cv2
 import matplotlib
 import matplotlib.pyplot as plt
 import multiprocessing
+import random
 
 from deertracker import caltech
 
@@ -12,7 +13,7 @@ def show_caltech(photos, bboxes):
 
     bboxes = caltech.load_bboxes(bboxes)
 
-    for annotation in bboxes:
+    for annotation in random.sample(bboxes, len(bboxes)):
         image = cv2.imread(f"{photos}/{annotation['file_path']}")
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
@@ -50,7 +51,7 @@ def show_classes(image_paths, model_dir):
     from deertracker.classifier import load_model as Classifier
 
     classifier = Classifier(model_dir)
-    for image_path in image_paths:
+    for image_path in random.sample(image_paths, len(image_paths)):
         yield show_class(image_path, classifier)
 
 
@@ -63,21 +64,23 @@ def show_class(image_path: str, classifier):
     image = cv2.imread(image_path)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-    font_scale = min(image.shape[0], image.shape[1]) / (25 / 0.05)
-    newline_step = int(image.shape[1] * 0.05)
-    label_y = newline_step
-    for i, score in enumerate(classifier.predict(image)):
+    predictions = classifier.predict(image)
+    index = sorted(range(len(predictions)), reverse=True, key=lambda k: predictions[k])
+    xy = (25, 40)
+    for i in index:
+        score = predictions[i]
+        label = classifier.classes[i]
         if score > 0.01:
             cv2.putText(
                 image,
-                f"{int(score * 100)} {classifier.classes[i]}",
-                (25, label_y),
+                f"{str(int(score * 100)).rjust(2)} {label}",
+                xy,
                 cv2.FONT_HERSHEY_SIMPLEX,
-                font_scale,
+                1.0,
                 (0, 255, 0),
                 2,
             )
-            label_y += newline_step
+            xy = (xy[0], xy[1] + 40)
     pool = multiprocessing.Pool(8)
     pool.map(plot, (image,))
     pool.close()
@@ -88,7 +91,7 @@ def show_detections(image_paths):
     from deertracker.detector import MegaDetector
 
     detector = MegaDetector()
-    for image_path in image_paths:
+    for image_path in random.sample(image_paths, len(image_paths)):
         yield show_detection(image_path, detector)
 
 
