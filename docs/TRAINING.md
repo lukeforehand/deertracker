@@ -103,6 +103,7 @@ drive.mount("/content/drive", force_remount=True)
   --images "training_imgs" \
   --model-dir ../drive/MyDrive/deertracker/models \
   --min-images 500 \
-  --epochs 1000
+  --epochs 1000 \
+  --resume
 
 ```
