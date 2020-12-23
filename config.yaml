@@ -1,6 +1,6 @@
 
 # path to application data directory
-# if relative path, will be to application root
+# can be relative to application folder, or absolute
 data: .data
 
 # database filename
