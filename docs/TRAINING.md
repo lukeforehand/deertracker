@@ -27,6 +27,8 @@ deertracker train \
  --epochs 500
 ```
 
+When a model is sufficiently trained, update `classifier` in `config.yaml` with the new model iteration.
+
 ## Training can be done in a python notebook like colab.research.google.com with a small amount of code
 
 ```notebook
@@ -55,3 +57,5 @@ drive.mount("/content/drive", force_remount=True)
   --epochs 1000 \
   --resume
 ```
+
+When a model in colab is sufficiently trained, download it from google drive, and unzip to `.data/models/`, and update `classifier` in `config.yaml` with the new model iteration.
