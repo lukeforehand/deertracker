@@ -19,7 +19,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 warnings.filterwarnings("ignore")
 
 
-def find_files(photos):
+def find_files(input_dir):
     exts = []
     exts.extend(photo.PHOTO_EXTS)
     exts.extend([ext.upper() for ext in photo.PHOTO_EXTS])
@@ -28,13 +28,13 @@ def find_files(photos):
     return [
         str(x)
         for ext in exts
-        for x in pathlib.Path(photos).glob(f"**/*{ext}")
+        for x in pathlib.Path(input_dir).glob(f"**/*{ext}")
         if x.is_file()
     ]
 
 
 # API commands
-@click.group()
+@click.group(help="Deer Tracker")
 def main():
     pass
 
@@ -52,8 +52,7 @@ def add_camera(name, lat, lon):
 @click.option("--photos", required=True, help="Location of photos to process")
 @click.option(
     "--camera",
-    default="training",
-    required=False,
+    required=True,
     help="Name of trail cam to associate with photos",
 )
 def import_photos(photos, camera):
@@ -84,7 +83,7 @@ def label():
     default=False,
     is_flag=True,
     required=False,
-    help="export all datastore assets (database, models, photos)",
+    help="export all datastore assets (database, models, crops)",
 )
 @click.option(
     "--models",
@@ -111,8 +110,8 @@ def training_report():
         print(db.training_dataset_report())
 
 
-@label.command(help="Import photo crops organized by class")
-@click.option("--photos", required=True, help="Location of photo crops")
+@label.command(help="Import training photo crops organized by class")
+@click.option("--crops", required=True, help="Location of photo crops to process")
 @click.option(
     "--ground-truth",
     default=False,
@@ -120,13 +119,24 @@ def training_report():
     required=False,
     help="Set flag if photos have already been labeled",
 )
-def import_training_photos(photos, ground_truth):
-    file_paths = find_files(photos)
-    imported_photos = photo.import_training_photos(photos, file_paths, ground_truth)
-    with click.progressbar(imported_photos, length=len(file_paths)) as progress:
+def import_training_crops(crops, ground_truth):
+    file_paths = find_files(crops)
+    imported_crops = photo.import_training_crops(crops, file_paths, ground_truth)
+    with click.progressbar(imported_crops, length=len(file_paths)) as progress:
         for annotation in progress:
             if "error" in annotation:
                 click.secho(str(annotation), bg="red")
+
+
+@label.command(help="Import training photos")
+@click.option("--photos", required=True, help="Location of photos to process")
+def import_training_photos(photos):
+    file_paths = find_files(photos)
+    imported_photos = PhotoProcessor(file_paths, "training").import_photos()
+    with click.progressbar(imported_photos, length=len(file_paths)) as progress:
+        for imported_photo in progress:
+            if "error" in imported_photo:
+                click.secho(str(imported_photo), bg="red")
 
 
 @label.command(help="Review and correct labels")
@@ -264,15 +274,15 @@ def detections(photos):
 
 
 @viz.command(help="Show classifications for photo crops")
-@click.option("--photos", required=True, help="Location of photo crops to process")
+@click.option("--crops", required=True, help="Location of photo crops to process")
 @click.option(
     "--model-dir",
     default=dt.DEFAULT_CLASSIFIER_PATH,
     required=False,
     help="Path to saved classifier model",
 )
-def classes(photos, model_dir):
-    file_paths = find_files(photos)
+def classes(crops, model_dir):
+    file_paths = find_files(crops)
     classes = visualize.show_classes(file_paths, model_dir)
     with click.progressbar(classes, length=len(file_paths)) as progress:
         for _ in progress:

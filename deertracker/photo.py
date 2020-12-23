@@ -49,7 +49,7 @@ def export_ground_truth(output="./deertracker_crops.tar.gz"):
             yield f"Added {dest_folder / file_path} to {output}"
 
 
-def import_training_photos(input_dir, file_paths, ground_truth):
+def import_training_crops(input_dir, file_paths, ground_truth):
     with database.conn() as db:
         batch = db.insert_batch()
     file_paths = [x for x in pathlib.Path(input_dir).glob(f"**/*") if x.is_file()]

@@ -1,5 +1,18 @@
 # Prediction Examples
 
+```bash
+Usage: deertracker viz [OPTIONS] COMMAND [ARGS]...
+
+  Visualize detections, classes
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  classes     Show classifications for photo crops
+  detections  Show object detections for photos
+```
+
 ![](examples/buck1.png?raw=true)
 ![](examples/buck2.png?raw=true)
 ![](examples/cat2.png?raw=true)

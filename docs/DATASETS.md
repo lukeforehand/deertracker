@@ -5,8 +5,6 @@ Models are trained on crops extracted from various datasets, referenced below.
 * Bounding boxes were used for crops when provided by data source.
 * Mega Detector was used on images with no bounding box, and manually curated.
 
-[Download crops]()
-
 Distribution:
 
 ```bash
