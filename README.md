@@ -2,7 +2,6 @@
 
 Identify and track wildlife using trail cameras, object detection and classification.
 
-- [Development notes](docs/NOTES.md)
 - [Prediction Examples](docs/EXAMPLES.md)
 - [Datasets](docs/DATASETS.md)
 - [Labeling](docs/LABELING.md)
