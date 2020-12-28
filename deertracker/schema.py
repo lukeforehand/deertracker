@@ -27,14 +27,14 @@ CREATE_TABLE_OBJECT = """
 CREATE TABLE IF NOT EXISTS object (
     id CHARACTER(32) PRIMARY KEY NOT NULL,
     path VARCHAR(255) NOT NULL UNIQUE,
-    lat FLOAT NOT NULL,
-    lon FLOAT NOT NULL,
+    lat FLOAT,
+    lon FLOAT,
     time DATETIME,
     label VARCHAR(255) NOT NULL,
     confidence FLOAT NOT NULL,
     ground_truth BOOLEAN NOT NULL,
     photo_id CHARACTER(32) NOT NULL,
-    location_id INTEGER NULL,
+    location_id INTEGER,
     FOREIGN KEY(photo_id) REFERENCES photo(id),
     FOREIGN KEY(location_id) REFERENCES location(id)
 )

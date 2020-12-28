@@ -125,11 +125,13 @@ def process_annotation(batch, photos, filename, label, bbox=None, ground_truth=F
 class PhotoProcessor:
     def __init__(self, file_paths, location_name):
         self.file_paths = file_paths
+        self.location = {"id": None, "lat": None, "lon": None}
         with database.conn() as db:
-            self.location = db.select_location(location_name)
+            if location_name:
+                self.location = db.select_location(location_name)
+                if self.location is None:
+                    raise Exception(f"Location `{location_name}` not found.")
             self.batch = db.insert_batch()
-        if self.location is None:
-            raise Exception(f"Location `{location_name}` not found.")
 
         from deertracker.detector import MegaDetector
 

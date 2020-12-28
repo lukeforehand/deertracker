@@ -132,7 +132,7 @@ def import_training_crops(crops, ground_truth):
 @click.option("--photos", required=True, help="Location of photos to process")
 def import_training_photos(photos):
     file_paths = find_files(photos)
-    imported_photos = PhotoProcessor(file_paths, "training").import_photos()
+    imported_photos = PhotoProcessor(file_paths, None).import_photos()
     with click.progressbar(imported_photos, length=len(file_paths)) as progress:
         for imported_photo in progress:
             if "error" in imported_photo:
