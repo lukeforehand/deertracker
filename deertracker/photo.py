@@ -5,7 +5,6 @@ import itertools
 import multiprocessing
 import numpy as np
 import pathlib
-import random
 import tarfile
 
 from datetime import datetime
@@ -54,13 +53,13 @@ def export_ground_truth(
             label_map[obj["label"]] = label_map.get(obj["label"], []) + [
                 pathlib.Path(obj["path"])
             ]
-
-    r = random.Random(seed)
     dest_folder = "training_imgs"
     with tarfile.open(output, "w:gz") as tarball:
         for label in label_map:
-            for file_path in label_map[label]:
-                if r.random() < validation_split:
+            total = len(label_map[label])
+            test_total = int(total * validation_split)
+            for i, file_path in enumerate(label_map[label]):
+                if i < test_total:
                     dest_path = "test" / file_path
                 else:
                     dest_path = "train" / file_path

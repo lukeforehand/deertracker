@@ -186,7 +186,9 @@ def train(
     num_classes = len(class_names)
 
     # class label -> number of examples of that class
-    class_to_num = {c: len(list((data_dir / c).glob("*"))) for c in class_names}
+    train_num = {c: len(list((data_dir / "train" / c).glob("*"))) for c in class_names}
+    test_num = {c: len(list((data_dir / "test" / c).glob("*"))) for c in class_names}
+    class_to_num = {k: train_num[k] + test_num[k] for k in class_names}
 
     model = Linnaeus(num_classes)
     model.build((32, IMAGE_SIZE, IMAGE_SIZE, 3))
