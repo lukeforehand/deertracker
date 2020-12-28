@@ -83,7 +83,7 @@ def label():
     default=False,
     is_flag=True,
     required=False,
-    help="export all datastore assets (database, models, crops)",
+    help="export all datastore assets (database, models, photos, crops)",
 )
 @click.option(
     "--models",
