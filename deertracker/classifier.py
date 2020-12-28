@@ -82,7 +82,10 @@ def load_model(model_path=DEFAULT_CLASSIFIER_PATH):
 
 
 def get_datasets(
-    data_dir: Path = DEFAULT_DATA_FOLDER, min_images: int = 1_000, seed: int = 20201130
+    data_dir: Path = DEFAULT_DATA_FOLDER,
+    min_images: int = 1_000,
+    validation_split: float = 0.2,
+    seed: int = 20201130,
 ) -> Tuple[tf.data.Dataset, tf.data.Dataset, List[str]]:
     """
     Get the training dataset, testing dataset, and a list of class labels.
@@ -109,7 +112,9 @@ def get_datasets(
     test_ds = test_ds.map(unpack_batch)
 
     rare_labels = [
-        f.name for f in data_dir.glob("*") if len(list(f.glob("*"))) < min_images
+        f.name
+        for f in (data_dir / "test").glob("*")
+        if len(list(f.glob("*"))) < (min_images * validation_split)
     ]
     if rare_labels:
         print(f"These labels will be ignored due to lack of data: {rare_labels}")
