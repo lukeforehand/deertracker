@@ -35,8 +35,9 @@ class Connection:
             cur = self.conn.cursor()
             cur.execute(sql, location)
             cur.execute("SELECT LAST_INSERT_ROWID()")
-            location["id"] = cur.fetchone()[0]
-            return self._location_from_tuple(location)
+            return self._location_from_tuple(
+                (cur.fetchone()[0], location[0], location[1], location[2])
+            )
         except sqlite3.IntegrityError:
             return {"error": f"Location `{location[0]}` already exists."}
 

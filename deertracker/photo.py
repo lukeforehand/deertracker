@@ -186,7 +186,7 @@ class PhotoProcessor:
                     return {"error": f"Photo `{file_path}` already exists."}
             photo_time = self.get_time(image)
             model_results = model.model(self.detector, self.classifier, image)
-            if len(model_results > 0):
+            if len(model_results) > 0:
                 for obj in model_results:
                     obj_photo = obj["image"]
                     obj_label = obj["label"]
@@ -201,10 +201,10 @@ class PhotoProcessor:
                             (
                                 obj_id,
                                 obj_path,
-                                obj["x"][0],
-                                obj["y"][1],
-                                obj["w"][2],
-                                obj["h"][3],
+                                obj["x"],
+                                obj["y"],
+                                obj["w"],
+                                obj["h"],
                                 self.location["lat"],
                                 self.location["lon"],
                                 photo_time,
@@ -215,9 +215,9 @@ class PhotoProcessor:
                                 self.location["id"],
                             )
                         )
-                photo_path = store_photo(f"{photo_hash}.jpg", image)
-                with database.conn() as db:
-                    return db.insert_photo((photo_hash, photo_path, self.batch["id"]))
+                file_path = store_photo(f"{photo_hash}.jpg", image)
+            with database.conn() as db:
+                return db.insert_photo((photo_hash, file_path, self.batch["id"]))
         except Exception:
             msg = f"Error processing photo `{file_path}`"
             LOGGER.exception(msg)

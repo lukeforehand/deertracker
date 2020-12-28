@@ -60,7 +60,7 @@ def import_photos(photos, location):
     imported_photos = PhotoProcessor(file_paths, location).import_photos()
     with click.progressbar(imported_photos, length=len(file_paths)) as progress:
         for imported_photo in progress:
-            if "error" in imported_photo:
+            if imported_photo and "error" in imported_photo:
                 click.secho(str(imported_photo), bg="red")
 
 
