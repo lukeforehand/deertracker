@@ -5,6 +5,7 @@ import itertools
 import multiprocessing
 import numpy as np
 import pathlib
+import random
 import tarfile
 
 from datetime import datetime
@@ -44,15 +45,27 @@ def store_photo(filename, photo):
     return f"{filename}"
 
 
-def export_ground_truth(output="./deertracker_crops.tar.gz"):
+def export_ground_truth(
+    output="./deertracker_crops.tar.gz", validation_split=0.2, seed=20201130
+):
     with database.conn() as db:
-        objects = db.select_ground_truth()
+        label_map = {}
+        for obj in db.select_ground_truth():
+            label_map[obj["label"]] = label_map.get(obj["label"], []) + [
+                pathlib.Path(obj["path"])
+            ]
+
+    r = random.Random(seed)
     dest_folder = "training_imgs"
     with tarfile.open(output, "w:gz") as tarball:
-        for obj in objects:
-            file_path = pathlib.Path(obj["path"])
-            tarball.add(DEFAULT_CROP_STORE / file_path, dest_folder / file_path)
-            yield f"Added {dest_folder / file_path} to {output}"
+        for label in label_map:
+            for file_path in label_map[label]:
+                if r.random() < validation_split:
+                    dest_path = "test" / file_path
+                else:
+                    dest_path = "train" / file_path
+                tarball.add(DEFAULT_CROP_STORE / file_path, dest_folder / dest_path)
+                yield f"Added {dest_folder / dest_path} to {output}"
 
 
 def import_training_crops(input_dir, file_paths, ground_truth):

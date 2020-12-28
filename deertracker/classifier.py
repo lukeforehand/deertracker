@@ -82,24 +82,24 @@ def load_model(model_path=DEFAULT_CLASSIFIER_PATH):
 
 
 def get_datasets(
-    data_dir: Path = DEFAULT_DATA_FOLDER, min_images: int = 1_000
+    data_dir: Path = DEFAULT_DATA_FOLDER, min_images: int = 1_000, seed: int = 20201130
 ) -> Tuple[tf.data.Dataset, tf.data.Dataset, List[str]]:
     """
     Get the training dataset, testing dataset, and a list of class labels.
     """
     train_ds = tf.keras.preprocessing.image_dataset_from_directory(
-        data_dir,
-        validation_split=0.2,
+        data_dir / "train",
+        validation_split=0,
         subset="training",
-        seed=20201130,
+        seed=seed,
         image_size=(IMAGE_SIZE + 10, IMAGE_SIZE + 10),
         batch_size=1,
     )
     test_ds = tf.keras.preprocessing.image_dataset_from_directory(
-        data_dir,
-        validation_split=0.2,
-        subset="validation",
-        seed=20201130,
+        data_dir / "test",
+        validation_split=0,
+        subset="training",
+        seed=seed,
         image_size=(IMAGE_SIZE, IMAGE_SIZE),
         batch_size=1,
     )
