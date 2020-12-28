@@ -89,16 +89,12 @@ def get_datasets(
     """
     train_ds = tf.keras.preprocessing.image_dataset_from_directory(
         data_dir / "train",
-        validation_split=0,
-        subset="training",
         seed=seed,
         image_size=(IMAGE_SIZE + 10, IMAGE_SIZE + 10),
         batch_size=1,
     )
     test_ds = tf.keras.preprocessing.image_dataset_from_directory(
         data_dir / "test",
-        validation_split=0,
-        subset="training",
         seed=seed,
         image_size=(IMAGE_SIZE, IMAGE_SIZE),
         batch_size=1,
