@@ -10,14 +10,19 @@ def model(detector, classifier, photo, confidence=0.98):
     results = []
     for i, _ in enumerate(bbox):
 
-        w = bbox[i][3] - bbox[i][1]
+        x = bbox[i][1]
+        x2 = bbox[i][3]
+        y = bbox[i][0]
+        y2 = bbox[i][2]
+        w = x2 - x
+        h = y2 - y
+
         pw = max(int(w * 0.01), 10)
-        h = bbox[i][2] - bbox[i][0]
         ph = max(int(h * 0.01), 10)
 
         crop = image[
-            max(bbox[i][0] - ph, 0) : min(bbox[i][2] + ph, image.shape[0]),
-            max(bbox[i][1] - pw, 0) : min(bbox[i][3] + pw, image.shape[1]),
+            max(y - ph, 0) : min(y2 + ph, image.shape[0]),
+            max(x - pw, 0) : min(x2 + pw, image.shape[1]),
         ]
 
         label = detector.labels[_class[i]]
@@ -35,6 +40,10 @@ def model(detector, classifier, photo, confidence=0.98):
                     "image": Image.fromarray(crop),
                     "label": label,
                     "confidence": score,
+                    "x": x,
+                    "y": y,
+                    "w": w,
+                    "h": h,
                 }
             )
     return results

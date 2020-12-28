@@ -15,7 +15,7 @@ def conn():
         c.close()
 
 
-# FIXME: foreign key constraints don't work
+# FIXME: verify foreign key constraints work
 class Connection:
     def __init__(self, database=str(DEFAULT_DATABASE)):
         conn = sqlite3.connect(database)
@@ -43,7 +43,10 @@ class Connection:
     def select_location(self, location_name):
         return self._location_from_tuple(
             self.conn.cursor()
-            .execute("SELECT * FROM location WHERE name = ?", [location_name])
+            .execute(
+                "SELECT id, name, lat, lon FROM location WHERE name = ?",
+                [location_name],
+            )
             .fetchone()
         )
 
@@ -82,20 +85,27 @@ class Connection:
 
     def insert_object(self, obj):
         try:
-            sql = "INSERT INTO object(id, path, lat, lon, time, label, confidence, ground_truth, photo_id, location_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            sql = """
+                INSERT INTO object(id, path, x, y, w, h, lat, lon, time, label, confidence, ground_truth, photo_id, location_id)
+                VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """
             cur = self.conn.cursor()
             cur.execute(sql, obj)
             return {
                 "id": obj[0],
                 "path": obj[1],
-                "lat": obj[2],
-                "lon": obj[3],
-                "time": obj[4],
-                "label": obj[5],
-                "confidence": obj[6],
-                "ground_truth": obj[7],
-                "photo_id": obj[8],
-                "location_id": obj[9],
+                "x": obj[2],
+                "y": obj[3],
+                "w": obj[4],
+                "h": obj[5],
+                "lat": obj[6],
+                "lon": obj[7],
+                "time": obj[8],
+                "label": obj[9],
+                "confidence": obj[10],
+                "ground_truth": obj[11],
+                "photo_id": obj[12],
+                "location_id": obj[13],
             }
         except sqlite3.IntegrityError:
             return {"error": f"Object `{obj[1]}` already exists."}
@@ -105,7 +115,10 @@ class Connection:
             self._object_from_tuple(obj)
             for obj in self.conn.cursor()
             .execute(
-                "SELECT * FROM object WHERE ground_truth IS TRUE AND label NOT IN ('animal', 'vehicle', 'person')"
+                """
+                    SELECT id, path, x, y, w, h, lat, lon, time, label, confidence, ground_truth, location_id, photo_id
+                    FROM object WHERE ground_truth IS TRUE AND label NOT IN ('animal', 'vehicle', 'person')
+                """
             )
             .fetchall()
         ]
@@ -116,14 +129,18 @@ class Connection:
         return {
             "id": obj[0],
             "path": obj[1],
-            "lat": obj[2],
-            "lon": obj[3],
-            "time": obj[4],
-            "label": obj[5],
-            "confidence": obj[6],
-            "ground_truth": obj[7],
-            "location_id": obj[8],
-            "photo_id": obj[9],
+            "x": obj[2],
+            "y": obj[3],
+            "w": obj[4],
+            "h": obj[5],
+            "lat": obj[6],
+            "lon": obj[7],
+            "time": obj[8],
+            "label": obj[9],
+            "confidence": obj[10],
+            "ground_truth": obj[11],
+            "location_id": obj[12],
+            "photo_id": obj[13],
         }
 
     def training_dataset_report(self):

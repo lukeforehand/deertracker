@@ -108,6 +108,10 @@ def process_annotation(batch, photos, filename, label, bbox=None, ground_truth=F
             (
                 obj_id,
                 obj_path,
+                int(bbox[0]),
+                int(bbox[1]),
+                int(bbox[2]),
+                int(bbox[3]),
                 0.0,
                 0.0,
                 None,
@@ -197,6 +201,10 @@ class PhotoProcessor:
                             (
                                 obj_id,
                                 obj_path,
+                                obj["x"][0],
+                                obj["y"][1],
+                                obj["w"][2],
+                                obj["h"][3],
                                 self.location["lat"],
                                 self.location["lon"],
                                 photo_time,
