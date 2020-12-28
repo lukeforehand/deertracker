@@ -141,7 +141,7 @@ def import_training_photos(photos):
 
 @label.command(help="Review and correct labels")
 def tool():
-    tkteach.main(dt.DEFAULT_DATABASE, dt.DEFAULT_PHOTO_STORE)
+    tkteach.main(dt.DEFAULT_DATABASE, dt.DEFAULT_CROP_STORE)
 
 
 @label.command(

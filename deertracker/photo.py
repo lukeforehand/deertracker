@@ -11,7 +11,7 @@ from datetime import datetime
 from PIL import Image, UnidentifiedImageError
 from PIL.ExifTags import TAGS
 
-from deertracker import DEFAULT_PHOTO_STORE, database, model, logger
+from deertracker import DEFAULT_CROP_STORE, DEFAULT_PHOTO_STORE, database, model, logger
 
 
 EXIF_TAGS = dict(((v, k) for k, v in TAGS.items()))
@@ -32,7 +32,13 @@ def add_location(name, lat, lon):
         return db.insert_location((name, lat, lon))
 
 
-def store(filename, photo):
+def store_crop(filename, photo):
+    dest_path = f"{DEFAULT_CROP_STORE}/{filename}"
+    photo.save(dest_path, "JPEG")
+    return f"{filename}"
+
+
+def store_photo(filename, photo):
     dest_path = f"{DEFAULT_PHOTO_STORE}/{filename}"
     photo.save(dest_path, "JPEG")
     return f"{filename}"
@@ -45,7 +51,7 @@ def export_ground_truth(output="./deertracker_crops.tar.gz"):
     with tarfile.open(output, "w:gz") as tarball:
         for obj in objects:
             file_path = pathlib.Path(obj["path"])
-            tarball.add(DEFAULT_PHOTO_STORE / file_path, dest_folder / file_path)
+            tarball.add(DEFAULT_CROP_STORE / file_path, dest_folder / file_path)
             yield f"Added {dest_folder / file_path} to {output}"
 
 
@@ -85,7 +91,7 @@ def crop_image(photo, bbox):
 
 
 def process_annotation(batch, photos, filename, label, bbox=None, ground_truth=False):
-    (DEFAULT_PHOTO_STORE / label).mkdir(exist_ok=True)
+    (DEFAULT_CROP_STORE / label).mkdir(exist_ok=True)
     image = Image.open(f"{photos}/{filename}")
     image_hash = hashlib.md5(image.tobytes()).hexdigest()
     with database.conn() as db:
@@ -96,7 +102,7 @@ def process_annotation(batch, photos, filename, label, bbox=None, ground_truth=F
         obj_id = hashlib.md5(image.tobytes()).hexdigest()
     else:
         obj_id = image_hash
-    obj_path = store(f"{label}/{obj_id}.jpg", image)
+    obj_path = store_crop(f"{label}/{obj_id}.jpg", image)
     with database.conn() as db:
         db.insert_object(
             (
@@ -112,7 +118,7 @@ def process_annotation(batch, photos, filename, label, bbox=None, ground_truth=F
                 None,
             )
         )
-        db.insert_photo((image_hash, str(filename), batch["id"]))
+        db.insert_photo((image_hash, None, batch["id"]))
     return {"id": obj_id}
 
 
@@ -129,13 +135,13 @@ class PhotoProcessor:
 
         self.detector = MegaDetector()
         for label in self.detector.labels.values():
-            (DEFAULT_PHOTO_STORE / label).mkdir(exist_ok=True)
+            (DEFAULT_CROP_STORE / label).mkdir(exist_ok=True)
 
         from deertracker.classifier import load_model as Classifier
 
         self.classifier = Classifier()
         for label in self.classifier.classes:
-            (DEFAULT_PHOTO_STORE / label).mkdir(exist_ok=True)
+            (DEFAULT_CROP_STORE / label).mkdir(exist_ok=True)
 
     def import_photos(
         self,
@@ -173,31 +179,35 @@ class PhotoProcessor:
                 if db.select_photo(photo_hash) is not None:
                     return {"error": f"Photo `{file_path}` already exists."}
             photo_time = self.get_time(image)
-            for obj in model.model(self.detector, self.classifier, image):
-                obj_photo = obj["image"]
-                obj_label = obj["label"]
-                obj_conf = float(obj["confidence"])
-                obj_id = hashlib.md5(obj_photo.tobytes()).hexdigest()
-                obj_path = store(
-                    f"{obj_label}/{int(obj_conf*100)}_{obj_id}.jpg", obj_photo
-                )
-                with database.conn() as db:
-                    db.insert_object(
-                        (
-                            obj_id,
-                            obj_path,
-                            self.location["lat"],
-                            self.location["lon"],
-                            photo_time,
-                            obj_label,
-                            obj_conf,
-                            False,
-                            photo_hash,
-                            self.location["id"],
-                        )
+            model_results = model.model(self.detector, self.classifier, image)
+            if len(model_results > 0):
+                for obj in model_results:
+                    obj_photo = obj["image"]
+                    obj_label = obj["label"]
+                    obj_conf = float(obj["confidence"])
+                    obj_id = hashlib.md5(obj_photo.tobytes()).hexdigest()
+                    obj_path = store_crop(
+                        f"{obj_label}/{int(obj_conf*100)}_{obj_id}.jpg",
+                        obj_photo,
                     )
-            with database.conn() as db:
-                return db.insert_photo((photo_hash, file_path, self.batch["id"]))
+                    with database.conn() as db:
+                        db.insert_object(
+                            (
+                                obj_id,
+                                obj_path,
+                                self.location["lat"],
+                                self.location["lon"],
+                                photo_time,
+                                obj_label,
+                                obj_conf,
+                                False,
+                                photo_hash,
+                                self.location["id"],
+                            )
+                        )
+                photo_path = store_photo(f"{photo_hash}.jpg", image)
+                with database.conn() as db:
+                    return db.insert_photo((photo_hash, photo_path, self.batch["id"]))
         except Exception:
             msg = f"Error processing photo `{file_path}`"
             LOGGER.exception(msg)

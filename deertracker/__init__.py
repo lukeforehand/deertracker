@@ -13,6 +13,8 @@ if not DEFAULT_DATA_STORE.is_absolute():
 DEFAULT_DATA_STORE.mkdir(exist_ok=True)
 DEFAULT_PHOTO_STORE = DEFAULT_DATA_STORE / "photos"
 DEFAULT_PHOTO_STORE.mkdir(exist_ok=True)
+DEFAULT_CROP_STORE = DEFAULT_DATA_STORE / "crops"
+DEFAULT_CROP_STORE.mkdir(exist_ok=True)
 DEFAULT_DATABASE = DEFAULT_DATA_STORE / CONFIG["database"]
 DEFAULT_MODELS_PATH = DEFAULT_DATA_STORE / "models"
 DEFAULT_DETECTOR_PATH = DEFAULT_MODELS_PATH / CONFIG["detector"]
@@ -38,6 +40,12 @@ def export_data(assets, models):
             output = ".data" / DEFAULT_PHOTO_STORE.relative_to(DEFAULT_DATA_STORE)
             tarball.add(
                 DEFAULT_PHOTO_STORE,
+                output,
+            )
+            print(f"Added {output} to {f}")
+            output = ".data" / DEFAULT_CROP_STORE.relative_to(DEFAULT_DATA_STORE)
+            tarball.add(
+                DEFAULT_CROP_STORE,
                 output,
             )
             print(f"Added {output} to {f}")

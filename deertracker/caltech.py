@@ -2,7 +2,7 @@ import json
 import pathlib
 import shutil
 
-from deertracker import photo, database, DEFAULT_PHOTO_STORE
+from deertracker import photo, database
 
 
 def load_labels(bboxes_json, labels_json):
