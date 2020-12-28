@@ -27,9 +27,9 @@ LOGGER = logger.get_logger()
 CPUS = 1
 
 
-def add_camera(name, lat, lon):
+def add_location(name, lat, lon):
     with database.conn() as db:
-        return db.insert_camera((name, lat, lon))
+        return db.insert_location((name, lat, lon))
 
 
 def store(filename, photo):
@@ -109,7 +109,7 @@ def process_annotation(batch, photos, filename, label, bbox=None, ground_truth=F
                 1.0 if ground_truth else 0.0,
                 ground_truth,
                 image_hash,
-                "training",
+                None,
             )
         )
         db.insert_photo((image_hash, str(filename), batch["id"]))
@@ -117,13 +117,13 @@ def process_annotation(batch, photos, filename, label, bbox=None, ground_truth=F
 
 
 class PhotoProcessor:
-    def __init__(self, file_paths, camera_name):
+    def __init__(self, file_paths, location_name):
         self.file_paths = file_paths
         with database.conn() as db:
-            self.camera = db.select_camera(camera_name)
+            self.location = db.select_location(location_name)
             self.batch = db.insert_batch()
-        if self.camera is None:
-            raise Exception(f"Camera `{camera_name}` not found.")
+        if self.location is None:
+            raise Exception(f"Location `{location_name}` not found.")
 
         from deertracker.detector import MegaDetector
 
@@ -186,14 +186,14 @@ class PhotoProcessor:
                         (
                             obj_id,
                             obj_path,
-                            self.camera["lat"],
-                            self.camera["lon"],
+                            self.location["lat"],
+                            self.location["lon"],
                             photo_time,
                             obj_label,
                             obj_conf,
                             False,
                             photo_hash,
-                            self.camera["name"],
+                            self.location["id"],
                         )
                     )
             with database.conn() as db:

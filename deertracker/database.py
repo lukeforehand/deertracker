@@ -19,8 +19,7 @@ def conn():
 class Connection:
     def __init__(self, database=str(DEFAULT_DATABASE)):
         conn = sqlite3.connect(database)
-        conn.execute(schema.CREATE_TABLE_CAMERA)
-        conn.execute(schema.INSERT_TRAINING_CAMERA)
+        conn.execute(schema.CREATE_TABLE_LOCATION)
         conn.execute(schema.CREATE_TABLE_BATCH)
         conn.execute(schema.CREATE_TABLE_PHOTO)
         conn.execute(schema.CREATE_TABLE_OBJECT)
@@ -30,29 +29,32 @@ class Connection:
         self.conn.commit()
         self.conn.close()
 
-    def insert_camera(self, camera):
+    def insert_location(self, location):
         try:
-            sql = "INSERT INTO camera(name, lat, lon) VALUES(?, ?, ?)"
+            sql = "INSERT INTO location(id, name, lat, lon) VALUES(NULL, ?, ?, ?)"
             cur = self.conn.cursor()
-            cur.execute(sql, camera)
-            return self._camera_from_tuple(camera)
+            cur.execute(sql, location)
+            cur.execute("SELECT LAST_INSERT_ROWID()")
+            location["id"] = cur.fetchone()[0]
+            return self._location_from_tuple(location)
         except sqlite3.IntegrityError:
-            return {"error": f"Camera `{camera[0]}` already exists."}
+            return {"error": f"Location `{location[0]}` already exists."}
 
-    def select_camera(self, camera_name):
-        return self._camera_from_tuple(
+    def select_location(self, location_name):
+        return self._location_from_tuple(
             self.conn.cursor()
-            .execute("SELECT * FROM camera WHERE name = ?", [camera_name])
+            .execute("SELECT * FROM location WHERE name = ?", [location_name])
             .fetchone()
         )
 
-    def _camera_from_tuple(self, camera):
-        if camera is None:
+    def _location_from_tuple(self, location):
+        if location is None:
             return None
         return {
-            "name": camera[0],
-            "lat": camera[1],
-            "lon": camera[2],
+            "id": location[0],
+            "name": location[1],
+            "lat": location[2],
+            "lon": location[3],
         }
 
     def select_photo(self, photo_id):
@@ -80,7 +82,7 @@ class Connection:
 
     def insert_object(self, obj):
         try:
-            sql = "INSERT INTO object(id, path, lat, lon, time, label, confidence, ground_truth, photo_id, camera_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            sql = "INSERT INTO object(id, path, lat, lon, time, label, confidence, ground_truth, photo_id, location_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             cur = self.conn.cursor()
             cur.execute(sql, obj)
             return {
@@ -93,7 +95,7 @@ class Connection:
                 "confidence": obj[6],
                 "ground_truth": obj[7],
                 "photo_id": obj[8],
-                "camera_id": obj[9],
+                "location_id": obj[9],
             }
         except sqlite3.IntegrityError:
             return {"error": f"Object `{obj[1]}` already exists."}
@@ -120,7 +122,7 @@ class Connection:
             "label": obj[5],
             "confidence": obj[6],
             "ground_truth": obj[7],
-            "camera_id": obj[8],
+            "location_id": obj[8],
             "photo_id": obj[9],
         }
 

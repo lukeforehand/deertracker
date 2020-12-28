@@ -1,15 +1,10 @@
-CREATE_TABLE_CAMERA = """
-CREATE TABLE IF NOT EXISTS camera (
-    name VARCHAR(255) PRIMARY KEY NOT NULL,
+CREATE_TABLE_LOCATION = """
+CREATE TABLE IF NOT EXISTS location (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(255) NOT NULL UNIQUE,
     lat FLOAT NOT NULL,
     lon FLOAT NOT NULL
 )
-"""
-
-INSERT_TRAINING_CAMERA = """
-INSERT INTO camera(name, lat, lon)
-SELECT 'training', 0.0, 0.0
-WHERE NOT EXISTS(SELECT 1 FROM camera WHERE name = 'training')
 """
 
 CREATE_TABLE_BATCH = """
@@ -18,7 +13,6 @@ CREATE TABLE IF NOT EXISTS batch (
     time DATETIME NOT NULL
 )
 """
-
 
 CREATE_TABLE_PHOTO = """
 CREATE TABLE IF NOT EXISTS photo (
@@ -40,8 +34,8 @@ CREATE TABLE IF NOT EXISTS object (
     confidence FLOAT NOT NULL,
     ground_truth BOOLEAN NOT NULL,
     photo_id CHARACTER(32) NOT NULL,
-    camera_id VARCHAR(255) NOT NULL,
+    location_id INTEGER NULL,
     FOREIGN KEY(photo_id) REFERENCES photo(id),
-    FOREIGN KEY(camera_id) REFERENCES camera(name)
+    FOREIGN KEY(location_id) REFERENCES location(id)
 )
 """

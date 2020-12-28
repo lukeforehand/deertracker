@@ -29,13 +29,14 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  add-camera     Add camera location
+  add-location   Add camera location
   import-photos  Import photos
   label          Labeling tools
   train          Train classifier
   viz            Visualize detections, classes
 ```
 
-- Before starting, you need the gps coords of your trail cameras. [Find lat/lon](https://www.latlong.net/)
+- Before starting, you need the gps coords of the locations you set your trail cameras.
+  - [Find lat/lon](https://www.latlong.net/)
 - If you use bash or zsh then tab completion for commands and options is supported.
 - Advanced configuration is available in `config.yaml`

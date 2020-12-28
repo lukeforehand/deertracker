@@ -13,4 +13,4 @@ detector: md_v4.1.0.pb
 
 # path to classifier directory
 # directory should exist under $data/models/
-classifier: dt-0567
+classifier: dt-0570
