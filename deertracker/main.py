@@ -64,6 +64,49 @@ def import_photos(photos, location):
                 click.secho(str(imported_photo), bg="red")
 
 
+# Server
+@main.group(help="Server commands")
+def server():
+    pass
+
+
+@server.command(help="Start")
+def start():
+    import grpc
+    from concurrent import futures
+    from deertracker import detector_pb2_grpc
+
+    print("Starting detector service...")
+    options = [("grpc.max_receive_message_length", 100 * 1024 * 1024)]
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10), options=options)
+    detector_pb2_grpc.add_DetectorServicer_to_server(
+        detector_pb2_grpc.DetectorServicer(), server
+    )
+    server.add_insecure_port("[::]:10001")
+    server.start()
+    print("Detector service started on port 10001")
+    server.wait_for_termination()
+
+
+@server.command(help="Test Server")
+def test_server():
+    import grpc
+    from deertracker import detector_pb2_grpc, detector_pb2
+    from PIL import Image
+
+    channel = grpc.insecure_channel("localhost:10001")
+    stub = detector_pb2_grpc.DetectorStub(channel)
+
+    image = Image.open("test/cam1/MFDC1487.JPG")
+    image.show()
+    import io
+
+    b = io.BytesIO()
+    image.save(b, "JPEG")
+
+    print(stub.predict(detector_pb2.Image(value=b.getvalue())))
+
+
 # Labeling subcommands
 @main.group(help="Labeling tools")
 def label():

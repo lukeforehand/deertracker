@@ -2,6 +2,9 @@ black
 click
 colorama
 cvlib
+futures
+grpcio
+grpcio-tools
 matplotlib
 opencv-python
 pathlib

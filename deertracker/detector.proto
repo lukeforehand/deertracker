@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+message Image {
+  bytes value = 1;
+}
+
+message Box {
+  int32 x = 1;
+  int32 y = 2;
+  int32 w = 3;
+  int32 h = 4;
+}
+
+message Prediction {
+  repeated Box bbox = 1;
+  repeated string label = 2;
+  repeated float score = 3;
+}
+
+service Detector {
+
+  rpc predict(Image) returns (Prediction) {}
+
+}
