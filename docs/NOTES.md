@@ -53,3 +53,11 @@ gdf.head()
 Interpolating lines from camera geocoords
 
 https://www.statology.org/matplotlib-smooth-curve/
+
+## GRPC NOTES
+
+Compile grpc service
+
+```bash
+python -m grpc_tools.protoc --proto_path=. deertracker/grpc/*.proto --python_out=. --grpc_python_out=.
+```

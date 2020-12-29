@@ -72,10 +72,10 @@ class MegaDetector:
             Nx4 array of bounding boxes:
                 bboxes[i][0]  # starting y coordinate
                 bboxes[i][1]  # starting x coordinate
-                bboxes[i][2]  # ending y coordinate
-                bboxes[i][3]  # ending x coordinate
+                bboxes[i][2]  # width
+                bboxes[i][3]  # height
         classes : np.ndarray
-            N-length array of class labels (integers)
+            N-length array of class labels (str)
         scores : np.ndarray
             N-length array of bounding box scores. Higher is better.
             Use `confidence` to ignore bounding boxes below a confidence.
@@ -89,4 +89,8 @@ class MegaDetector:
         scores = scores[scores > confidence]
         # Need to convert fractions -> pixels
         bboxes = np.round(bboxes * (image.shape[:2] * 2)).astype("uint16")
-        return bboxes, classes, scores
+        # x, y, w, h
+        bboxes = np.array([(b[1], b[0], b[3] - b[1], b[2] - b[0]) for b in bboxes])
+        labels = np.array([self.labels[c] for c in classes])
+
+        return bboxes, labels, scores

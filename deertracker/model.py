@@ -1,51 +1,80 @@
 import cv2
+import io
 import numpy as np
+import pathlib
 
 from PIL import Image
 
+from deertracker import DEFAULT_CLASSIFIER_PATH
 
-def model(detector, classifier, photo, confidence=0.98):
-    image = np.array(photo)
-    bbox, _class, scores = detector.predict(image)
+
+class Detector:
+    """
+    Performs predictions using mega detector and defers to classifier
+    """
+
+    def __init__(self):
+        from deertracker.detector import MegaDetector
+
+        self.detector = MegaDetector()
+        from deertracker.classifier import load_model as Classifier
+
+        self.classifier = Classifier()
+
+        self.labels = self.classifier.classes + list(self.detector.labels.values())
+
+    def predict(self, image, confidence=0.98):
+        if isinstance(image, bytes):
+            image = np.array(Image.open(io.BytesIO(image)))
+        else:
+            image = np.array(image)
+
+        bboxes, labels, scores = self.detector.predict(image)
+        r_bboxes = []
+        r_labels = []
+        r_scores = []
+
+        for bbox, label, score in zip(bboxes, labels, scores):
+            x = bbox[0]
+            y = bbox[1]
+            w = bbox[2]
+            h = bbox[3]
+            crop = image[
+                max(y, 0) : min(y + h, image.shape[0]),
+                max(x, 0) : min(x + w, image.shape[1]),
+            ]
+            if label == "animal":
+                predictions = self.classifier.predict(crop)
+                high_score = np.argmax(predictions)
+                score = predictions[high_score]
+                label = self.classifier.classes[high_score]
+            if score > confidence:
+                r_bboxes.append((x, y, w, h))
+                r_labels.append(label)
+                r_scores.append(score)
+        return r_bboxes, r_labels, r_scores
+
+
+def model(detector, image, confidence=0.98):
+    """
+    Runs predictions, but pads crops before storage (for training), and result data structure
+    is a bit different
+    """
+    bboxes, labels, scores = detector.predict(image, confidence=confidence)
     results = []
-    for i, _ in enumerate(bbox):
-
-        x = bbox[i][1]
-        x2 = bbox[i][3]
-        y = bbox[i][0]
-        y2 = bbox[i][2]
-        w = x2 - x
-        h = y2 - y
-
+    for bbox, label, score in zip(bboxes, labels, scores):
+        x, y, w, h = bbox
         pw = max(int(w * 0.01), 10)
         ph = max(int(h * 0.01), 10)
-
-        crop = image[
-            max(y - ph, 0) : min(y2 + ph, image.shape[0]),
-            max(x - pw, 0) : min(x2 + pw, image.shape[1]),
-        ]
-
-        label = detector.labels[_class[i]]
-        score = scores[i]
-
-        if label == "animal":
-            predictions = classifier.predict(crop)
-            high_score = np.argmax(predictions)
-            score = predictions[high_score]
-            label = classifier.classes[high_score]
-
-        if score > confidence:
-            results.append(
-                {
-                    "image": Image.fromarray(crop),
-                    "label": label,
-                    "confidence": score,
-                    "x": x,
-                    "y": y,
-                    "w": w,
-                    "h": h,
-                }
-            )
+        crop = Image.fromarray(
+            image[
+                max(y - ph, 0) : min(y + h + ph, image.shape[0]),
+                max(x - pw, 0) : min(x + w + pw, image.shape[1]),
+            ]
+        )
+        results.append(
+            {"crop": crop, "label": label, "score": score, "bbox": (x, y, w, h)}
+        )
     return results
 
 

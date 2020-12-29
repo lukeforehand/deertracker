@@ -104,15 +104,17 @@ def show_detection(image_path: str, detector):
     image = cv2.imread(image_path)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-    bboxes, classes, scores = detector.predict(image)
+    bboxes, labels, scores = detector.predict(image)
     colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]
-    for bbox, _class, score in zip(bboxes, classes, scores):
-        color = colors[_class]
-        cv2.rectangle(image, (bbox[1], bbox[0]), (bbox[3], bbox[2]), color, 2)
+    for bbox, label, score in zip(bboxes, labels, scores):
+        color = colors[list(labels).index(label)]
+        cv2.rectangle(
+            image, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]), color, 2
+        )
         cv2.putText(
             image,
-            str(f"{detector.labels[_class]} {score}"),
-            (bbox[1], bbox[0] - 10),
+            str(f"{label} {score}"),
+            (bbox[0], bbox[1] - 10),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.5,
             color,

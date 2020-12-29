@@ -1,8 +1,5 @@
 import cv2
-import functools
 import hashlib
-import itertools
-import multiprocessing
 import numpy as np
 import pathlib
 import tarfile
@@ -11,7 +8,9 @@ from datetime import datetime
 from PIL import Image, UnidentifiedImageError
 from PIL.ExifTags import TAGS
 
-from deertracker import DEFAULT_CROP_STORE, DEFAULT_PHOTO_STORE, database, model, logger
+from deertracker import DEFAULT_CROP_STORE, DEFAULT_PHOTO_STORE, database, logger, model
+
+from deertracker.model import Detector
 
 
 EXIF_TAGS = dict(((v, k) for k, v in TAGS.items()))
@@ -20,11 +19,6 @@ PHOTO_EXTS = {".jpg", ".jpeg", ".png"}
 VIDEO_EXTS = {".mp4", ".mov", ".avi"}
 
 LOGGER = logger.get_logger()
-
-# this is somewhat dependent on how much RAM you have
-# tensorflow seems to utilize all CPUS regardless
-# CPUS = multiprocessing.cpu_count()
-CPUS = 1
 
 
 def add_location(name, lat, lon):
@@ -137,40 +131,13 @@ class PhotoProcessor:
                     raise Exception(f"Location `{location_name}` not found.")
             self.batch = db.insert_batch()
 
-        from deertracker.detector import MegaDetector
-
-        self.detector = MegaDetector()
-        for label in self.detector.labels.values():
+        self.detector = Detector()
+        for label in self.detector.labels:
             (DEFAULT_CROP_STORE / label).mkdir(exist_ok=True)
 
-        from deertracker.classifier import load_model as Classifier
-
-        self.classifier = Classifier()
-        for label in self.classifier.classes:
-            (DEFAULT_CROP_STORE / label).mkdir(exist_ok=True)
-
-    def import_photos(
-        self,
-    ):
-        import tensorflow as tf
-
-        if CPUS <= 1 or tf.test.is_gpu_available():
-            return self._import_photos(True, self.file_paths)
-        pool = multiprocessing.Pool(CPUS)
-        results = pool.map(
-            functools.partial(self._import_photos, False),
-            np.array_split(self.file_paths, CPUS),
-        )
-        pool.close()
-        pool.join()
-        return itertools.chain.from_iterable(results)
-
-    def _import_photos(self, yield_results, file_paths):
-        if yield_results:
-            for file_path in file_paths:
-                yield self.process_photo(file_path)
-        else:
-            return [self.process_photo(file_path) for file_path in file_paths]
+    def import_photos(self):
+        for file_path in self.file_paths:
+            yield self.process_photo(file_path)
 
     def process_photo(self, file_path):
         try:
@@ -185,12 +152,13 @@ class PhotoProcessor:
                 if db.select_photo(photo_hash) is not None:
                     return {"error": f"Photo `{file_path}` already exists."}
             photo_time = self.get_time(image)
-            model_results = model.model(self.detector, self.classifier, image)
+            model_results = model.model(self.detector, image)
             if len(model_results) > 0:
                 for obj in model_results:
-                    obj_photo = obj["image"]
+                    obj_photo = obj["crop"]
                     obj_label = obj["label"]
-                    obj_conf = float(obj["confidence"])
+                    obj_conf = float(obj["score"])
+                    obj_bbox = obj["bbox"]
                     obj_id = hashlib.md5(obj_photo.tobytes()).hexdigest()
                     obj_path = store_crop(
                         f"{obj_label}/{int(obj_conf*100)}_{obj_id}.jpg",
@@ -201,10 +169,10 @@ class PhotoProcessor:
                             (
                                 obj_id,
                                 obj_path,
-                                obj["x"],
-                                obj["y"],
-                                obj["w"],
-                                obj["h"],
+                                obj_bbox[0],
+                                obj_bbox[1],
+                                obj_bbox[2],
+                                obj_bbox[3],
                                 self.location["lat"],
                                 self.location["lon"],
                                 photo_time,
