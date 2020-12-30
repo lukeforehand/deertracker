@@ -26,8 +26,6 @@ class Detector:
     def predict(self, image, confidence=0.98):
         if isinstance(image, bytes):
             image = np.array(Image.open(io.BytesIO(image)))
-        else:
-            image = np.array(image)
 
         bboxes, labels, scores = self.detector.predict(image)
         r_bboxes = []
@@ -60,6 +58,7 @@ def model(detector, image, confidence=0.98):
     Runs predictions, but pads crops before storage (for training), and result data structure
     is a bit different
     """
+    image = np.array(image)
     bboxes, labels, scores = detector.predict(image, confidence=confidence)
     results = []
     for bbox, label, score in zip(bboxes, labels, scores):
