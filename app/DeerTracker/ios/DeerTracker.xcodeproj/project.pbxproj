@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* DeerTrackerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* DeerTrackerTests.m */; };
+		0565176D00104E3A92CB7BD4 /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D48A86A9B3B64AC6AE606357 /* Feather.ttf */; };
 		0DD85D3DBA1FB25AA0059A4C /* libPods-DeerTracker-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A08F2660A26B9156CF827FF0 /* libPods-DeerTracker-tvOSTests.a */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
@@ -16,10 +17,25 @@
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* DeerTrackerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* DeerTrackerTests.m */; };
+		39549EBB151C42C6A826BA98 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A5C44370FB0447DCA94AFBD4 /* FontAwesome.ttf */; };
 		3EC6ACE5A35B40DCB6E110D0 /* libPods-DeerTracker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 788514FA33DC34DC1059247A /* libPods-DeerTracker.a */; };
 		44C064BCF43E880944F0BC4A /* libPods-DeerTracker-DeerTrackerTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C62A32C80DC95B6ECBDBDB35 /* libPods-DeerTracker-DeerTrackerTests.a */; };
+		51D734D6E66041AC9CFAD4AB /* Foundation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9B3AC081F7CF496ABD975236 /* Foundation.ttf */; };
+		67D8AEE994BD432A9093F2AC /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 98B081BC54714F719CE8ABD2 /* SimpleLineIcons.ttf */; };
+		6CAB0521D9DD46018876B6DD /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 30E8E5631C4A4E7D8BE7A032 /* Ionicons.ttf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		8D4605565675118725D78379 /* libPods-DeerTracker-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B6BD3AF64BB3DF7E20D5D8B4 /* libPods-DeerTracker-tvOS.a */; };
+		9F242D524FDD475ABE8FA706 /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7C40D6AB8CDC40348B38F7D9 /* Entypo.ttf */; };
+		9FCC03FDEACD4A74B0B45878 /* FontAwesome5_Solid.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 19CB25D30C434F23B441042B /* FontAwesome5_Solid.ttf */; };
+		B7C36486F0CC4DF9B23F9CED /* AntDesign.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7093B8CEF90C46C3B858BB03 /* AntDesign.ttf */; };
+		B9D87B237E25405FA4938A34 /* Fontisto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7331FE23AA134E45A60E8C4B /* Fontisto.ttf */; };
+		C66628865CBD4A39A0D3D7D2 /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C7A2E8EA5A7948F49DD974EB /* EvilIcons.ttf */; };
+		CB66F70EA9154B70BE39496F /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8192348311C74235B16737ED /* Zocial.ttf */; };
+		CD4937D993CE4F55B3D6912B /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A5E45939823045FE9BF91BA5 /* Octicons.ttf */; };
+		D18E583359154192ACB819E8 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6301030F69F344F38DC423D6 /* MaterialCommunityIcons.ttf */; };
+		DB1412A123664E1C9057AC0A /* FontAwesome5_Brands.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F4C6A8F300B9458D863AAE95 /* FontAwesome5_Brands.ttf */; };
+		DE56FBF38ABB40F792172AA1 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CC684C1B4A0047D3AD5DE0DC /* MaterialIcons.ttf */; };
+		F40AB5D671D645EFBAD7290B /* FontAwesome5_Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FDDC2BC339D245B19D366FDF /* FontAwesome5_Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,23 +66,39 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = DeerTracker/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = DeerTracker/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = DeerTracker/main.m; sourceTree = "<group>"; };
+		19CB25D30C434F23B441042B /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = ../assets/fonts/FontAwesome5_Solid.ttf; sourceTree = "<group>"; };
 		242289C5802006EDB0567C82 /* Pods-DeerTracker-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DeerTracker-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-DeerTracker-tvOSTests/Pods-DeerTracker-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		2AE41914CC04E19FC353959A /* Pods-DeerTracker.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DeerTracker.debug.xcconfig"; path = "Target Support Files/Pods-DeerTracker/Pods-DeerTracker.debug.xcconfig"; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* DeerTracker-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DeerTracker-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* DeerTracker-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "DeerTracker-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		309030599B49CC6DD25D3C6C /* Pods-DeerTracker-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DeerTracker-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-DeerTracker-tvOS/Pods-DeerTracker-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
+		30E8E5631C4A4E7D8BE7A032 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = ../assets/fonts/Ionicons.ttf; sourceTree = "<group>"; };
 		4033D05C1BC88E00B5046B03 /* Pods-DeerTracker-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DeerTracker-tvOS.release.xcconfig"; path = "Target Support Files/Pods-DeerTracker-tvOS/Pods-DeerTracker-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		47442B9F8749EF70E4C5F31A /* Pods-DeerTracker-DeerTrackerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DeerTracker-DeerTrackerTests.debug.xcconfig"; path = "Target Support Files/Pods-DeerTracker-DeerTrackerTests/Pods-DeerTracker-DeerTrackerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		61DD49EAF21D83EE330348D4 /* Pods-DeerTracker.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DeerTracker.release.xcconfig"; path = "Target Support Files/Pods-DeerTracker/Pods-DeerTracker.release.xcconfig"; sourceTree = "<group>"; };
+		6301030F69F344F38DC423D6 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = ../assets/fonts/MaterialCommunityIcons.ttf; sourceTree = "<group>"; };
+		7093B8CEF90C46C3B858BB03 /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = ../assets/fonts/AntDesign.ttf; sourceTree = "<group>"; };
+		7331FE23AA134E45A60E8C4B /* Fontisto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Fontisto.ttf; path = ../assets/fonts/Fontisto.ttf; sourceTree = "<group>"; };
 		788514FA33DC34DC1059247A /* libPods-DeerTracker.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-DeerTracker.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7C40D6AB8CDC40348B38F7D9 /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = ../assets/fonts/Entypo.ttf; sourceTree = "<group>"; };
+		8192348311C74235B16737ED /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = ../assets/fonts/Zocial.ttf; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = DeerTracker/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		93A9EFC1355A7E77BFD08E98 /* Pods-DeerTracker-DeerTrackerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DeerTracker-DeerTrackerTests.release.xcconfig"; path = "Target Support Files/Pods-DeerTracker-DeerTrackerTests/Pods-DeerTracker-DeerTrackerTests.release.xcconfig"; sourceTree = "<group>"; };
+		98B081BC54714F719CE8ABD2 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = ../assets/fonts/SimpleLineIcons.ttf; sourceTree = "<group>"; };
+		9B3AC081F7CF496ABD975236 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = ../assets/fonts/Foundation.ttf; sourceTree = "<group>"; };
 		A08F2660A26B9156CF827FF0 /* libPods-DeerTracker-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-DeerTracker-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A5C44370FB0447DCA94AFBD4 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = ../assets/fonts/FontAwesome.ttf; sourceTree = "<group>"; };
+		A5E45939823045FE9BF91BA5 /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = ../assets/fonts/Octicons.ttf; sourceTree = "<group>"; };
 		B49EC96BD3F5D25DBBDBB2FC /* Pods-DeerTracker-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DeerTracker-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-DeerTracker-tvOSTests/Pods-DeerTracker-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		B6BD3AF64BB3DF7E20D5D8B4 /* libPods-DeerTracker-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-DeerTracker-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C62A32C80DC95B6ECBDBDB35 /* libPods-DeerTracker-DeerTrackerTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-DeerTracker-DeerTrackerTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7A2E8EA5A7948F49DD974EB /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = ../assets/fonts/EvilIcons.ttf; sourceTree = "<group>"; };
+		CC684C1B4A0047D3AD5DE0DC /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = ../assets/fonts/MaterialIcons.ttf; sourceTree = "<group>"; };
+		D48A86A9B3B64AC6AE606357 /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = ../assets/fonts/Feather.ttf; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
+		F4C6A8F300B9458D863AAE95 /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Brands.ttf; path = ../assets/fonts/FontAwesome5_Brands.ttf; sourceTree = "<group>"; };
+		FDDC2BC339D245B19D366FDF /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Regular.ttf; path = ../assets/fonts/FontAwesome5_Regular.ttf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -149,6 +181,29 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		61605794544C420A85A72121 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				7093B8CEF90C46C3B858BB03 /* AntDesign.ttf */,
+				7C40D6AB8CDC40348B38F7D9 /* Entypo.ttf */,
+				C7A2E8EA5A7948F49DD974EB /* EvilIcons.ttf */,
+				D48A86A9B3B64AC6AE606357 /* Feather.ttf */,
+				A5C44370FB0447DCA94AFBD4 /* FontAwesome.ttf */,
+				F4C6A8F300B9458D863AAE95 /* FontAwesome5_Brands.ttf */,
+				FDDC2BC339D245B19D366FDF /* FontAwesome5_Regular.ttf */,
+				19CB25D30C434F23B441042B /* FontAwesome5_Solid.ttf */,
+				7331FE23AA134E45A60E8C4B /* Fontisto.ttf */,
+				9B3AC081F7CF496ABD975236 /* Foundation.ttf */,
+				30E8E5631C4A4E7D8BE7A032 /* Ionicons.ttf */,
+				6301030F69F344F38DC423D6 /* MaterialCommunityIcons.ttf */,
+				CC684C1B4A0047D3AD5DE0DC /* MaterialIcons.ttf */,
+				A5E45939823045FE9BF91BA5 /* Octicons.ttf */,
+				98B081BC54714F719CE8ABD2 /* SimpleLineIcons.ttf */,
+				8192348311C74235B16737ED /* Zocial.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
@@ -165,6 +220,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				8EF8C2CD3AF5CB6CAFFC7175 /* Pods */,
+				61605794544C420A85A72121 /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -194,7 +250,6 @@
 				242289C5802006EDB0567C82 /* Pods-DeerTracker-tvOSTests.debug.xcconfig */,
 				B49EC96BD3F5D25DBBDBB2FC /* Pods-DeerTracker-tvOSTests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -294,6 +349,7 @@
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
+						DevelopmentTeam = 6KKG5JRQ8R;
 						LastSwiftMigration = 1120;
 					};
 					2D02E47A1E0B4A5D006451C7 = {
@@ -342,6 +398,22 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				B7C36486F0CC4DF9B23F9CED /* AntDesign.ttf in Resources */,
+				9F242D524FDD475ABE8FA706 /* Entypo.ttf in Resources */,
+				C66628865CBD4A39A0D3D7D2 /* EvilIcons.ttf in Resources */,
+				0565176D00104E3A92CB7BD4 /* Feather.ttf in Resources */,
+				39549EBB151C42C6A826BA98 /* FontAwesome.ttf in Resources */,
+				DB1412A123664E1C9057AC0A /* FontAwesome5_Brands.ttf in Resources */,
+				F40AB5D671D645EFBAD7290B /* FontAwesome5_Regular.ttf in Resources */,
+				9FCC03FDEACD4A74B0B45878 /* FontAwesome5_Solid.ttf in Resources */,
+				B9D87B237E25405FA4938A34 /* Fontisto.ttf in Resources */,
+				51D734D6E66041AC9CFAD4AB /* Foundation.ttf in Resources */,
+				6CAB0521D9DD46018876B6DD /* Ionicons.ttf in Resources */,
+				D18E583359154192ACB819E8 /* MaterialCommunityIcons.ttf in Resources */,
+				DE56FBF38ABB40F792172AA1 /* MaterialIcons.ttf in Resources */,
+				CD4937D993CE4F55B3D6912B /* Octicons.ttf in Resources */,
+				67D8AEE994BD432A9093F2AC /* SimpleLineIcons.ttf in Resources */,
+				CB66F70EA9154B70BE39496F /* Zocial.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -384,10 +456,42 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-DeerTracker-DeerTrackerTests/Pods-DeerTracker-DeerTrackerTests-resources.sh",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Entypo.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Feather.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Foundation.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Octicons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Zocial.ttf",
 				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AntDesign.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Entypo.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EvilIcons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Feather.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Brands.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Regular.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Solid.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Fontisto.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Foundation.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Ionicons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialCommunityIcons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialIcons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Octicons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SimpleLineIcons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Zocial.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AccessibilityResources.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -406,7 +510,6 @@
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AccessibilityResources.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -656,6 +759,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6KKG5JRQ8R;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = DeerTracker/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -679,6 +783,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6KKG5JRQ8R;
 				INFOPLIST_FILE = DeerTracker/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
