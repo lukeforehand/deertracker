@@ -53,7 +53,7 @@ class Detector:
         return r_bboxes, r_labels, r_scores
 
 
-def model(detector, image, confidence=0.98):
+def model(detector: Detector, image, confidence=0.98):
     """
     Runs predictions, but pads crops before storage (for training), and result data structure
     is a bit different
