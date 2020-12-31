@@ -4,11 +4,11 @@ import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
-import HomeScreen from './HomeScreen';
+import ImportScreen from './ImportScreen';
 
-const HomeScreenNavigator = createStackNavigator({
-  HomeScreen: {
-    screen: HomeScreen,
+const ImportScreenNavigator = createStackNavigator({
+  ImportScreen: {
+    screen: ImportScreen,
     navigationOptions: {
       title: 'DeerTracker',
       //      headerTitleStyle: {
@@ -23,11 +23,11 @@ const HomeScreenNavigator = createStackNavigator({
 const TabNavigator = createBottomTabNavigator(
   {
     Home: {
-      screen: HomeScreenNavigator,
+      screen: ImportScreenNavigator,
       navigationOptions: {
-        tabBarLabel: 'Home',
+        tabBarLabel: 'Pull Card',
         tabBarIcon: ({ tintColor }) => (
-          <Icon name='home' color={tintColor} size={20} />
+          <Icon name='upload' style={{ transform: [{ rotateX: '180deg' }] }} color={tintColor} size={20} />
         )
       }
     },

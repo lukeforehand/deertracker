@@ -9,7 +9,7 @@ npm install react-native-gesture-handler
 npm install react-native-reanimated
 npm install react-native-safe-area-context
 npm install react-native-screens
-
+npm react-native-sqlite-storage
 npx pod-install ios
 
 react-native link
