@@ -44,7 +44,7 @@ CREATE_TABLE_PHOTO = `
 CREATE TABLE IF NOT EXISTS photo (
     id CHARACTER(32) PRIMARY KEY NOT NULL,
     path VARCHAR(255) NOT NULL,
-    batch_id INTEGER NOT NULL,
+    batch_id INTEGER,
     FOREIGN KEY(batch_id) REFERENCES batch(id)
 )
 `
