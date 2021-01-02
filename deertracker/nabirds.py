@@ -1,6 +1,6 @@
 import pathlib
 
-from deertracker import database, photo
+from deertracker import model
 
 
 def process_annotations(photos, image_ids, bboxes, classes, labels):
@@ -31,8 +31,6 @@ def process_annotations(photos, image_ids, bboxes, classes, labels):
             image_id = pieces[0]
             class_id = pieces[1]
             label_map[image_id] = class_map[class_id]
-    with database.conn() as db:
-        batch = db.insert_batch()
     for image_id, path in image_map.items():
         annotation = {
             "file_path": image_map[image_id],
@@ -40,8 +38,7 @@ def process_annotations(photos, image_ids, bboxes, classes, labels):
             "bbox": bbox_map[image_id],
         }
         try:
-            yield photo.process_annotation(
-                batch,
+            yield model.process_annotation(
                 photos,
                 annotation["file_path"],
                 annotation["label"],

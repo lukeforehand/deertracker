@@ -2,7 +2,7 @@ import json
 import pathlib
 import shutil
 
-from deertracker import photo, database
+from deertracker import model
 
 
 def load_labels(bboxes_json, labels_json):
@@ -52,12 +52,9 @@ def load_bboxes(bboxes_json):
 
 
 def process_annotations(photos, annotations):
-    with database.conn() as db:
-        batch = db.insert_batch()
     for annotation in annotations:
         try:
-            yield photo.process_annotation(
-                batch,
+            yield model.process_annotation(
                 photos,
                 annotation["file_path"],
                 annotation["label"],

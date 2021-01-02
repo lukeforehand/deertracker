@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x1f\x64\x65\x65rtracker/grpc/detector.proto\"\x16\n\x05Image\x12\r\n\x05value\x18\x01 \x01(\x0c\"1\n\x03\x42ox\x12\t\n\x01x\x18\x01 \x01(\x05\x12\t\n\x01y\x18\x02 \x01(\x05\x12\t\n\x01w\x18\x03 \x01(\x05\x12\t\n\x01h\x18\x04 \x01(\x05\">\n\nPrediction\x12\x12\n\x04\x62\x62ox\x18\x01 \x03(\x0b\x32\x04.Box\x12\r\n\x05label\x18\x02 \x03(\t\x12\r\n\x05score\x18\x03 \x03(\x02\x32*\n\x08\x44\x65tector\x12\x1e\n\x07predict\x12\x06.Image\x1a\x0b.Predictionb\x06proto3'
+  serialized_pb=b'\n\x1f\x64\x65\x65rtracker/grpc/detector.proto\"0\n\x05Image\x12\r\n\x05value\x18\x01 \x01(\x0c\x12\x0b\n\x03lat\x18\x02 \x01(\x02\x12\x0b\n\x03lon\x18\x03 \x01(\x02\"1\n\x03\x42ox\x12\t\n\x01x\x18\x01 \x01(\x05\x12\t\n\x01y\x18\x02 \x01(\x05\x12\t\n\x01w\x18\x03 \x01(\x05\x12\t\n\x01h\x18\x04 \x01(\x05\">\n\nPrediction\x12\x12\n\x04\x62\x62ox\x18\x01 \x03(\x0b\x32\x04.Box\x12\r\n\x05label\x18\x02 \x03(\t\x12\r\n\x05score\x18\x03 \x03(\x02\x32*\n\x08\x44\x65tector\x12\x1e\n\x07predict\x12\x06.Image\x1a\x0b.Predictionb\x06proto3'
 )
 
 
@@ -40,6 +40,20 @@ _IMAGE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='lat', full_name='Image.lat', index=1,
+      number=2, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='lon', full_name='Image.lon', index=2,
+      number=3, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -53,7 +67,7 @@ _IMAGE = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=35,
-  serialized_end=57,
+  serialized_end=83,
 )
 
 
@@ -105,8 +119,8 @@ _BOX = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=59,
-  serialized_end=108,
+  serialized_start=85,
+  serialized_end=134,
 )
 
 
@@ -151,8 +165,8 @@ _PREDICTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=110,
-  serialized_end=172,
+  serialized_start=136,
+  serialized_end=198,
 )
 
 _PREDICTION.fields_by_name['bbox'].message_type = _BOX
@@ -191,8 +205,8 @@ _DETECTOR = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=174,
-  serialized_end=216,
+  serialized_start=200,
+  serialized_end=242,
   methods=[
   _descriptor.MethodDescriptor(
     name='predict',

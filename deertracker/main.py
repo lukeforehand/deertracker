@@ -10,6 +10,7 @@ from deertracker import (
     database,
     nabirds as nab,
     photo,
+    model,
     tkteach,
     visualize,
 )
@@ -107,8 +108,11 @@ def test_server(port, photos):
         b = io.BytesIO()
         Image.open(file_path).save(b, "JPEG")
         now = datetime.now()
+        lat = 43.08154
+        lon = -89.31911
+        result = stub.predict(detector_pb2.Image(value=b.getvalue(), lat=lat, lon=lon))
         print(f"input: {file_path}")
-        print(f"result: {stub.predict(detector_pb2.Image(value=b.getvalue()))}")
+        print(f"result: {result}")
         print(f"took: {datetime.now() - now}")
 
 
@@ -146,7 +150,7 @@ def export_data(training, assets, models):
         with database.conn() as db:
             print(db.training_dataset_report())
             total = db.training_dataset_count()
-            results = photo.export_ground_truth()
+            results = model.export_ground_truth()
         with click.progressbar(results, length=total) as progress:
             for _ in progress:
                 pass
@@ -169,7 +173,7 @@ def training_report():
 )
 def import_training_crops(crops, ground_truth):
     file_paths = find_files(crops)
-    imported_crops = photo.import_training_crops(crops, file_paths, ground_truth)
+    imported_crops = model.import_training_crops(crops, file_paths, ground_truth)
     with click.progressbar(imported_crops, length=len(file_paths)) as progress:
         for annotation in progress:
             if "error" in annotation:
