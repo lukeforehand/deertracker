@@ -4,6 +4,8 @@ syntax = "proto3";
 
 message Image {
   bytes value = 1; // bytes
+  float lat = 2;   // latitude
+  float lon = 3;   // longitude
 }
 
 /* Bounding box struct */

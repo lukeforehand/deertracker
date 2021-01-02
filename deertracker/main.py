@@ -108,8 +108,11 @@ def test_server(port, photos):
         b = io.BytesIO()
         Image.open(file_path).save(b, "JPEG")
         now = datetime.now()
+        lat = 43.08154
+        lon = -89.31911
+        result = stub.predict(detector_pb2.Image(value=b.getvalue(), lat=lat, lon=lon))
         print(f"input: {file_path}")
-        print(f"result: {stub.predict(detector_pb2.Image(value=b.getvalue()))}")
+        print(f"result: {result}")
         print(f"took: {datetime.now() - now}")
 
 

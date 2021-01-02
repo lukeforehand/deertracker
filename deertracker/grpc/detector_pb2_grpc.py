@@ -3,7 +3,6 @@
 import grpc
 
 from deertracker.grpc import detector_pb2 as deertracker_dot_grpc_dot_detector__pb2
-
 from deertracker import logger
 
 LOGGER = logger.get_logger()
@@ -36,7 +35,9 @@ class DetectorServicer(object):
     def predict(self, request, context):
         """predict"""
         try:
-            bbox, label, score = self.model.predict(request.value)
+            bbox, label, score = self.model.predict(
+                request.value, lat=request.lat, lon=request.lon
+            )
             context.set_code(grpc.StatusCode.OK)
             return deertracker_dot_grpc_dot_detector__pb2.Prediction(
                 bbox=[
