@@ -37,7 +37,6 @@ class PhotoProcessor:
                 if self.location is None:
                     raise Exception(f"Location `{location_name}` not found.")
             self.batch = db.insert_batch()
-
         self.detector = Detector()
 
     def import_photos(self):
@@ -52,7 +51,9 @@ class PhotoProcessor:
                     return {"error": f"Video `{file_path}` could not be processed."}
             else:
                 image = Image.open(file_path)
-            return model.model(self.detector, image)
+            return self.detector.predict(
+                image, lat=self.location["lat"], lon=self.location["lon"]
+            )
         except Exception:
             msg = f"Error processing photo `{file_path}`"
             LOGGER.exception(msg)

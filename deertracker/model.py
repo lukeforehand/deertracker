@@ -2,22 +2,26 @@ import cv2
 from datetime import datetime
 import hashlib
 import io
+import multiprocessing
 import numpy as np
 import pathlib
 import tarfile
 
 from PIL import Image
 
-from PIL.ExifTags import TAGS
+from PIL.ExifTags import TAGS, GPSTAGS
 
 from deertracker import (
     DEFAULT_CLASSIFIER_PATH,
     DEFAULT_CROP_STORE,
     DEFAULT_PHOTO_STORE,
     database,
+    logger,
 )
 
+LOGGER = logger.get_logger()
 EXIF_TAGS = dict(((v, k) for k, v in TAGS.items()))
+GPS_TAGS = dict(((v, k) for k, v in GPSTAGS.items()))
 
 
 class Detector:
@@ -35,6 +39,7 @@ class Detector:
         self.labels = self.classifier.classes + list(self.detector.labels.values())
         for label in self.labels:
             (DEFAULT_CROP_STORE / label).mkdir(exist_ok=True)
+        self.pool = multiprocessing.Pool(10)
 
     def predict(self, image: bytes, confidence=0.98, lat=None, lon=None):
         """
@@ -44,59 +49,26 @@ class Detector:
         photo_hash = hashlib.md5(image).hexdigest()
         image = Image.open(io.BytesIO(image))
         photo_time = get_time(image)
+        if lat is None or lon is None:
+            lat, lon = get_gps(image)
         image = np.array(image)
         bboxes, labels, scores = self._predict(image, confidence=confidence)
-        results = []
-        for bbox, label, score in zip(bboxes, labels, scores):
-            x, y, w, h = bbox
-            pw = max(int(w * 0.01), 10)
-            ph = max(int(h * 0.01), 10)
-            crop = Image.fromarray(
-                image[
-                    max(y - ph, 0) : min(y + h + ph, image.shape[0]),
-                    max(x - pw, 0) : min(x + w + pw, image.shape[1]),
-                ]
-            )
-            results.append(
-                {"crop": crop, "label": label, "score": score, "bbox": (x, y, w, h)}
-            )
-        if len(results) > 0:
-            for obj in results:
-                obj_photo = obj["crop"]
-                obj_label = obj["label"]
-                obj_conf = float(obj["score"])
-                obj_bbox = obj["bbox"]
-                obj_id = hashlib.md5(obj_photo.tobytes()).hexdigest()
-                obj_path = store_crop(
-                    f"{obj_label}/{int(obj_conf*100)}_{obj_id}.jpg",
-                    obj_photo,
-                )
-                with database.conn() as db:
-                    db.insert_object(
-                        (
-                            obj_id,
-                            obj_path,
-                            obj_bbox[0],
-                            obj_bbox[1],
-                            obj_bbox[2],
-                            obj_bbox[3],
-                            lat,
-                            lon,
-                            photo_time,
-                            obj_label,
-                            obj_conf,
-                            False,
-                            photo_hash,
-                            None,
-                        )
-                    )
-            file_path = store_photo(f"{photo_hash}.jpg", image)
-        with database.conn() as db:
-            db.insert_photo((photo_hash, file_path, None))
-        # FIXME make the storage stuff above async
-        return results
+        self.pool.apply_async(
+            process_image,
+            (
+                bboxes,
+                labels,
+                scores,
+                image,
+                lat,
+                lon,
+                photo_time,
+                photo_hash,
+            ),
+        )
+        return bboxes, labels, scores
 
-    def _predict(self, image, confidence=0.98):
+    def _predict(self, image: np.ndarray, confidence: float = 0.98):
         bboxes, labels, scores = self.detector.predict(image)
         r_bboxes = []
         r_labels = []
@@ -120,6 +92,48 @@ class Detector:
                 r_labels.append(label)
                 r_scores.append(score)
         return r_bboxes, r_labels, r_scores
+
+
+def process_image(bboxes, labels, scores, image, lat, lon, image_time, image_hash):
+    try:
+        file_path = f"{image_hash}.jpg"
+        for bbox, label, score in zip(bboxes, labels, scores):
+            x, y, w, h = bbox
+            pw = max(int(w * 0.01), 10)
+            ph = max(int(h * 0.01), 10)
+            crop = Image.fromarray(
+                image[
+                    max(y - ph, 0) : min(y + h + ph, image.shape[0]),
+                    max(x - pw, 0) : min(x + w + pw, image.shape[1]),
+                ]
+            )
+            crop_id = hashlib.md5(crop.tobytes()).hexdigest()
+            crop_path = f"{label}/{int(score*100)}_{crop_id}.jpg"
+            store_crop(crop_path, crop)
+            with database.conn() as db:
+                db.insert_object(
+                    (
+                        crop_id,
+                        crop_path,
+                        x,
+                        y,
+                        w,
+                        h,
+                        lat,
+                        lon,
+                        image_time,
+                        label,
+                        float(score),
+                        False,
+                        image_hash,
+                        None,
+                    )
+                )
+            store_photo(file_path, Image.fromarray(image))
+        with database.conn() as db:
+            db.insert_photo((image_hash, file_path, None))
+    except Exception as e:
+        LOGGER.exception(e)
 
 
 def export_ground_truth(output="./deertracker_crops.tar.gz"):
@@ -219,5 +233,31 @@ def get_time(image):
         return datetime.strptime(
             image.getexif()[EXIF_TAGS["DateTime"]], "%Y:%m:%d %H:%M:%S"
         )
+    except KeyError:
+        return None
+
+
+def get_gps(image):
+    def get_decimal_from_dms(dms, ref):
+        degrees = dms[0]
+        minutes = dms[1] / 60.0
+        seconds = dms[2] / 3600.0
+        if ref in ["S", "W"]:
+            degrees = -degrees
+            minutes = -minutes
+            seconds = -seconds
+        return round(degrees + minutes + seconds, 5)
+
+    def get_coordinates(geo):
+        lat = get_decimal_from_dms(
+            geo[GPS_TAGS["GPSLatitude"]], geo[GPS_TAGS["GPSLatitudeRef"]]
+        )
+        lon = get_decimal_from_dms(
+            geo[GPS_TAGS["GPSLongitude"]], geo[GPS_TAGS["GPSLongitudeRef"]]
+        )
+        return (lat, lon)
+
+    try:
+        return get_coordinates(image.getexif()[EXIF_TAGS["GPSInfo"]])
     except KeyError:
         return None
