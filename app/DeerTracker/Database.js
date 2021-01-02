@@ -18,10 +18,9 @@ export default class Database {
         });
     }
 
-    selectBatches() {
-        return SQLite.openDatabase({ name: database, location: location }).then((db) => {
-            return db.executeSql('SELECT * from batch ORDER BY id DESC');
-        });
+    async selectBatches() {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        return await db.executeSql('SELECT * from batch ORDER BY id DESC');
     }
 }
 
