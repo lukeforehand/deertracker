@@ -4,6 +4,7 @@ import {
   ActivityIndicator,
   ScrollView,
   Text,
+  Image,
   View,
 } from 'react-native';
 
@@ -42,6 +43,7 @@ export default class ImportScreen extends React.Component {
         <ScrollView>
           <View style={style.center}>
             <Text style={style.h1}>Batch ID: {this.state.data.batch_id}</Text>
+            <Image style={{ height: 200, width: 300 }} source={{ uri: 'https://pbs.twimg.com/profile_images/428316729220276224/EdBZ2Kgp.jpeg' }} />
           </View>
           {this.state.data.error &&
             <View style={style.center}>
@@ -51,6 +53,10 @@ export default class ImportScreen extends React.Component {
         </ScrollView>
       </SafeAreaView>
     );
+  }
+
+  onButtonPress() {
+    this.props.navigation.navigate('Second_screen');
   }
 
   fetchData() {
