@@ -4,8 +4,8 @@ import {
   ActivityIndicator,
   ScrollView,
   Text,
-  Image,
   View,
+  Button
 } from 'react-native';
 
 import Database from './Database';
@@ -42,32 +42,35 @@ export default class ImportScreen extends React.Component {
       <SafeAreaView>
         <ScrollView>
           <View style={style.center}>
+            <Button title="Add Location" onPress={this.onButtonPress.bind(this)} />
             <Text style={style.h1}>Batch ID: {this.state.data.batch_id}</Text>
-            <Image style={{ height: 200, width: 300 }} source={{ uri: 'https://pbs.twimg.com/profile_images/428316729220276224/EdBZ2Kgp.jpeg' }} />
           </View>
-          {this.state.data.error &&
-            <View style={style.center}>
-              <Text style={style.h1}>Error: {this.state.data.error}</Text>
-            </View>
-          }
         </ScrollView>
       </SafeAreaView>
     );
   }
 
   onButtonPress() {
-    this.props.navigation.navigate('Second_screen');
+    this.props.navigation.navigate('LocationScreen');
   }
 
   fetchData() {
     this.setState({
       isLoading: true
     });
-    this.db.selectBatches().then((rs) => {
-      console.log(rs);
-      this.setState({
-        isLoading: false,
-        data: rs
+    this.db.selectBatches().then((batches) => {
+      console.log(batches);
+      this.db.selectLocations().then((locations) => {
+        console.log(locations);
+        this.setState({
+          isLoading: false,
+          data: {
+            batches: batches,
+            locations: locations
+          }
+        });
+      }).catch((error) => {
+        console.log(error);
       });
     }).catch((error) => {
       console.log(error);

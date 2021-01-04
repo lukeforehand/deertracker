@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 
 export default StyleSheet.create({
   h1: {
@@ -26,5 +26,19 @@ export default StyleSheet.create({
   center: {
     justifyContent: 'center',
     alignItems: 'center'
+  },
+  map: {
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
+  },
+  modal: {
+    flex: 1,
+    marginTop: Dimensions.get('window').height - 215,
+    marginLeft: 25,
+    marginRight: 25,
+    maxHeight: 100,
+    backgroundColor: 'white',
+    borderColor: 'gray',
+    borderWidth: 1
   }
 });

@@ -5,12 +5,23 @@ import { createBottomTabNavigator } from 'react-navigation-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 import ImportScreen from './ImportScreen';
+import LocationScreen from './LocationScreen';
 
 const ImportScreenNavigator = createStackNavigator({
   ImportScreen: {
     screen: ImportScreen,
     navigationOptions: {
-      title: 'DeerTracker',
+      title: 'Pull Card',
+      //      headerTitleStyle: {
+      //        fontFamily: Platform.OS === 'ios' ? 'Metamorphous' : 'metamorphous_regular'
+      //      },
+      headerTitleAlign: 'center'
+    },
+  },
+  LocationScreen: {
+    screen: LocationScreen,
+    navigationOptions: {
+      title: 'Locations',
       //      headerTitleStyle: {
       //        fontFamily: Platform.OS === 'ios' ? 'Metamorphous' : 'metamorphous_regular'
       //      },

@@ -22,6 +22,11 @@ export default class Database {
         const db = await SQLite.openDatabase({ name: database, location: location });
         return await db.executeSql('SELECT * from batch ORDER BY id DESC');
     }
+
+    async selectLocations() {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        return await db.executeSql('SELECT * from location ORDER BY name DESC');
+    }
 }
 
 CREATE_TABLE_LOCATION = `
