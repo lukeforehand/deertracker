@@ -49,11 +49,13 @@ export default class LocationScreen extends React.Component {
       <SafeAreaView>
         <View style={style.map}>
           <MapView
+            ref={ref => { this.map = ref; }}
             style={{ ...StyleSheet.absoluteFillObject }}
             showsUserLocation={true}
             mapType="satellite"
             initialRegion={this.state.region}
             region={this.state.region}
+            onDoublePress={(ev) => { this.map.animateToCoordinate(ev.nativeEvent.coordinate) }}
             onRegionChangeComplete={(region) => { this.setState({ region: region }) }}>
           </MapView>
           <View style={style.markerFixed}>
@@ -103,14 +105,13 @@ export default class LocationScreen extends React.Component {
     });
     Geolocation.getCurrentPosition(
       (position) => {
-        let region = {
-          latitude: parseFloat(position.coords.latitude),
-          longitude: parseFloat(position.coords.longitude),
-          latitudeDelta: 0.0009,
-          longitudeDelta: 0.0009
-        };
         this.setState({
-          region: region
+          region: {
+            latitude: parseFloat(position.coords.latitude),
+            longitude: parseFloat(position.coords.longitude),
+            latitudeDelta: 0.0009,
+            longitudeDelta: 0.0009
+          }
         });
       },
       (error) => {

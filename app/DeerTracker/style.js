@@ -45,7 +45,7 @@ export default StyleSheet.create({
     marginTop: 170,
     marginLeft: 25,
     marginRight: 25,
-    maxHeight: 88,
+    maxHeight: 90,
     backgroundColor: 'white',
     borderColor: 'gray',
     borderWidth: 1
