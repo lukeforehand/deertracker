@@ -61,9 +61,11 @@ export default class LocationScreen extends React.Component {
           <View style={style.markerFixed}>
             <Image source={require('./assets/images/crosshairs.png')} style={{ width: 100, height: 100 }} />
           </View>
-          <TouchableOpacity style={style.button} onPress={() => { this.setState({ modalVisible: true }) }}>
-            <Text style={style.h1}>Save Location</Text>
-          </TouchableOpacity>
+          {!this.state.modalVisible &&
+            <TouchableOpacity style={style.button} onPress={() => { this.setState({ modalVisible: true }) }}>
+              <Text style={style.h1}>Save Location</Text>
+            </TouchableOpacity>
+          }
           {this.state.region &&
             <Modal
               animationType="slide"
@@ -78,12 +80,12 @@ export default class LocationScreen extends React.Component {
                 <Text style={style.t1}>
                   {this.state.region.latitude.toFixed(5)}, {this.state.region.longitude.toFixed(5)}
                 </Text>
-                <TouchableOpacity style={style.button} onPress={this.saveLocation.bind(this)}>
-                  <Text style={style.h1}>Save</Text>
-                </TouchableOpacity>
               </View>
+              <TouchableOpacity style={style.button} onPress={this.saveLocation.bind(this)}>
+                <Text style={style.h1}>Save</Text>
+              </TouchableOpacity>
               <TouchableWithoutFeedback onPress={() => { this.setState({ modalVisible: false }) }}>
-                <View style={{ marginTop: 50, flex: 1 }} />
+                <View style={{ flex: 1 }} />
               </TouchableWithoutFeedback>
             </Modal>
           }
@@ -93,7 +95,6 @@ export default class LocationScreen extends React.Component {
   }
 
   saveLocation() {
-
     // FIXME: insert location
     alert(this.state.locationName + " " + this.state.region.latitude + " " + this.state.region.longitude);
     this.setState({ modalVisible: false })
