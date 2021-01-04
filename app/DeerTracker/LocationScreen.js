@@ -55,7 +55,7 @@ export default class LocationScreen extends React.Component {
             mapType="satellite"
             initialRegion={this.state.region}
             region={this.state.region}
-            onDoublePress={(ev) => { this.map.animateToCoordinate(ev.nativeEvent.coordinate) }}
+            onDoublePress={(ev) => { this.map.animateCamera({ center: ev.nativeEvent.coordinate }) }}
             onRegionChangeComplete={(region) => { this.setState({ region: region }) }}>
           </MapView>
           <View style={style.markerFixed}>
@@ -110,8 +110,8 @@ export default class LocationScreen extends React.Component {
           region: {
             latitude: parseFloat(position.coords.latitude),
             longitude: parseFloat(position.coords.longitude),
-            latitudeDelta: 0.0009,
-            longitudeDelta: 0.0009
+            latitudeDelta: 0.001,
+            longitudeDelta: 0.001
           }
         });
       },
