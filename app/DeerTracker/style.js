@@ -1,23 +1,20 @@
 import { StyleSheet, Dimensions } from 'react-native';
+//fontFamily: Platform.OS === 'ios' ? 'Metamorphous' : 'metamorphous_regular'
 
 export default StyleSheet.create({
   h1: {
     color: '#C1CDCD',
     textAlign: 'center',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
-    paddingTop: 10,
-    fontSize: 16,
-    //fontFamily: Platform.OS === 'ios' ? 'Metamorphous' : 'metamorphous_regular'
+    fontSize: 20,
+    margin: 10,
   },
   t1: {
-    color: '#C1CDCD',
-    textAlign: 'left',
+    color: 'black',
+    textAlign: 'center',
     fontWeight: 'normal',
-    marginLeft: '5%',
-    marginRight: '5%',
-    lineHeight: 24,
-    fontSize: 18,
-    //fontFamily: Platform.OS === 'ios' ? 'Metamorphous' : 'metamorphous_regular'
+    margin: 10,
+    fontSize: 18
   },
   activity: {
     flex: 1,
@@ -31,14 +28,31 @@ export default StyleSheet.create({
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
   },
+  markerFixed: {
+    left: '50%',
+    marginLeft: -50,
+    marginTop: -50,
+    position: 'absolute',
+    top: '50%'
+  },
+  button: {
+    backgroundColor: 'darkred',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 60,
+  },
   modal: {
-    flex: 1,
-    marginTop: Dimensions.get('window').height - 215,
+    marginTop: 170,
     marginLeft: 25,
     marginRight: 25,
-    maxHeight: 100,
+    maxHeight: 88,
     backgroundColor: 'white',
     borderColor: 'gray',
     borderWidth: 1
+  },
+  input: {
+    borderColor: 'gray',
+    borderWidth: 1,
+    padding: 10
   }
 });

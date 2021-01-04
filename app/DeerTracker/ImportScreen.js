@@ -5,7 +5,7 @@ import {
   ScrollView,
   Text,
   View,
-  Button
+  TouchableOpacity
 } from 'react-native';
 
 import Database from './Database';
@@ -41,10 +41,10 @@ export default class ImportScreen extends React.Component {
     return (
       <SafeAreaView>
         <ScrollView>
-          <View style={style.center}>
-            <Button title="Add Location" onPress={this.onButtonPress.bind(this)} />
-            <Text style={style.h1}>Batch ID: {this.state.data.batch_id}</Text>
-          </View>
+          <TouchableOpacity style={style.button} onPress={this.onButtonPress.bind(this)}>
+            <Text style={style.h1}>Add Location</Text>
+          </TouchableOpacity>
+          <Text style={style.h1}>Batch ID: {this.state.data.batch_id}</Text>
         </ScrollView>
       </SafeAreaView>
     );

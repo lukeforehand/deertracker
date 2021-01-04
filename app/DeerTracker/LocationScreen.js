@@ -3,11 +3,12 @@ import {
   SafeAreaView,
   ActivityIndicator,
   Image,
-  Button,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
   Modal,
-  ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 
@@ -46,39 +47,53 @@ export default class LocationScreen extends React.Component {
     }
     return (
       <SafeAreaView>
-        <ScrollView>
-          <View style={style.map}>
-            <MapView
-              style={{ ...StyleSheet.absoluteFillObject }}
-              showsUserLocation={true}
-              mapType="satellite"
-              region={this.state.initialRegion}>
-              <Marker draggable
-                coordinate={this.state.location}
-                onDragEnd={(e) => this.setState({ modalVisible: true, location: e.nativeEvent.coordinate })}>
-                <Image source={require('./assets/images/crosshairs.png')} style={{ width: 100, height: 100 }} />
-              </Marker>
-            </MapView>
+        <View style={style.map}>
+          <MapView
+            style={{ ...StyleSheet.absoluteFillObject }}
+            showsUserLocation={true}
+            mapType="satellite"
+            initialRegion={this.state.region}
+            region={this.state.region}
+            onRegionChangeComplete={(region) => { this.setState({ region: region }) }}>
+          </MapView>
+          <View style={style.markerFixed}>
+            <Image source={require('./assets/images/crosshairs.png')} style={{ width: 100, height: 100 }} />
+          </View>
+          <TouchableOpacity style={style.button} onPress={() => { this.setState({ modalVisible: true }) }}>
+            <Text style={style.h1}>Save Location</Text>
+          </TouchableOpacity>
+          {this.state.region &&
             <Modal
               animationType="slide"
               transparent={true}
               visible={this.state.modalVisible}>
               <View style={style.modal}>
-                {this.state.location &&
-                  <Text>{this.state.location.latitude}, {this.state.location.longitude}</Text>
-                }
-                <Button title="Save Location" onPress={this.saveLocation.bind(this)} />
+                <TextInput
+                  style={style.h1}
+                  onChangeText={(text) => { this.setState({ locationName: text }) }}
+                  selectTextOnFocus={true}
+                  defaultValue="Enter location name" />
+                <Text style={style.t1}>
+                  {this.state.region.latitude.toFixed(5)}, {this.state.region.longitude.toFixed(5)}
+                </Text>
+                <TouchableOpacity style={style.button} onPress={this.saveLocation.bind(this)}>
+                  <Text style={style.h1}>Save</Text>
+                </TouchableOpacity>
               </View>
+              <TouchableWithoutFeedback onPress={() => { this.setState({ modalVisible: false }) }}>
+                <View style={{ marginTop: 50, flex: 1 }} />
+              </TouchableWithoutFeedback>
             </Modal>
-          </View>
-        </ScrollView >
+          }
+        </View>
       </SafeAreaView >
     );
   }
 
   saveLocation() {
+
     // FIXME: insert location
-    alert(this.state.location.latitude)
+    alert(this.state.locationName + " " + this.state.region.latitude + " " + this.state.region.longitude);
     this.setState({ modalVisible: false })
   }
 
@@ -95,18 +110,14 @@ export default class LocationScreen extends React.Component {
           longitudeDelta: 0.0009
         };
         this.setState({
-          location: position.coords,
-          initialRegion: region
+          region: region
         });
       },
       (error) => {
         console.log(error.code, error.message);
       },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-    );
-
-
-    this.db.selectBatches().then((rs) => {
+    ).then(this.db.selectBatches().then((rs) => {
       console.log(rs);
       this.setState({
         isLoading: false,
@@ -114,7 +125,7 @@ export default class LocationScreen extends React.Component {
       });
     }).catch((error) => {
       console.log(error);
-    });
+    }));
   }
 
 }
