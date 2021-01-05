@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from 'react-navigation-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 import ImportScreen from './ImportScreen';
+
 import LocationScreen from './LocationScreen';
 
 const ImportScreenNavigator = createStackNavigator({
@@ -46,7 +47,7 @@ const TabNavigator = createBottomTabNavigator(
   {
     tabBarOptions: {
       labelStyle: {
-        fontSize: 10,
+        fontSize: 14,
         //fontFamily: Platform.OS === 'ios' ? 'Metamorphous' : 'metamorphous_regular'
       }
     }
