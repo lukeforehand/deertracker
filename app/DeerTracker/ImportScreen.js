@@ -4,6 +4,7 @@ import {
   ActivityIndicator,
   ScrollView,
   Text,
+  Image,
   View,
   TouchableOpacity
 } from 'react-native';
@@ -21,7 +22,7 @@ export default class ImportScreen extends React.Component {
   }
 
   componentDidMount() {
-    this.fetchData()
+    this.fetchData();
   }
 
   refreshing() {
@@ -40,13 +41,25 @@ export default class ImportScreen extends React.Component {
     }
     return (
       <SafeAreaView>
-        <ScrollView>
+        <ScrollView style={style.container}>
+          {this.state.locations.map((location) => {
+            return (
+              <TouchableOpacity key={location['id']} style={style.locationButton}>
+                <View style={{ flexDirection: 'row' }}>
+                  <Image source={require('./assets/images/crosshairs.png')} style={{ margin: 10, width: 80, height: 80 }} />
+                  <View>
+                    <Text style={style.h2}>{location['name']}</Text>
+                    <Text style={style.h2}>({location['lat'].toFixed(5)}, {location['lon'].toFixed(5)})</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
           <TouchableOpacity style={style.button} onPress={this.onButtonPress.bind(this)}>
             <Text style={style.h1}>Add Location</Text>
           </TouchableOpacity>
-          <Text style={style.h1}>Batch ID: {this.state.data.batch_id}</Text>
         </ScrollView>
-      </SafeAreaView>
+      </SafeAreaView >
     );
   }
 
@@ -58,19 +71,10 @@ export default class ImportScreen extends React.Component {
     this.setState({
       isLoading: true
     });
-    this.db.selectBatches().then((batches) => {
-      console.log(batches);
-      this.db.selectLocations().then((locations) => {
-        console.log(locations);
-        this.setState({
-          isLoading: false,
-          data: {
-            batches: batches,
-            locations: locations
-          }
-        });
-      }).catch((error) => {
-        console.log(error);
+    this.db.selectLocations().then((locations) => {
+      this.setState({
+        isLoading: false,
+        locations: locations
       });
     }).catch((error) => {
       console.log(error);

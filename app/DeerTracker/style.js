@@ -3,8 +3,15 @@ import { StyleSheet, Dimensions } from 'react-native';
 
 export default StyleSheet.create({
   h1: {
-    color: '#C1CDCD',
+    color: '#e3e8e8',
     textAlign: 'center',
+    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontSize: 20,
+    margin: 10,
+  },
+  h2: {
+    color: 'black',
+    textAlign: 'left',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
     fontSize: 20,
     margin: 10,
@@ -16,6 +23,13 @@ export default StyleSheet.create({
     margin: 10,
     fontSize: 18
   },
+  t2: {
+    color: 'black',
+    textAlign: 'center',
+    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontSize: 20,
+    margin: 10,
+  },
   activity: {
     flex: 1,
     justifyContent: 'center'
@@ -24,7 +38,7 @@ export default StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
-  map: {
+  container: {
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
   },
@@ -47,6 +61,14 @@ export default StyleSheet.create({
     alignItems: 'center',
     height: 60,
   },
+  marker: {
+    shadowColor: '#fff',
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    elevation: 5,
+    width: 30,
+    height: 30
+  },
   modal: {
     borderRadius: 2,
     marginTop: 110,
@@ -61,5 +83,19 @@ export default StyleSheet.create({
     borderColor: 'gray',
     borderWidth: 1,
     padding: 10
-  }
+  },
+  locationButton: {
+    shadowColor: '#000',
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 4,
+    borderRadius: 2,
+    marginLeft: 20,
+    marginRight: 20,
+    marginTop: 10,
+    marginBottom: 10,
+    backgroundColor: 'white',
+    borderColor: 'gray',
+    borderWidth: 1
+  },
 });

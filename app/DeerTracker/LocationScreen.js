@@ -10,10 +10,13 @@ import {
   Text,
   TextInput,
   View,
+  Alert,
 } from 'react-native';
 
+import Icon from 'react-native-vector-icons/FontAwesome5';
+
 import Geolocation from '@react-native-community/geolocation';
-import MapView, { Callout, Marker } from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 
 import Database from './Database';
 
@@ -47,7 +50,7 @@ export default class LocationScreen extends React.Component {
     }
     return (
       <SafeAreaView>
-        <View style={style.map}>
+        <View style={style.container}>
           <MapView
             ref={ref => { this.map = ref; }}
             style={{ ...StyleSheet.absoluteFillObject }}
@@ -57,9 +60,17 @@ export default class LocationScreen extends React.Component {
             region={this.state.region}
             onDoublePress={(ev) => { this.map.animateCamera({ center: ev.nativeEvent.coordinate }) }}
             onRegionChangeComplete={(region) => { this.setState({ region: region }) }}>
+            {this.state.locations.map((location) => {
+              return (
+                <Marker key={location['id']}
+                  coordinate={{ latitude: location['lat'], longitude: location['lon'] }}
+                  title={location['name']}>
+                </Marker>
+              );
+            })}
           </MapView>
           <View style={style.markerFixed}>
-            <Image source={require('./assets/images/crosshairs.png')} style={{ width: 100, height: 100 }} />
+            <Image source={require('./assets/images/crosshairs.png')} style={{ width: 80, height: 80 }} />
           </View>
           {!this.state.modalVisible &&
             <TouchableOpacity style={style.button} onPress={() => { this.setState({ modalVisible: true }) }}>
@@ -70,11 +81,13 @@ export default class LocationScreen extends React.Component {
             <Modal
               animationType="slide"
               transparent={true}
+              onShow={() => { this.location.focus(); }}
               visible={this.state.modalVisible}>
               <View style={style.modal}>
                 <TextInput
-                  style={style.h1}
-                  onChangeText={(text) => { this.setState({ locationName: text }) }}
+                  style={style.t2}
+                  ref={ref => { this.location = ref; }}
+                  onChangeText={(text) => { this.setState({ location: text }) }}
                   selectTextOnFocus={true}
                   defaultValue="Enter location name" />
                 <Text style={style.t1}>
@@ -95,9 +108,22 @@ export default class LocationScreen extends React.Component {
   }
 
   saveLocation() {
-    // FIXME: insert location
-    alert(this.state.locationName + " " + this.state.region.latitude + " " + this.state.region.longitude);
-    this.setState({ modalVisible: false })
+    location = this.state.location;
+    lat = this.state.region.latitude;
+    lon = this.state.region.longitude;
+    if (location && location.length > 0 && location != "Enter location name") {
+      this.db.insertLocation(location, lat, lon).then((rs) => {
+        console.log(rs);
+        this.setState({ modalVisible: false });
+        this.props.navigation.navigate('ImportScreen');
+      }).catch((error) => {
+        if (error.code && error.code == 6) {
+          Alert.alert("That name already exists");
+        }
+      });
+    } else {
+      Alert.alert("Enter location name");
+    }
   }
 
   fetchData() {
@@ -119,11 +145,10 @@ export default class LocationScreen extends React.Component {
         console.log(error.code, error.message);
       },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-    ).then(this.db.selectBatches().then((rs) => {
-      console.log(rs);
+    ).then(this.db.selectLocations().then((locations) => {
       this.setState({
         isLoading: false,
-        data: rs
+        locations: locations
       });
     }).catch((error) => {
       console.log(error);

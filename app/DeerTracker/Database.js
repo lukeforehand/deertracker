@@ -25,7 +25,17 @@ export default class Database {
 
     async selectLocations() {
         const db = await SQLite.openDatabase({ name: database, location: location });
-        return await db.executeSql('SELECT * from location ORDER BY name DESC');
+        rs = await db.executeSql('SELECT * from location ORDER BY name DESC')
+        return rs.map((r) => {
+            return r.rows.raw();
+        })[0];
+    }
+
+    async insertLocation(name, lat, lon) {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        return await db.executeSql(
+            'INSERT INTO location(id, name, lat, lon) VALUES(NULL, ?, ?, ?)',
+            [name, lat, lon]);
     }
 }
 
