@@ -90,10 +90,6 @@ export default StyleSheet.create({
     shadowRadius: 4,
     elevation: 4,
     borderRadius: 2,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 10,
-    marginBottom: 10,
     backgroundColor: 'white',
     borderColor: 'gray',
     borderWidth: 1

@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Alert,
   SafeAreaView,
   ActivityIndicator,
   ScrollView,
@@ -10,6 +11,7 @@ import {
 } from 'react-native';
 
 import Database from './Database';
+import SwipeRow from './SwipeRow';
 
 import style from './style';
 
@@ -19,6 +21,13 @@ export default class ImportScreen extends React.Component {
     super(props);
     this.db = new Database();
     this.state = { isLoading: true }
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    locations = props.navigation.getParam('locations');
+    return {
+      locations: locations ? locations : state.locations
+    }
   }
 
   componentDidMount() {
@@ -39,32 +48,51 @@ export default class ImportScreen extends React.Component {
         </SafeAreaView>
       )
     }
+
     return (
       <SafeAreaView>
-        <ScrollView style={style.container}>
-          {this.state.locations.map((location) => {
-            return (
-              <TouchableOpacity key={location['id']} style={style.locationButton}>
-                <View style={{ flexDirection: 'row' }}>
-                  <Image source={require('./assets/images/crosshairs.png')} style={{ margin: 10, width: 80, height: 80 }} />
-                  <View>
-                    <Text style={style.h2}>{location['name']}</Text>
-                    <Text style={style.h2}>({location['lat'].toFixed(5)}, {location['lon'].toFixed(5)})</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            );
-          })}
-          <TouchableOpacity style={style.button} onPress={this.onButtonPress.bind(this)}>
+        <ScrollView>
+          <TouchableOpacity style={style.button} onPress={() => { this.props.navigation.navigate('LocationScreen') }}>
             <Text style={style.h1}>Add Location</Text>
           </TouchableOpacity>
+          {this.state.locations.map((location) => {
+            return (
+              <SwipeRow key={location['id']} location={location} onDelete={this.deleteLocation}>
+                <TouchableOpacity key={location['id']} style={style.locationButton}>
+                  <View style={{ flexDirection: 'row' }}>
+                    <Image source={require('./assets/images/crosshairs.png')} style={{ margin: 10, width: 80, height: 80 }} />
+                    <View>
+                      <Text style={style.h2}>{location['name']}</Text>
+                      <Text style={style.h2}>({location['lat'].toFixed(5)}, {location['lon'].toFixed(5)})</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </SwipeRow>
+            );
+          })}
         </ScrollView>
+
       </SafeAreaView >
     );
   }
 
-  onButtonPress() {
-    this.props.navigation.navigate('LocationScreen');
+  deleteLocation = (location) => {
+    Alert.alert(
+      'Delete Location ' + location['name'] + '?', '', [
+      {
+        text: 'Yes',
+        onPress: () => {
+          this.db.deleteLocation(location['id']).then(() => {
+            this.db.selectLocations().then((locations) => {
+              this.setState({ locations: locations });
+              this.props.navigation.dispatch('LocationScreen', {
+                locations: this.state.locations
+              });
+            });
+          });
+        }
+      },
+      { text: 'No' }], { cancelable: false });
   }
 
   fetchData() {

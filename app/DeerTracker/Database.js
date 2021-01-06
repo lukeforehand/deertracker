@@ -37,6 +37,12 @@ export default class Database {
             'INSERT INTO location(id, name, lat, lon) VALUES(NULL, ?, ?, ?)',
             [name, lat, lon]);
     }
+
+    async deleteLocation(id) {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        return await db.executeSql(
+            'DELETE FROM location where id = ?', [id]);
+    }
 }
 
 CREATE_TABLE_LOCATION = `

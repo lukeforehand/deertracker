@@ -13,8 +13,6 @@ import {
   Alert,
 } from 'react-native';
 
-import Icon from 'react-native-vector-icons/FontAwesome5';
-
 import Geolocation from '@react-native-community/geolocation';
 import MapView, { Marker } from 'react-native-maps';
 
@@ -28,6 +26,13 @@ export default class LocationScreen extends React.Component {
     super(props);
     this.db = new Database();
     this.state = { isLoading: true, modalVisible: false }
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    locations = props.navigation.getParam('locations');
+    return {
+      locations: locations ? locations : state.locations
+    }
   }
 
   componentDidMount() {
@@ -113,9 +118,12 @@ export default class LocationScreen extends React.Component {
     lon = this.state.region.longitude;
     if (location && location.length > 0 && location != "Enter location name") {
       this.db.insertLocation(location, lat, lon).then((rs) => {
-        console.log(rs);
-        this.setState({ modalVisible: false });
-        this.props.navigation.navigate('ImportScreen');
+        this.db.selectLocations().then((locations) => {
+          this.setState({ modalVisible: false, locations: locations });
+          this.props.navigation.navigate('ImportScreen', {
+            locations: this.state.locations
+          });
+        });
       }).catch((error) => {
         if (error.code && error.code == 6) {
           Alert.alert("That name already exists");
@@ -132,27 +140,26 @@ export default class LocationScreen extends React.Component {
     });
     Geolocation.getCurrentPosition(
       (position) => {
-        this.setState({
-          region: {
-            latitude: parseFloat(position.coords.latitude),
-            longitude: parseFloat(position.coords.longitude),
-            latitudeDelta: 0.001,
-            longitudeDelta: 0.001
-          }
+        this.db.selectLocations().then((locations) => {
+          this.setState({
+            isLoading: false,
+            locations: locations,
+            region: {
+              latitude: parseFloat(position.coords.latitude),
+              longitude: parseFloat(position.coords.longitude),
+              latitudeDelta: 0.001,
+              longitudeDelta: 0.001
+            }
+          });
         });
       },
       (error) => {
         console.log(error.code, error.message);
       },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-    ).then(this.db.selectLocations().then((locations) => {
-      this.setState({
-        isLoading: false,
-        locations: locations
-      });
-    }).catch((error) => {
+    ).catch((error) => {
       console.log(error);
-    }));
+    });
   }
 
 }
