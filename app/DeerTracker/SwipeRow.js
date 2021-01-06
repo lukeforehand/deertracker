@@ -12,8 +12,7 @@ export default class SwipeRow extends Component {
       outputRange: [x, 0],
     });
     const pressHandler = () => {
-      onDelete(location);
-      this.close();
+      onDelete(location, this.close);
     };
     return (
       <Animated.View style={{ flex: 1, transform: [{ translateX: trans }] }}>

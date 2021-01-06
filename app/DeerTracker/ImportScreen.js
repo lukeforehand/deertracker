@@ -25,9 +25,9 @@ export default class ImportScreen extends React.Component {
 
   static getDerivedStateFromProps(props, state) {
     locations = props.navigation.getParam('locations');
-    return {
-      locations: locations ? locations : state.locations
-    }
+    return locations === undefined || locations === state.locations ? {} : {
+      locations
+    };
   }
 
   componentDidMount() {
@@ -57,7 +57,7 @@ export default class ImportScreen extends React.Component {
           </TouchableOpacity>
           {this.state.locations.map((location) => {
             return (
-              <SwipeRow key={location['id']} location={location} onDelete={this.deleteLocation}>
+              <SwipeRow key={location['id']} location={location} onDelete={this.deleteLocation.bind(this)}>
                 <TouchableOpacity key={location['id']} style={style.locationButton}>
                   <View style={{ flexDirection: 'row' }}>
                     <Image source={require('./assets/images/crosshairs.png')} style={{ margin: 10, width: 80, height: 80 }} />
@@ -76,7 +76,7 @@ export default class ImportScreen extends React.Component {
     );
   }
 
-  deleteLocation = (location) => {
+  deleteLocation(location, callback) {
     Alert.alert(
       'Delete Location ' + location['name'] + '?', '', [
       {
@@ -84,15 +84,18 @@ export default class ImportScreen extends React.Component {
         onPress: () => {
           this.db.deleteLocation(location['id']).then(() => {
             this.db.selectLocations().then((locations) => {
-              this.setState({ locations: locations });
               this.props.navigation.dispatch('LocationScreen', {
-                locations: this.state.locations
+                locations: locations
+              });
+              this.props.navigation.navigate('ImportScreen', {
+                locations: locations
               });
             });
           });
+          callback();
         }
       },
-      { text: 'No' }], { cancelable: false });
+      { text: 'No', onPress: callback }], { cancelable: false });
   }
 
   fetchData() {

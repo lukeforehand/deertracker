@@ -30,9 +30,9 @@ export default class LocationScreen extends React.Component {
 
   static getDerivedStateFromProps(props, state) {
     locations = props.navigation.getParam('locations');
-    return {
-      locations: locations ? locations : state.locations
-    }
+    return locations === undefined || locations === state.locations ? {} : {
+      locations
+    };
   }
 
   componentDidMount() {
@@ -119,9 +119,8 @@ export default class LocationScreen extends React.Component {
     if (location && location.length > 0 && location != "Enter location name") {
       this.db.insertLocation(location, lat, lon).then((rs) => {
         this.db.selectLocations().then((locations) => {
-          this.setState({ modalVisible: false, locations: locations });
           this.props.navigation.navigate('ImportScreen', {
-            locations: this.state.locations
+            locations: locations
           });
         });
       }).catch((error) => {
