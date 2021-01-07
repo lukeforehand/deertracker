@@ -15,7 +15,7 @@ import SwipeRow from './SwipeRow';
 
 import style from './style';
 
-export default class LocationScreen extends React.Component {
+export default class BatchScreen extends React.Component {
 
   constructor(props) {
     super(props);
@@ -52,16 +52,13 @@ export default class LocationScreen extends React.Component {
     return (
       <SafeAreaView>
         <ScrollView>
-          <TouchableOpacity style={style.button} onPress={() => { this.props.navigation.navigate('AddLocationScreen') }}>
+          <TouchableOpacity style={style.button} onPress={() => { this.props.navigation.navigate('LocationScreen') }}>
             <Text style={style.h1}>Add Location</Text>
           </TouchableOpacity>
           {this.state.locations.map((location) => {
             return (
               <SwipeRow key={location['id']} location={location} onDelete={this.deleteLocation.bind(this)}>
-                <TouchableOpacity
-                  key={location['id']}
-                  style={style.locationButton}
-                  onPress={() => { this.props.navigation.navigate('ImportScreen', { location: location }) }}>
+                <TouchableOpacity key={location['id']} style={style.locationButton}>
                   <View style={{ flexDirection: 'row' }}>
                     <Image source={require('./assets/images/crosshairs.png')} style={{ margin: 10, width: 80, height: 80 }} />
                     <View>
@@ -87,10 +84,10 @@ export default class LocationScreen extends React.Component {
         onPress: () => {
           this.db.deleteLocation(location['id']).then(() => {
             this.db.selectLocations().then((locations) => {
-              this.props.navigation.dispatch('AddLocationScreen', {
+              this.props.navigation.dispatch('LocationScreen', {
                 locations: locations
               });
-              this.props.navigation.navigate('LocationScreen', {
+              this.props.navigation.navigate('ImportScreen', {
                 locations: locations
               });
             });

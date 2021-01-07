@@ -1,17 +1,7 @@
 # Install
 
 ```bash
-npm install react-navigation
-npm install react-navigation-stack
-npm install react-navigation-tabs
-npm install react-native-vector-icons
-npm install react-native-gesture-handler
-npm install react-native-reanimated
-npm install react-native-safe-area-context
-npm install react-native-screens
-npm install react-native-sqlite-storage
-npm install react-native-maps
-
+npm install
 npx pod-install ios
 
 react-native link

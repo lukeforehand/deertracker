@@ -4,28 +4,53 @@ import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
-import ImportScreen from './ImportScreen';
-
 import LocationScreen from './LocationScreen';
+import AddLocationScreen from './AddLocationScreen';
+import ImportScreen from './ImportScreen';
+import BatchScreen from './BatchScreen';
 
 const ImportScreenNavigator = createStackNavigator({
-  ImportScreen: {
-    screen: ImportScreen,
-    navigationOptions: {
-      title: 'Pull Card',
-      //      headerTitleStyle: {
-      //        fontFamily: Platform.OS === 'ios' ? 'Metamorphous' : 'metamorphous_regular'
-      //      },
-      headerTitleAlign: 'center'
-    },
-  },
   LocationScreen: {
     screen: LocationScreen,
     navigationOptions: {
-      title: 'Locations',
-      //      headerTitleStyle: {
-      //        fontFamily: Platform.OS === 'ios' ? 'Metamorphous' : 'metamorphous_regular'
-      //      },
+      title: 'Choose Location',
+      headerTitleStyle: {
+        fontSize: 20
+      },
+      headerTitleAlign: 'center'
+    },
+  },
+  AddLocationScreen: {
+    screen: AddLocationScreen,
+    navigationOptions: {
+      title: 'Add Location',
+      headerTitleStyle: {
+        fontSize: 20
+      },
+      headerTitleAlign: 'center'
+    },
+  },
+  ImportScreen: {
+    screen: ImportScreen,
+    navigationOptions: {
+      title: 'Choose Photos',
+      headerTitleStyle: {
+        fontSize: 20
+      },
+      headerTitleAlign: 'center'
+    },
+  },
+});
+
+
+const BatchScreenNavigator = createStackNavigator({
+  BatchScreen: {
+    screen: BatchScreen,
+    navigationOptions: {
+      title: 'Batches',
+      headerTitleStyle: {
+        fontSize: 20
+      },
       headerTitleAlign: 'center'
     },
   },
@@ -34,12 +59,21 @@ const ImportScreenNavigator = createStackNavigator({
 
 const TabNavigator = createBottomTabNavigator(
   {
-    Home: {
+    Import: {
       screen: ImportScreenNavigator,
       navigationOptions: {
         tabBarLabel: 'Pull Card',
         tabBarIcon: ({ tintColor }) => (
           <Icon name='upload' style={{ transform: [{ rotateX: '180deg' }] }} color={tintColor} size={20} />
+        )
+      }
+    },
+    Photos: {
+      screen: BatchScreenNavigator,
+      navigationOptions: {
+        tabBarLabel: 'Photos',
+        tabBarIcon: ({ tintColor }) => (
+          <Icon name='camera' color={tintColor} size={20} />
         )
       }
     },

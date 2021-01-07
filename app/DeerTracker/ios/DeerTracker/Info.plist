@@ -39,6 +39,8 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>To associate photos with camera location.</string>
+	<key>NSRemovableVolumesUsageDescription</key>
+	<string>To import photos.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
