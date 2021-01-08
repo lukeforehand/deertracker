@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Dimensions,
+  Alert,
   SafeAreaView,
   ActivityIndicator,
   ScrollView,
@@ -59,32 +59,48 @@ export default class ImportScreen extends React.Component {
 
     return (
       <SafeAreaView>
-        <Text style={style.t2}>{this.state.location['name']}</Text>
-        <Text style={style.t1}>
-          Insert the camera card and use the Files app to move the photos into the DeerTracker folder.
-            {'\n'}{'\n'}All photos in the DeerTracker folder will be imported for location: "{this.state.location['name']}"
-          </Text>
-        <Text style={style.t2}>Photos to import: {this.state.files.length}</Text>
-        <TouchableOpacity
-          disabled={this.importDisabled()}
-          style={this.importDisabled() ? style.buttonDisabled : style.button} onPress={() => { this.setState({ modalVisible: true }) }}>
-          <Text style={style.h1}>Import</Text>
-        </TouchableOpacity>
-        <ScrollView>
-          <View style={style.grid}>
-            {this.state.files.map((file) => {
-              return (
-                <Image key={file.path} source={{ uri: file.path }} style={style.thumbnail} />
-              );
-            })}
-          </View>
-        </ScrollView>
-      </SafeAreaView >
+        <View style={style.importScreenTop}>
+          <Text style={style.t2}>{this.state.location['name']}</Text>
+          <TouchableOpacity
+            disabled={this.importDisabled()}
+            style={this.importDisabled() ? style.buttonDisabled : style.button} onPress={this.importPhotos.bind(this)}>
+            <Text style={style.h1}>Import {this.state.files.length} Photos</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={style.importScreenBottom}>
+          {this.importDisabled() &&
+            <Text style={style.t3}>No Photos found, insert camera card and use the Files app to move photos to DeerTracker folder.</Text>
+          }
+          {!this.importDisabled() &&
+            <ScrollView>
+              <View style={style.grid}>
+                {this.state.files.map((file) => {
+                  return (
+                    <Image key={file.path} source={{ uri: file.path }} style={style.thumbnail} />
+                  );
+                })}
+              </View>
+            </ScrollView>
+          }
+        </View>
+      </SafeAreaView>
     );
   }
 
   importDisabled() {
     return !this.state.files || this.state.files.length <= 0;
+  }
+
+  importPhotos() {
+    Alert.alert(
+      'Import ' + this.state.files.length + ' photos for location ' + this.state.location['name'] + '?', '', [
+      {
+        text: 'Yes',
+        onPress: () => {
+          // FIXME: import the photos
+        }
+      },
+      { text: 'No' }], { cancelable: false });
   }
 
   async setFiles() {

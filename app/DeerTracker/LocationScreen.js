@@ -74,7 +74,6 @@ export default class LocationScreen extends React.Component {
             );
           })}
         </ScrollView>
-
       </SafeAreaView >
     );
   }

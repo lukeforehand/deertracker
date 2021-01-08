@@ -1,7 +1,9 @@
 import { StyleSheet, Dimensions } from 'react-native';
 //fontFamily: Platform.OS === 'ios' ? 'Metamorphous' : 'metamorphous_regular'
 
-const imageWidth = (Dimensions.get('window').width - 20) / 2;
+const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
+const imageWidth = (screenWidth - 20) / 2;
 const imageHeight = imageWidth * (9 / 16);
 
 export default StyleSheet.create({
@@ -35,7 +37,7 @@ export default StyleSheet.create({
   },
   t3: {
     color: 'black',
-    textAlign: 'left',
+    textAlign: 'center',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
     fontSize: 18,
     margin: 20,
@@ -49,8 +51,8 @@ export default StyleSheet.create({
     alignItems: 'center'
   },
   container: {
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
+    width: screenWidth,
+    height: screenHeight,
   },
   markerFixed: {
     left: '50%',
@@ -121,6 +123,13 @@ export default StyleSheet.create({
   thumbnail: {
     width: imageWidth,
     height: imageHeight,
-    margin: 1
+    borderWidth: 1,
+    borderColor: 'grey'
+  },
+  importScreenTop: {
+    height: 150,
+  },
+  importScreenBottom: {
+    height: screenHeight - 150 - 200, // tab nav
   }
 });
