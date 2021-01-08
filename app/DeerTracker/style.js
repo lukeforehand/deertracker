@@ -130,6 +130,6 @@ export default StyleSheet.create({
     height: 150,
   },
   importScreenBottom: {
-    height: screenHeight - 150 - 200, // tab nav
+    height: screenHeight - 150 - 100, // tab nav
   }
 });
