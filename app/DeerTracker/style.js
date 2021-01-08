@@ -1,6 +1,9 @@
 import { StyleSheet, Dimensions } from 'react-native';
 //fontFamily: Platform.OS === 'ios' ? 'Metamorphous' : 'metamorphous_regular'
 
+const imageWidth = (Dimensions.get('window').width - 20) / 2;
+const imageHeight = imageWidth * (9 / 16);
+
 export default StyleSheet.create({
   h1: {
     color: '#e3e8e8',
@@ -30,6 +33,13 @@ export default StyleSheet.create({
     fontSize: 20,
     margin: 10,
   },
+  t3: {
+    color: 'black',
+    textAlign: 'left',
+    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontSize: 18,
+    margin: 20,
+  },
   activity: {
     flex: 1,
     justifyContent: 'center'
@@ -57,6 +67,14 @@ export default StyleSheet.create({
     shadowRadius: 1,
     elevation: 1,
     backgroundColor: 'darkred',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 60,
+  },
+  buttonDisabled: {
+    borderRadius: 2,
+    margin: 20,
+    backgroundColor: 'lightgrey',
     justifyContent: 'center',
     alignItems: 'center',
     height: 60,
@@ -94,4 +112,15 @@ export default StyleSheet.create({
     borderColor: 'gray',
     borderWidth: 1
   },
+  grid: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center'
+  },
+  thumbnail: {
+    width: imageWidth,
+    height: imageHeight,
+    margin: 1
+  }
 });

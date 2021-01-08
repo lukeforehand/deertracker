@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Alert,
+  Dimensions,
   SafeAreaView,
   ActivityIndicator,
   ScrollView,
@@ -15,6 +15,8 @@ import RNFS from 'react-native-fs';
 import Database from './Database';
 
 import style from './style';
+
+const root = RNFS.DocumentDirectoryPath;
 
 export default class ImportScreen extends React.Component {
 
@@ -33,6 +35,11 @@ export default class ImportScreen extends React.Component {
 
   componentDidMount() {
     this.fetchData();
+    this.checkFiles = setInterval(() => { this.setFiles() }, 5000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.checkFiles);
   }
 
   refreshing() {
@@ -52,34 +59,65 @@ export default class ImportScreen extends React.Component {
 
     return (
       <SafeAreaView>
+        <Text style={style.t2}>{this.state.location['name']}</Text>
+        <Text style={style.t1}>
+          Insert the camera card and use the Files app to move the photos into the DeerTracker folder.
+            {'\n'}{'\n'}All photos in the DeerTracker folder will be imported for location: "{this.state.location['name']}"
+          </Text>
+        <Text style={style.t2}>Photos to import: {this.state.files.length}</Text>
+        <TouchableOpacity
+          disabled={this.importDisabled()}
+          style={this.importDisabled() ? style.buttonDisabled : style.button} onPress={() => { this.setState({ modalVisible: true }) }}>
+          <Text style={style.h1}>Import</Text>
+        </TouchableOpacity>
         <ScrollView>
-          <Text style={style.t2}>{this.state.location['name']}</Text>
-          {this.state.files.map((file) => {
-            return (
-              <View style={{ flexDirection: 'row' }}>
-                <Text style={style.h2}>{file.path}</Text>
-              </View>
-            );
-          })}
+          <View style={style.grid}>
+            {this.state.files.map((file) => {
+              return (
+                <Image key={file.path} source={{ uri: file.path }} style={style.thumbnail} />
+              );
+            })}
+          </View>
         </ScrollView>
       </SafeAreaView >
     );
+  }
+
+  importDisabled() {
+    return !this.state.files || this.state.files.length <= 0;
+  }
+
+  async setFiles() {
+    files = await this.recursiveFindFiles(root);
+    this.setState({
+      isLoading: false,
+      files: files
+    });
+  }
+
+  async recursiveFindFiles(dir) {
+    results = await RNFS.readDir(dir);
+    results = results.filter((result) => {
+      return !result.name.startsWith(".");
+    });
+    files = []
+    for (result of results) {
+      if (result.isDirectory()) {
+        files = files.concat(await this.recursiveFindFiles(result.path));
+      } else {
+        files.push(result);
+      }
+    }
+    return files;
   }
 
   fetchData() {
     this.setState({
       isLoading: true
     });
+    RNFS.mkdir(root + '/.data', { NSURLIsExcludedFromBackupKey: true });
+    this.setFiles();
 
-    // FIXME: write to here RNFS.DocumentDirectoryPath
-    RNFS.readDir(RNFS.DocumentDirectoryPath).then((results) => {
-      console.log(results);
-      this.setState({
-        isLoading: false,
-        files: results
-      });
-    }).catch((err) => {
-      console.log(err.message, err.code);
-    });
   }
+
 }
