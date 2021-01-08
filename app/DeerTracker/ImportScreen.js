@@ -76,7 +76,9 @@ export default class ImportScreen extends React.Component {
               <View style={style.grid}>
                 {this.state.files.map((file) => {
                   return (
-                    <Image key={file.path} source={{ uri: file.path }} style={style.thumbnail} />
+                    <TouchableOpacity key={file.path} onPress={() => { this.props.navigation.navigate('PhotoScreen', { file: file, files: this.state.files }) }}>
+                      <Image key={file.path} source={{ uri: file.path }} style={style.thumbnail} />
+                    </TouchableOpacity>
                   );
                 })}
               </View>

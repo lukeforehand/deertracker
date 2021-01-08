@@ -3,8 +3,11 @@ import { StyleSheet, Dimensions } from 'react-native';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
-const imageWidth = (screenWidth - 20) / 2;
-const imageHeight = imageWidth * (9 / 16);
+const thumbWidth = (screenWidth - 20) / 2;
+const thumbHeight = thumbWidth * (9 / 16);
+const photoWidth = screenWidth;
+const photoHeight = photoWidth * (9 / 16);
+
 
 export default StyleSheet.create({
   h1: {
@@ -121,10 +124,21 @@ export default StyleSheet.create({
     justifyContent: 'center'
   },
   thumbnail: {
-    width: imageWidth,
-    height: imageHeight,
+    width: thumbWidth,
+    height: thumbHeight,
     borderWidth: 1,
     borderColor: 'grey'
+  },
+  photoContainer: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+    backgroundColor: 'black'
+  },
+  photo: {
+    width: photoWidth,
+    height: photoHeight
   },
   importScreenTop: {
     height: 150,
