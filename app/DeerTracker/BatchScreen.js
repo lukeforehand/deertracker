@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Alert,
   Modal,
   SafeAreaView,
   ActivityIndicator,
@@ -12,8 +13,11 @@ import {
 
 import ImageViewer from 'react-native-image-zoom-viewer';
 
+import RNFS from 'react-native-fs';
+
 import Moment from 'moment';
 
+import SwipeRow from './SwipeRow';
 import Database from './Database';
 
 import style from './style';
@@ -57,27 +61,29 @@ export default class BatchScreen extends React.Component {
         <ScrollView>
           {this.state.batches.map((batch) => {
             return (
-              <TouchableOpacity
-                key={batch['id']}
-                style={style.locationButton}
-                onPress={() => { this.getPhotos(batch['id']) }}
-              >
-                <Text style={style.h3}>
-                  {Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY hh:mm A')}
-                </Text>
-                <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text style={style.t4}>
-                    Batch {batch['id']}{'\n'}
+              <SwipeRow key={batch['id']} item={batch} onDelete={this.deleteBatch.bind(this)}>
+                <TouchableOpacity
+                  key={batch['id']}
+                  style={style.locationButton}
+                  onPress={() => { this.getPhotos(batch['id']) }}
+                >
+                  <Text style={style.h3}>
+                    {Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY hh:mm A')}
+                  </Text>
+                  <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Text style={style.t4}>
+                      Batch {batch['id']}{'\n'}
                     Location: {batch['location_name']}{'\n'}
                     Photos:{batch['num_photos']}{'\n'}
-                  </Text>
-                  <View>
-                    {batch['photo_path'] &&
-                      <Image source={{ uri: batch['photo_path'] }} style={style.smallThumbnail} />
-                    }
+                    </Text>
+                    <View>
+                      {batch['photo_path'] &&
+                        <Image source={{ uri: batch['photo_path'] }} style={style.smallThumbnail} />
+                      }
+                    </View>
                   </View>
-                </View>
-              </TouchableOpacity>
+                </TouchableOpacity>
+              </SwipeRow>
             );
           })}
           <Modal visible={this.state.modalVisible} transparent={true}>
@@ -105,6 +111,26 @@ export default class BatchScreen extends React.Component {
         })
       }
     });
+  }
+
+  deleteBatch(batch, callback) {
+    Alert.alert(
+      'Delete Batch ' + batch['id'] + '?', '', [
+      {
+        text: 'Yes',
+        onPress: () => {
+          this.db.deleteBatch(batch['id']).then(() => {
+            RNFS.unlink(RNFS.DocumentDirectoryPath + '/.data/batch/' + batch['id']);
+            this.db.selectBatches().then((batches) => {
+              this.setState({
+                batches: batches
+              });
+            });
+          });
+          callback();
+        }
+      },
+      { text: 'No', onPress: callback }], { cancelable: false });
   }
 
   fetchData() {

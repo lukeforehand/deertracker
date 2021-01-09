@@ -25,6 +25,12 @@ export default class Database {
             [Date.now(), locationId]);
     }
 
+    async deleteBatch(id) {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        return await db.executeSql(
+            'DELETE FROM batch where id = ?', [id]);
+    }
+
     async selectBatches() {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql(`

@@ -62,7 +62,7 @@ export default class LocationScreen extends React.Component {
           </TouchableOpacity>
           {this.state.locations.map((location) => {
             return (
-              <SwipeRow key={location['id']} location={location} onDelete={this.deleteLocation.bind(this)}>
+              <SwipeRow key={location['id']} item={location} onDelete={this.deleteLocation.bind(this)}>
                 <TouchableOpacity
                   key={location['id']}
                   style={style.locationButton}

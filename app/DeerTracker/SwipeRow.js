@@ -6,13 +6,13 @@ import { RectButton } from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 export default class SwipeRow extends Component {
-  renderRightAction = (onDelete, location, text, color, x, progress) => {
+  renderRightAction = (onDelete, item, text, color, x, progress) => {
     const trans = progress.interpolate({
       inputRange: [0, 1],
       outputRange: [x, 0],
     });
     const pressHandler = () => {
-      onDelete(location, this.close);
+      onDelete(item, this.close);
     };
     return (
       <Animated.View style={{ flex: 1, transform: [{ translateX: trans }] }}>
@@ -31,7 +31,7 @@ export default class SwipeRow extends Component {
         flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
       }}>
       {this.renderRightAction(
-        this.props.onDelete, this.props.location, 'Delete', 'darkred', 64, progress
+        this.props.onDelete, this.props.item, 'Delete', 'darkred', 64, progress
       )}
     </View>
   );
