@@ -129,7 +129,7 @@ export default class ImportScreen extends React.Component {
               })).then(() => {
                 this.removeEmptyFolders();
                 this.db.selectBatches().then((batches) => {
-                  // FIXME: see that location gets unset on ImportScreen
+                  this.props.navigation.replace('LocationScreen');
                   this.props.navigation.navigate('BatchScreen', {
                     batches: batches
                   });
