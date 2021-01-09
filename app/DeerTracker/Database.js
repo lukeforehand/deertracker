@@ -18,18 +18,22 @@ export default class Database {
         });
     }
 
-    async insertBatch() {
+    async insertBatch(locationId) {
         const db = await SQLite.openDatabase({ name: database, location: location });
         return await db.executeSql(
-            'INSERT INTO batch(id, time) VALUES(NULL, ?)',
-            [Date.now()]);
+            'INSERT INTO batch(id, time, location_id) VALUES(NULL, ?, ?)',
+            [Date.now(), locationId]);
     }
 
     async selectBatches() {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql(`
-            SELECT b.*, COUNT(*) AS num_photos
-            FROM batch b JOIN photo p ON b.id = p.batch_id
+            SELECT b.*, l.name,
+                (SELECT COUNT(*) FROM photo p
+                WHERE p.batch_id = b.id)
+                AS num_photos
+            FROM batch b
+            JOIN location l ON l.id = b.location_id
             GROUP BY b.id
             ORDER BY id DESC
         `);
@@ -79,7 +83,9 @@ CREATE TABLE IF NOT EXISTS location (
 CREATE_TABLE_BATCH = `
 CREATE TABLE IF NOT EXISTS batch (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    time DATETIME NOT NULL
+    time DATETIME NOT NULL,
+    location_id INTEGER,
+    FOREIGN KEY(location_id) REFERENCES location(id)
 )
 `
 
