@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Alert,
+  Modal,
   SafeAreaView,
   ActivityIndicator,
   ScrollView,
@@ -9,6 +9,8 @@ import {
   View,
   TouchableOpacity
 } from 'react-native';
+
+import ImageViewer from 'react-native-image-zoom-viewer';
 
 import Moment from 'moment';
 
@@ -21,7 +23,7 @@ export default class BatchScreen extends React.Component {
   constructor(props) {
     super(props);
     this.db = new Database();
-    this.state = { isLoading: true }
+    this.state = { isLoading: true, modalVisible: false }
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -55,26 +57,54 @@ export default class BatchScreen extends React.Component {
         <ScrollView>
           {this.state.batches.map((batch) => {
             return (
-              <TouchableOpacity key={batch['id']} style={style.locationButton}>
-                <Text style={style.h2}>
+              <TouchableOpacity
+                key={batch['id']}
+                style={style.locationButton}
+                onPress={() => { this.getPhotos(batch['id']) }}
+              >
+                <Text style={style.h3}>
                   {Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY hh:mm A')}
                 </Text>
-                <View style={{ flex: 1, flexDirection: 'row' }}>
+                <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                   <Text style={style.t4}>
                     Batch {batch['id']}{'\n'}
                     Location: {batch['location_name']}{'\n'}
                     Photos:{batch['num_photos']}{'\n'}
                   </Text>
-                  {batch['photo_path'] &&
-                    <Image source={{ uri: batch['photo_path'] }} style={style.smallThumbnail} />
-                  }
+                  <View>
+                    {batch['photo_path'] &&
+                      <Image source={{ uri: batch['photo_path'] }} style={style.smallThumbnail} />
+                    }
+                  </View>
                 </View>
               </TouchableOpacity>
             );
           })}
+          <Modal visible={this.state.modalVisible} transparent={true}>
+            <ImageViewer imageUrls={this.state.imageUrls}
+              enableSwipeDown={true}
+              swipeDownThreshold={80}
+              onSwipeDown={() => { this.setState({ modalVisible: false }) }}
+            />
+          </Modal>
         </ScrollView>
       </SafeAreaView >
     );
+  }
+
+  getPhotos(batchId) {
+    this.db.selectBatchPhotos(batchId).then((photos) => {
+      if (photos.length > 0) {
+        this.setState({
+          modalVisible: true,
+          imageUrls: photos.map((photo) => {
+            return {
+              url: photo.path
+            };
+          })
+        })
+      }
+    });
   }
 
   fetchData() {

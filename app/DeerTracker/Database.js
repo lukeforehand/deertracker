@@ -52,6 +52,14 @@ export default class Database {
             [id, path, batchId]);
     }
 
+    async selectBatchPhotos(batchId) {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        rs = await db.executeSql('SELECT * FROM photo WHERE batch_id = ?', [batchId]);
+        return rs.map((r) => {
+            return r.rows.raw();
+        })[0];
+    }
+
     async selectLocations() {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql('SELECT * FROM location ORDER BY name ASC')

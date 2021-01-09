@@ -24,6 +24,14 @@ export default StyleSheet.create({
     fontSize: 20,
     margin: 10,
   },
+  h3: {
+    color: '#e3e8e8',
+    backgroundColor: 'darkred',
+    textAlign: 'left',
+    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontSize: 18,
+    padding: 10
+  },
   t1: {
     color: 'black',
     textAlign: 'center',
@@ -50,8 +58,7 @@ export default StyleSheet.create({
     textAlign: 'left',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
     fontSize: 18,
-    marginLeft: 20,
-    marginBottom: 20,
+    margin: 10
   },
   activity: {
     paddingTop: screenHeight / 2,
@@ -140,10 +147,11 @@ export default StyleSheet.create({
     borderColor: 'grey'
   },
   smallThumbnail: {
-    width: thumbWidth / 2,
-    height: thumbHeight / 2,
+    width: thumbWidth / 1.25,
+    height: thumbHeight / 1.25,
     borderWidth: 1,
-    borderColor: 'grey'
+    borderColor: 'grey',
+    margin: 10
   },
   photoContainer: {
     flexDirection: 'column',
