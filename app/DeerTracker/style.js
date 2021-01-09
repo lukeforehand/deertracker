@@ -45,6 +45,14 @@ export default StyleSheet.create({
     fontSize: 18,
     margin: 20,
   },
+  t4: {
+    color: 'black',
+    textAlign: 'left',
+    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontSize: 18,
+    marginLeft: 20,
+    marginBottom: 20,
+  },
   activity: {
     paddingTop: screenHeight / 2,
     height: '100%',
@@ -128,6 +136,12 @@ export default StyleSheet.create({
   thumbnail: {
     width: thumbWidth,
     height: thumbHeight,
+    borderWidth: 1,
+    borderColor: 'grey'
+  },
+  smallThumbnail: {
+    width: thumbWidth / 2,
+    height: thumbHeight / 2,
     borderWidth: 1,
     borderColor: 'grey'
   },

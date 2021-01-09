@@ -28,14 +28,17 @@ export default class Database {
     async selectBatches() {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql(`
-            SELECT b.*, l.name,
+            SELECT b.*, l.name AS location_name,
                 (SELECT COUNT(*) FROM photo p
                 WHERE p.batch_id = b.id)
-                AS num_photos
+                AS num_photos,
+                FIRST_VALUE(p.path) OVER (PARTITION BY b.id ORDER BY b.id DESC)
+                AS photo_path
             FROM batch b
             JOIN location l ON l.id = b.location_id
+            LEFT OUTER JOIN photo p ON b.id = p.batch_id
             GROUP BY b.id
-            ORDER BY id DESC
+            ORDER BY b.id DESC
         `);
         return rs.map((r) => {
             return r.rows.raw();

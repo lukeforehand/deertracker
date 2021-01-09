@@ -56,12 +56,18 @@ export default class BatchScreen extends React.Component {
           {this.state.batches.map((batch) => {
             return (
               <TouchableOpacity key={batch['id']} style={style.locationButton}>
-                <View style={{ flex: 1 }}>
-                  <Text style={style.h2}>
-                    {Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY hh:mm A')}{'\n'}
+                <Text style={style.h2}>
+                  {Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY hh:mm A')}
+                </Text>
+                <View style={{ flex: 1, flexDirection: 'row' }}>
+                  <Text style={style.t4}>
                     Batch {batch['id']}{'\n'}
-                    Location: {batch['name']}{'\n'}
-                    Photos:{batch['num_photos']}</Text>
+                    Location: {batch['location_name']}{'\n'}
+                    Photos:{batch['num_photos']}{'\n'}
+                  </Text>
+                  {batch['photo_path'] &&
+                    <Image source={{ uri: batch['photo_path'] }} style={style.smallThumbnail} />
+                  }
                 </View>
               </TouchableOpacity>
             );
