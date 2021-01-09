@@ -6,9 +6,12 @@ import {
   ScrollView,
   Text,
   Image,
+  Modal,
   View,
   TouchableOpacity
 } from 'react-native';
+
+import ImageViewer from 'react-native-image-zoom-viewer';
 
 import RNFS from 'react-native-fs';
 
@@ -23,7 +26,7 @@ export default class ImportScreen extends React.Component {
   constructor(props) {
     super(props);
     this.db = new Database();
-    this.state = { isLoading: true }
+    this.state = { isLoading: true, modalVisible: false }
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -76,13 +79,22 @@ export default class ImportScreen extends React.Component {
               <View style={style.grid}>
                 {this.state.files.map((file) => {
                   return (
-                    <TouchableOpacity key={file.path} onPress={() => { this.props.navigation.navigate('PhotoScreen', { file: file, files: this.state.files }) }}>
+                    <TouchableOpacity key={file.path} onPress={() => { this.setState({ modalVisible: true, file: file }) }}>
                       <Image key={file.path} source={{ uri: file.path }} style={style.thumbnail} />
                     </TouchableOpacity>
                   );
                 })}
               </View>
             </ScrollView>
+          }
+          {this.state.file &&
+            <Modal visible={this.state.modalVisible} transparent={true}>
+              <ImageViewer imageUrls={this.state.imageUrls} index={this.state.files.indexOf(this.state.file)}
+                enableSwipeDown={true}
+                swipeDownThreshold={80}
+                onSwipeDown={() => { this.setState({ modalVisible: false }) }}
+              />
+            </Modal>
           }
         </View>
       </SafeAreaView>
@@ -106,10 +118,19 @@ export default class ImportScreen extends React.Component {
   }
 
   async setFiles() {
+    if (this.state.modalVisible) {
+      // pause file update when modal is open
+      return;
+    }
     files = await this.recursiveFindFiles(root);
     this.setState({
       isLoading: false,
-      files: files
+      files: files,
+      imageUrls: files.map((file) => {
+        return {
+          url: file.path
+        };
+      })
     });
   }
 

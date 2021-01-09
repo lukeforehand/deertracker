@@ -7,7 +7,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import LocationScreen from './LocationScreen';
 import AddLocationScreen from './AddLocationScreen';
 import ImportScreen from './ImportScreen';
-import PhotoScreen from './PhotoScreen';
+
 import BatchScreen from './BatchScreen';
 
 const ImportScreenNavigator = createStackNavigator({
@@ -40,9 +40,6 @@ const ImportScreenNavigator = createStackNavigator({
       },
       headerTitleAlign: 'center'
     },
-  },
-  PhotoScreen: {
-    screen: PhotoScreen,
   },
 });
 
