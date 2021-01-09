@@ -19,6 +19,7 @@ import Database from './Database';
 import style from './style';
 
 const root = RNFS.DocumentDirectoryPath;
+RNFS.mkdir(root + '/.data', { NSURLIsExcludedFromBackupKey: true });
 
 export default class ImportScreen extends React.Component {
 
@@ -28,15 +29,8 @@ export default class ImportScreen extends React.Component {
     this.state = { isLoading: true, modalVisible: false }
   }
 
-  static getDerivedStateFromProps(props, state) {
-    location = props.navigation.getParam('location');
-    return location === undefined || location === state.location ? {} : {
-      location: location
-    };
-  }
-
   componentDidMount() {
-    this.fetchData();
+    this.setFiles();
     this.checkFiles = setInterval(() => { this.setFiles() }, 5000);
   }
 
@@ -59,10 +53,12 @@ export default class ImportScreen extends React.Component {
       )
     }
 
+    const location = this.props.navigation.getParam('location');
+
     return (
       <SafeAreaView>
         <View style={style.importScreenTop}>
-          <Text style={style.t2}>{this.state.location['name']}</Text>
+          <Text style={style.t2}>{location['name']}</Text>
           <TouchableOpacity
             disabled={this.importDisabled()}
             style={this.importDisabled() ? style.buttonDisabled : style.button} onPress={this.importPhotos.bind(this)}>
@@ -105,28 +101,40 @@ export default class ImportScreen extends React.Component {
   }
 
   importPhotos() {
+    const location = this.props.navigation.getParam('location');
     Alert.alert(
-      'Import ' + this.state.files.length + ' photos for location ' + this.state.location['name'] + '?', '', [
+      'Import ' + this.state.files.length + ' photos for location ' + location['name'] + '?', '', [
       {
         text: 'Yes',
         onPress: () => {
           this.setState({ isLoading: true });
           this.db.insertBatch().then((rs) => {
             let batchId = rs[0]['insertId'];
-            let destPath = root + '/.data/batch/' + batchId
+            let destPath = root + '/.data/batch/' + batchId;
             RNFS.mkdir(destPath, { NSURLIsExcludedFromBackupKey: true }).then(() => {
               Promise.all(this.state.files.map((file) => {
                 return RNFS.hash(file.path, 'md5').then((hash) => {
                   let destFile = destPath + '/' + hash + '.jpg';
                   RNFS.moveFile(file.path, destFile).then(() => {
-                    this.db.insertPhoto(hash, destFile, batchId);
+                    this.db.insertPhoto(hash, destFile, batchId).catch((error) => {
+                      console.log(error);
+                    });
                   }).catch((error) => {
+                    console.log(error);
                     if (error.includes("already exists")) {
                       RNFS.unlink(file.path);
                     }
                   });
                 });
-              })).then(() => { this.props.navigation.navigate('BatchScreen') });
+              })).then(() => {
+                this.removeEmptyFolders();
+                this.db.selectBatches().then((batches) => {
+                  // FIXME: see that location gets unset on ImportScreen
+                  this.props.navigation.navigate('BatchScreen', {
+                    batches: batches
+                  });
+                });
+              });
             });
           });
         }
@@ -150,6 +158,22 @@ export default class ImportScreen extends React.Component {
     });
   }
 
+  async removeEmptyFolders() {
+    results = await RNFS.readDir(root);
+    results = results.filter((result) => {
+      return !result.name.startsWith(".");
+    });
+    for (result of results) {
+      if (result.isDirectory()) {
+        dir = result.path;
+        files = await this.recursiveFindFiles(dir);
+        if (files.length <= 0) {
+          RNFS.unlink(dir);
+        }
+      }
+    }
+  }
+
   async recursiveFindFiles(dir) {
     results = await RNFS.readDir(dir);
     results = results.filter((result) => {
@@ -164,15 +188,6 @@ export default class ImportScreen extends React.Component {
       }
     }
     return files;
-  }
-
-  fetchData() {
-    this.setState({
-      isLoading: true
-    });
-    RNFS.mkdir(root + '/.data', { NSURLIsExcludedFromBackupKey: true });
-    this.setFiles();
-
   }
 
 }

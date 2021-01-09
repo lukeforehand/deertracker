@@ -24,6 +24,14 @@ export default class BatchScreen extends React.Component {
     this.state = { isLoading: true }
   }
 
+  static getDerivedStateFromProps(props, state) {
+    // state may come from initial fetch, or from ImportScreen
+    batches = props.navigation.getParam('batches');
+    return batches === undefined || batches === state.batches ? {} : {
+      batches: batches
+    };
+  }
+
   componentDidMount() {
     this.fetchData();
   }
@@ -48,7 +56,6 @@ export default class BatchScreen extends React.Component {
           {this.state.batches.map((batch) => {
             return (
               <TouchableOpacity key={batch['id']} style={style.locationButton}>
-
                 <View style={{ flexDirection: 'row' }}>
                   <Text style={style.t3}>{Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY hh:mm A')}</Text>
                   <Text style={style.t3}>{batch['num_photos']}</Text>

@@ -14,7 +14,7 @@ const ImportScreenNavigator = createStackNavigator({
   LocationScreen: {
     screen: LocationScreen,
     navigationOptions: {
-      title: 'Choose Location',
+      title: 'Location',
       headerTitleStyle: {
         fontSize: 20
       },
@@ -34,7 +34,7 @@ const ImportScreenNavigator = createStackNavigator({
   ImportScreen: {
     screen: ImportScreen,
     navigationOptions: {
-      title: 'Choose Photos',
+      title: 'Photos',
       headerTitleStyle: {
         fontSize: 20
       },

@@ -28,13 +28,6 @@ export default class AddLocationScreen extends React.Component {
     this.state = { isLoading: true, modalVisible: false }
   }
 
-  static getDerivedStateFromProps(props, state) {
-    locations = props.navigation.getParam('locations');
-    return locations === undefined || locations === state.locations ? {} : {
-      locations: locations
-    };
-  }
-
   componentDidMount() {
     this.fetchData();
   }
@@ -53,6 +46,9 @@ export default class AddLocationScreen extends React.Component {
         </SafeAreaView>
       )
     }
+
+    const locations = this.props.navigation.getParam('locations');
+
     return (
       <SafeAreaView>
         <View style={style.container}>
@@ -65,7 +61,7 @@ export default class AddLocationScreen extends React.Component {
             region={this.state.region}
             onDoublePress={(ev) => { this.map.animateCamera({ center: ev.nativeEvent.coordinate }) }}
             onRegionChangeComplete={(region) => { this.setState({ region: region }) }}>
-            {this.state.locations.map((location) => {
+            {locations.map((location) => {
               return (
                 <Marker key={location['id']}
                   coordinate={{ latitude: location['lat'], longitude: location['lon'] }}
@@ -119,6 +115,7 @@ export default class AddLocationScreen extends React.Component {
     if (location && location.length > 0 && location != "Enter location name") {
       this.db.insertLocation(location, lat, lon).then((rs) => {
         this.db.selectLocations().then((locations) => {
+          this.setState({ modalVisible: false });
           this.props.navigation.navigate('LocationScreen', {
             locations: locations
           });
@@ -139,17 +136,14 @@ export default class AddLocationScreen extends React.Component {
     });
     Geolocation.getCurrentPosition(
       (position) => {
-        this.db.selectLocations().then((locations) => {
-          this.setState({
-            isLoading: false,
-            locations: locations,
-            region: {
-              latitude: parseFloat(position.coords.latitude),
-              longitude: parseFloat(position.coords.longitude),
-              latitudeDelta: 0.001,
-              longitudeDelta: 0.001
-            }
-          });
+        this.setState({
+          isLoading: false,
+          region: {
+            latitude: parseFloat(position.coords.latitude),
+            longitude: parseFloat(position.coords.longitude),
+            latitudeDelta: 0.001,
+            longitudeDelta: 0.001
+          }
         });
       },
       (error) => {

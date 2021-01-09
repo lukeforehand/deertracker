@@ -24,6 +24,7 @@ export default class LocationScreen extends React.Component {
   }
 
   static getDerivedStateFromProps(props, state) {
+    // state may come from initial fetch of data, or from AddLocationScreen
     locations = props.navigation.getParam('locations');
     return locations === undefined || locations === state.locations ? {} : {
       locations: locations
@@ -52,7 +53,11 @@ export default class LocationScreen extends React.Component {
     return (
       <SafeAreaView>
         <ScrollView>
-          <TouchableOpacity style={style.button} onPress={() => { this.props.navigation.navigate('AddLocationScreen') }}>
+          <TouchableOpacity style={style.button} onPress={() => {
+            this.props.navigation.navigate('AddLocationScreen', {
+              locations: this.state.locations
+            })
+          }}>
             <Text style={style.h1}>Add Location</Text>
           </TouchableOpacity>
           {this.state.locations.map((location) => {
@@ -86,9 +91,6 @@ export default class LocationScreen extends React.Component {
         onPress: () => {
           this.db.deleteLocation(location['id']).then(() => {
             this.db.selectLocations().then((locations) => {
-              this.props.navigation.dispatch('AddLocationScreen', {
-                locations: locations
-              });
               this.props.navigation.navigate('LocationScreen', {
                 locations: locations
               });
