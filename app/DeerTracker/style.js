@@ -46,6 +46,8 @@ export default StyleSheet.create({
     margin: 20,
   },
   activity: {
+    paddingTop: screenHeight / 2,
+    height: '100%',
     flex: 1,
     justifyContent: 'center'
   },
