@@ -18,14 +18,29 @@ export default class Database {
         });
     }
 
+    async insertBatch() {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        return await db.executeSql(
+            'INSERT INTO batch(id, time) VALUES(NULL, ?)',
+            [Date.now()]);
+    }
+
     async selectBatches() {
         const db = await SQLite.openDatabase({ name: database, location: location });
-        return await db.executeSql('SELECT * from batch ORDER BY id DESC');
+        rs = await db.executeSql(`
+            SELECT b.*, COUNT(*) AS num_photos
+            FROM batch b JOIN photo p ON b.id = p.batch_id
+            GROUP BY b.id
+            ORDER BY id DESC
+        `);
+        return rs.map((r) => {
+            return r.rows.raw();
+        })[0];
     }
 
     async selectLocations() {
         const db = await SQLite.openDatabase({ name: database, location: location });
-        rs = await db.executeSql('SELECT * from location ORDER BY name DESC')
+        rs = await db.executeSql('SELECT * FROM location ORDER BY name ASC')
         return rs.map((r) => {
             return r.rows.raw();
         })[0];

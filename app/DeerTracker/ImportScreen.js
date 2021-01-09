@@ -14,7 +14,8 @@ import {
 import ImageViewer from 'react-native-image-zoom-viewer';
 
 import RNFS from 'react-native-fs';
-
+import md5 from 'md5';
+import { decode as atob } from 'base-64';
 import Database from './Database';
 
 import style from './style';
@@ -111,10 +112,35 @@ export default class ImportScreen extends React.Component {
       {
         text: 'Yes',
         onPress: () => {
-          // FIXME: import the photos
+          this.db.insertBatch().then((rs) => {
+            var batchId = rs[0]['insertId'];
+            var destPath = root + '/.data/batch/' + batchId
+            RNFS.mkdir(destPath, { NSURLIsExcludedFromBackupKey: true }).then(() => {
+              Promise.all(this.state.files.map((file) => {
+                return RNFS.readFile(file.path, 'base64').then((content) => {
+                  hash = this.base64ToMd5(content);
+                  // TODO: insert photo if not exist
+                  RNFS.moveFile(file.path, destPath + '/' + hash + '.jpg').catch((error) => {
+                    if (error.includes("already exists")) {
+                      RNFS.unlink(file.path);
+                    }
+                  });
+                });
+              })).then(() => { this.props.navigation.navigate('BatchScreen') });
+            });
+          });
         }
-      },
-      { text: 'No' }], { cancelable: false });
+      }, { text: 'No' }], { cancelable: false });
+  }
+
+  base64ToMd5(base64) {
+    var raw = atob(base64);
+    var rawLength = raw.length;
+    var array = new Uint8Array(new ArrayBuffer(rawLength));
+    for (i = 0; i < rawLength; i++) {
+      array[i] = raw.charCodeAt(i);
+    }
+    return md5(array);
   }
 
   async setFiles() {

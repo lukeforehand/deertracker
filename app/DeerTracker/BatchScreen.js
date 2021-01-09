@@ -10,8 +10,9 @@ import {
   TouchableOpacity
 } from 'react-native';
 
+import Moment from 'moment';
+
 import Database from './Database';
-import SwipeRow from './SwipeRow';
 
 import style from './style';
 
@@ -21,13 +22,6 @@ export default class BatchScreen extends React.Component {
     super(props);
     this.db = new Database();
     this.state = { isLoading: true }
-  }
-
-  static getDerivedStateFromProps(props, state) {
-    locations = props.navigation.getParam('locations');
-    return locations === undefined || locations === state.locations ? {} : {
-      locations: locations
-    };
   }
 
   componentDidMount() {
@@ -48,64 +42,34 @@ export default class BatchScreen extends React.Component {
         </SafeAreaView>
       )
     }
-
     return (
       <SafeAreaView>
         <ScrollView>
-          <TouchableOpacity style={style.button} onPress={() => { this.props.navigation.navigate('LocationScreen') }}>
-            <Text style={style.h1}>Add Location</Text>
-          </TouchableOpacity>
-          {this.state.locations.map((location) => {
+          {this.state.batches.map((batch) => {
             return (
-              <SwipeRow key={location['id']} location={location} onDelete={this.deleteLocation.bind(this)}>
-                <TouchableOpacity key={location['id']} style={style.locationButton}>
-                  <View style={{ flexDirection: 'row' }}>
-                    <Image source={require('./assets/images/crosshairs.png')} style={{ margin: 10, width: 80, height: 80 }} />
-                    <View>
-                      <Text style={style.h2}>{location['name']}</Text>
-                      <Text style={style.h2}>({location['lat'].toFixed(5)}, {location['lon'].toFixed(5)})</Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              </SwipeRow>
+              <TouchableOpacity key={batch['id']} style={style.locationButton}>
+                <Text style={style.t3}>{Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY hh:mm A')}</Text>
+                <View style={{ flexDirection: 'row' }}>
+                  {this.state.batches.map((batch) => {
+
+                  })}
+                </View>
+              </TouchableOpacity>
             );
           })}
         </ScrollView>
-
       </SafeAreaView >
     );
-  }
-
-  deleteLocation(location, callback) {
-    Alert.alert(
-      'Delete Location ' + location['name'] + '?', '', [
-      {
-        text: 'Yes',
-        onPress: () => {
-          this.db.deleteLocation(location['id']).then(() => {
-            this.db.selectLocations().then((locations) => {
-              this.props.navigation.dispatch('LocationScreen', {
-                locations: locations
-              });
-              this.props.navigation.navigate('ImportScreen', {
-                locations: locations
-              });
-            });
-          });
-          callback();
-        }
-      },
-      { text: 'No', onPress: callback }], { cancelable: false });
   }
 
   fetchData() {
     this.setState({
       isLoading: true
     });
-    this.db.selectLocations().then((locations) => {
+    this.db.selectBatches().then((batches) => {
       this.setState({
         isLoading: false,
-        locations: locations
+        batches: batches
       });
     }).catch((error) => {
       console.log(error);
