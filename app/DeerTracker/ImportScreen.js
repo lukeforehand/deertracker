@@ -112,15 +112,18 @@ export default class ImportScreen extends React.Component {
       {
         text: 'Yes',
         onPress: () => {
+          this.setState({ isLoading: true });
           this.db.insertBatch().then((rs) => {
             var batchId = rs[0]['insertId'];
             var destPath = root + '/.data/batch/' + batchId
             RNFS.mkdir(destPath, { NSURLIsExcludedFromBackupKey: true }).then(() => {
               Promise.all(this.state.files.map((file) => {
                 return RNFS.readFile(file.path, 'base64').then((content) => {
-                  hash = this.base64ToMd5(content);
-                  // TODO: insert photo if not exist
-                  RNFS.moveFile(file.path, destPath + '/' + hash + '.jpg').catch((error) => {
+                  var hash = this.base64ToMd5(content);
+                  var destFile = destPath + '/' + hash + '.jpg';
+                  RNFS.moveFile(file.path, destFile).then(() => {
+                    this.db.insertPhoto(hash, destFile, batchId);
+                  }).catch((error) => {
                     if (error.includes("already exists")) {
                       RNFS.unlink(file.path);
                     }

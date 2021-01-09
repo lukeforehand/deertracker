@@ -38,6 +38,13 @@ export default class Database {
         })[0];
     }
 
+    async insertPhoto(id, path, batchId) {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        return await db.executeSql(
+            'INSERT INTO photo(id, path, batch_id) VALUES(?, ?, ?)',
+            [id, path, batchId]);
+    }
+
     async selectLocations() {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql('SELECT * FROM location ORDER BY name ASC')
