@@ -1,13 +1,12 @@
 import { StyleSheet, Dimensions } from 'react-native';
 //fontFamily: Platform.OS === 'ios' ? 'Metamorphous' : 'metamorphous_regular'
 
-const screenWidth = Dimensions.get('window').width;
-const screenHeight = Dimensions.get('window').height;
-const thumbWidth = (screenWidth - 20) / 2;
-const thumbHeight = thumbWidth * (9 / 16);
-const photoWidth = screenWidth;
-const photoHeight = photoWidth * (9 / 16);
-
+export const screenWidth = Dimensions.get('window').width;
+export const screenHeight = Dimensions.get('window').height;
+export const thumbWidth = (screenWidth - 20) / 2;
+export const thumbHeight = thumbWidth * (9 / 16);
+export const photoWidth = screenWidth;
+export const photoHeight = photoWidth * (9 / 16);
 
 export default StyleSheet.create({
   h1: {

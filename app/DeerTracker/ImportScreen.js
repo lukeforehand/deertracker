@@ -11,12 +11,15 @@ import {
   Image,
 } from 'react-native';
 
+import ImageResizer from 'react-native-image-resizer';
+
 import ImageViewer from 'react-native-image-zoom-viewer';
 
 import RNFS from 'react-native-fs';
 import Database from './Database';
 
 import style from './style';
+import { thumbWidth, thumbHeight } from './style';
 
 const root = RNFS.DocumentDirectoryPath;
 RNFS.mkdir(root + '/.data', { NSURLIsExcludedFromBackupKey: true });
@@ -76,9 +79,9 @@ export default class ImportScreen extends React.Component {
             <View style={{ alignItems: 'center' }}>
               <FlatList
                 numColumns={2}
-                data={this.state.files}
+                data={this.state.thumbUrls}
                 renderItem={this.renderThumbnail.bind(this)}
-                keyExtractor={item => item.path}
+                keyExtractor={item => item.uri}
               />
             </View>
           }
@@ -97,16 +100,17 @@ export default class ImportScreen extends React.Component {
   }
 
   renderThumbnail(item) {
-    const file = item.item;
+    const thumb = item.item;
     return (
-      <TouchableOpacity key={file.path} onPress={() => { this.setState({ modalVisible: true, file: file }) }}>
+      <TouchableOpacity key={thumb.path} onPress={() => { this.setState({ modalVisible: true, file: file }) }}>
         <Image
-          key={file.path}
-          source={{ uri: file.path }}
+          key={thumb.path}
+          source={{ uri: thumb.uri }}
           style={style.thumbnail} />
       </TouchableOpacity>
     );
   }
+
 
   importDisabled() {
     return !this.state.files ||
@@ -163,6 +167,13 @@ export default class ImportScreen extends React.Component {
       return;
     }
 
+    let thumbUrls = files.map((file) => {
+      return ImageResizer.createResizedImage(file.path, thumbWidth, thumbHeight, 'JPEG', 50, 0);
+    });
+    Promise.all(thumbUrls).then((urls) => {
+      this.setState({ thumbUrls: urls });
+    });
+
     let previousFiles = this.state.files ? this.state.files.length : 0;
     let imageUrls = files.map((file) => {
       return {
@@ -173,7 +184,7 @@ export default class ImportScreen extends React.Component {
       isLoading: false,
       previousFiles: previousFiles,
       files: files,
-      imageUrls: imageUrls,
+      imageUrls: imageUrls
     });
   }
 
