@@ -141,12 +141,6 @@ export default StyleSheet.create({
     borderColor: 'gray',
     borderWidth: 1
   },
-  grid: {
-    flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center'
-  },
   thumbnail: {
     width: thumbWidth,
     height: thumbHeight,

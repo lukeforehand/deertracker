@@ -3,12 +3,12 @@ import {
   Alert,
   SafeAreaView,
   ActivityIndicator,
-  ScrollView,
   Text,
-  Image,
   Modal,
   View,
-  TouchableOpacity
+  FlatList,
+  TouchableOpacity,
+  Image,
 } from 'react-native';
 
 import ImageViewer from 'react-native-image-zoom-viewer';
@@ -72,18 +72,15 @@ export default class ImportScreen extends React.Component {
           {this.state.files && this.state.files.length <= 0 &&
             <Text style={style.t3}>No Photos found, insert camera card and use the Files app to move photos to DeerTracker folder.</Text>
           }
-          {!this.importDisabled() &&
-            <ScrollView>
-              <View style={style.grid}>
-                {this.state.files.map((file) => {
-                  return (
-                    <TouchableOpacity key={file.path} onPress={() => { this.setState({ modalVisible: true, file: file }) }}>
-
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            </ScrollView>
+          {this.state.files && this.state.files.length > 0 &&
+            <View style={{ alignItems: 'center' }}>
+              <FlatList
+                numColumns={2}
+                data={this.state.files}
+                renderItem={this.renderThumbnail.bind(this)}
+                keyExtractor={item => item.path}
+              />
+            </View>
           }
           {this.state.file &&
             <Modal visible={this.state.modalVisible} transparent={true}>
@@ -96,6 +93,18 @@ export default class ImportScreen extends React.Component {
           }
         </View>
       </SafeAreaView >
+    );
+  }
+
+  renderThumbnail(item) {
+    const file = item.item;
+    return (
+      <TouchableOpacity key={file.path} onPress={() => { this.setState({ modalVisible: true, file: file }) }}>
+        <Image
+          key={file.path}
+          source={{ uri: file.path }}
+          style={style.thumbnail} />
+      </TouchableOpacity>
     );
   }
 
@@ -117,7 +126,7 @@ export default class ImportScreen extends React.Component {
             let batchId = rs[0]['insertId'];
             let destPath = root + '/.data/batch/' + batchId;
             RNFS.mkdir(destPath, { NSURLIsExcludedFromBackupKey: true }).then(() => {
-              Promise.all(this.state.files.map((file) => {
+              Promise.all(this.state.files.map(async (file) => {
                 return RNFS.hash(file.path, 'md5').then((hash) => {
                   let destFile = destPath + '/' + hash + '.jpg';
                   this.db.insertPhoto(hash, destFile, batchId).then(() => {
@@ -143,17 +152,28 @@ export default class ImportScreen extends React.Component {
   }
 
   async setFiles() {
-    let previousFiles = this.state.files ? this.state.files.length : 0;
+    if (this.state.modalVisible) {
+      // don't affect the modal file index
+      return;
+    }
+
     let files = await this.recursiveFindFiles(root);
+    if (this.state.previousFiles == files.length) {
+      // nothing changed
+      return;
+    }
+
+    let previousFiles = this.state.files ? this.state.files.length : 0;
+    let imageUrls = files.map((file) => {
+      return {
+        url: file.path
+      };
+    })
     this.setState({
       isLoading: false,
-      files: files,
       previousFiles: previousFiles,
-      imageUrls: files.map((file) => {
-        return {
-          url: file.path
-        };
-      })
+      files: files,
+      imageUrls: imageUrls,
     });
   }
 
