@@ -31,7 +31,7 @@ export default class ImportScreen extends React.Component {
 
   componentDidMount() {
     this.setFiles();
-    this.checkFiles = setInterval(() => { this.setFiles() }, 5000);
+    this.checkFiles = setInterval(() => { this.setFiles() }, 3000);
   }
 
   componentWillUnmount() {
@@ -62,14 +62,17 @@ export default class ImportScreen extends React.Component {
           <TouchableOpacity
             disabled={this.importDisabled()}
             style={this.importDisabled() ? style.buttonDisabled : style.button} onPress={this.importPhotos.bind(this)}>
-            <Text style={style.h1}>Import {this.state.files.length} Photos</Text>
+            <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <ActivityIndicator animating={this.importDisabled()} size='small' />
+              <Text style={style.h1}>Import {this.state.files.length} Photos</Text>
+            </View>
           </TouchableOpacity>
         </View>
         <View style={style.importScreenBottom}>
-          {this.importDisabled() &&
+          {(!this.state.files || this.state.files.length <= 0) &&
             <Text style={style.t3}>No Photos found, insert camera card and use the Files app to move photos to DeerTracker folder.</Text>
           }
-          {!this.importDisabled() &&
+          {this.state.files && this.state.files.length > 0 &&
             <ScrollView>
               <View style={style.grid}>
                 {this.state.files.map((file) => {
@@ -92,12 +95,18 @@ export default class ImportScreen extends React.Component {
             </Modal>
           }
         </View>
-      </SafeAreaView>
+      </SafeAreaView >
     );
   }
 
   importDisabled() {
-    return !this.state.files || this.state.files.length <= 0;
+    if (this.state.previousFiles &&
+      this.state.files &&
+      this.state.previousFiles.length == this.state.files.length &&
+      this.state.files.length > 0) {
+      return false;
+    }
+    return true;
   }
 
   importPhotos() {
@@ -142,10 +151,16 @@ export default class ImportScreen extends React.Component {
       // pause file update when modal is open
       return;
     }
-    files = await this.recursiveFindFiles(root);
+
+    var previousFiles;
+    if (this.state.files) {
+      previousFiles = this.state.files;
+    }
+    let files = await this.recursiveFindFiles(root);
     this.setState({
       isLoading: false,
       files: files,
+      previousFiles: previousFiles,
       imageUrls: files.map((file) => {
         return {
           url: file.path
