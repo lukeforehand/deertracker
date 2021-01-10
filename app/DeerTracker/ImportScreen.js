@@ -26,7 +26,7 @@ export default class ImportScreen extends React.Component {
   constructor(props) {
     super(props);
     this.db = new Database();
-    this.state = { isLoading: true, modalVisible: false }
+    this.state = { isLoading: true, modalVisible: false, previousFiles: 0 }
   }
 
   componentDidMount() {
@@ -64,21 +64,21 @@ export default class ImportScreen extends React.Component {
             style={this.importDisabled() ? style.buttonDisabled : style.button} onPress={this.importPhotos.bind(this)}>
             <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <ActivityIndicator animating={this.importDisabled()} size='small' />
-              <Text style={style.h1}>Import {this.state.files.length} Photos</Text>
+              <Text style={this.importDisabled() ? style.h4 : style.h1}>Import {this.state.files.length} Photos</Text>
             </View>
           </TouchableOpacity>
         </View>
         <View style={style.importScreenBottom}>
-          {(!this.state.files || this.state.files.length <= 0) &&
+          {this.state.files && this.state.files.length <= 0 &&
             <Text style={style.t3}>No Photos found, insert camera card and use the Files app to move photos to DeerTracker folder.</Text>
           }
-          {this.state.files && this.state.files.length > 0 &&
+          {!this.importDisabled() &&
             <ScrollView>
               <View style={style.grid}>
                 {this.state.files.map((file) => {
                   return (
                     <TouchableOpacity key={file.path} onPress={() => { this.setState({ modalVisible: true, file: file }) }}>
-                      <Image key={file.path} source={{ uri: file.path }} style={style.thumbnail} />
+
                     </TouchableOpacity>
                   );
                 })}
@@ -100,13 +100,9 @@ export default class ImportScreen extends React.Component {
   }
 
   importDisabled() {
-    if (this.state.previousFiles &&
-      this.state.files &&
-      this.state.previousFiles.length == this.state.files.length &&
-      this.state.files.length > 0) {
-      return false;
-    }
-    return true;
+    return !this.state.files ||
+      this.state.previousFiles != this.state.files.length ||
+      this.state.files.length <= 0;
   }
 
   importPhotos() {
@@ -147,15 +143,7 @@ export default class ImportScreen extends React.Component {
   }
 
   async setFiles() {
-    if (this.state.modalVisible) {
-      // pause file update when modal is open
-      return;
-    }
-
-    var previousFiles;
-    if (this.state.files) {
-      previousFiles = this.state.files;
-    }
+    let previousFiles = this.state.files ? this.state.files.length : 0;
     let files = await this.recursiveFindFiles(root);
     this.setState({
       isLoading: false,

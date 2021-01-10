@@ -42,7 +42,7 @@ export default class Database {
                 AS photo_path
             FROM batch b
             JOIN location l ON l.id = b.location_id
-            LEFT OUTER JOIN photo p ON b.id = p.batch_id
+            JOIN photo p ON b.id = p.batch_id
             GROUP BY b.id
             ORDER BY b.id DESC
         `);
