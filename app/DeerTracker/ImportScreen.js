@@ -85,9 +85,11 @@ export default class ImportScreen extends React.Component {
               />
             </View>
           }
-          {this.state.file &&
+          {this.state.fileIndex &&
             <Modal visible={this.state.modalVisible} transparent={true}>
-              <ImageViewer imageUrls={this.state.imageUrls} index={this.state.files.indexOf(this.state.file)}
+              <ImageViewer
+                imageUrls={this.state.imageUrls}
+                index={this.state.fileIndex}
                 enableSwipeDown={true}
                 swipeDownThreshold={80}
                 onSwipeDown={() => { this.setState({ modalVisible: false }) }}
@@ -102,7 +104,7 @@ export default class ImportScreen extends React.Component {
   renderThumbnail(item) {
     const thumb = item.item;
     return (
-      <TouchableOpacity key={thumb.path} onPress={() => { this.setState({ modalVisible: true, file: file }) }}>
+      <TouchableOpacity key={thumb.path} onPress={() => { this.setState({ modalVisible: true, fileIndex: item.index }) }}>
         <Image
           key={thumb.path}
           source={{ uri: thumb.uri }}
@@ -162,11 +164,6 @@ export default class ImportScreen extends React.Component {
     }
 
     let files = await this.recursiveFindFiles(root);
-    if (this.state.previousFiles == files.length) {
-      // nothing changed
-      return;
-    }
-
     let thumbUrls = files.map((file) => {
       return ImageResizer.createResizedImage(file.path, thumbWidth, thumbHeight, 'JPEG', 50, 0);
     });
