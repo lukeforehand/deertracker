@@ -66,6 +66,12 @@ export default class Database {
         })[0];
     }
 
+    async deleteBatchPhotos(batchId) {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        return await db.executeSql(
+            'DELETE FROM photo WHERE batch_id = ?', [batchId]);
+    }
+
     async selectLocations() {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql('SELECT * FROM location ORDER BY name ASC')
@@ -84,7 +90,7 @@ export default class Database {
     async deleteLocation(id) {
         const db = await SQLite.openDatabase({ name: database, location: location });
         return await db.executeSql(
-            'DELETE FROM location where id = ?', [id]);
+            'DELETE FROM location WHERE id = ?', [id]);
     }
 }
 

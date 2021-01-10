@@ -70,11 +70,11 @@ export default class BatchScreen extends React.Component {
                   <Text style={style.h3}>
                     {Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY hh:mm A')}
                   </Text>
+                  <Text style={style.h2}>{batch['location_name']}</Text>
                   <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                     <Text style={style.t4}>
                       Batch {batch['id']}{'\n'}
-                    Location: {batch['location_name']}{'\n'}
-                    Photos:{batch['num_photos']}{'\n'}
+                      Photos:{batch['num_photos']}
                     </Text>
                     <View>
                       {batch['photo_path'] &&
@@ -120,10 +120,12 @@ export default class BatchScreen extends React.Component {
         text: 'Yes',
         onPress: () => {
           this.db.deleteBatch(batch['id']).then(() => {
-            RNFS.unlink(RNFS.DocumentDirectoryPath + '/.data/batch/' + batch['id']);
-            this.db.selectBatches().then((batches) => {
-              this.setState({
-                batches: batches
+            this.db.deleteBatchPhotos(batch['id']).then(() => {
+              RNFS.unlink(RNFS.DocumentDirectoryPath + '/.data/batch/' + batch['id']);
+              this.db.selectBatches().then((batches) => {
+                this.props.navigation.navigate('BatchScreen', {
+                  batches: batches
+                });
               });
             });
           });

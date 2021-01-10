@@ -41,6 +41,16 @@ const ImportScreenNavigator = createStackNavigator({
       headerTitleAlign: 'center'
     },
   },
+  BatchScreen: {
+    screen: BatchScreen,
+    navigationOptions: {
+      title: 'Photos',
+      headerTitleStyle: {
+        fontSize: 20
+      },
+      headerTitleAlign: 'center'
+    },
+  },
 });
 
 
@@ -48,7 +58,7 @@ const BatchScreenNavigator = createStackNavigator({
   BatchScreen: {
     screen: BatchScreen,
     navigationOptions: {
-      title: 'Batches',
+      title: 'Photos',
       headerTitleStyle: {
         fontSize: 20
       },
@@ -63,9 +73,9 @@ const TabNavigator = createBottomTabNavigator(
     Import: {
       screen: ImportScreenNavigator,
       navigationOptions: {
-        tabBarLabel: 'Pull Card',
+        tabBarLabel: 'Load Card',
         tabBarIcon: ({ tintColor }) => (
-          <Icon name='upload' style={{ transform: [{ rotateX: '180deg' }] }} color={tintColor} size={20} />
+          <Icon name='upload' color={tintColor} size={20} />
         )
       }
     },
