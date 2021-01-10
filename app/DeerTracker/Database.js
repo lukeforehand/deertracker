@@ -54,7 +54,7 @@ export default class Database {
     async insertPhoto(id, path, batchId) {
         const db = await SQLite.openDatabase({ name: database, location: location });
         return await db.executeSql(
-            'INSERT INTO photo(id, path, batch_id) VALUES(?, ?, ?)',
+            'INSERT INTO photo(id, path, processed, batch_id) VALUES(?, ?, FALSE, ?)',
             [id, path, batchId]);
     }
 
@@ -110,6 +110,7 @@ CREATE_TABLE_PHOTO = `
 CREATE TABLE IF NOT EXISTS photo (
     id CHARACTER(32) PRIMARY KEY NOT NULL,
     path VARCHAR(255) NOT NULL,
+    processed BOOLEAN NOT NULL,
     batch_id INTEGER,
     FOREIGN KEY(batch_id) REFERENCES batch(id)
 )
