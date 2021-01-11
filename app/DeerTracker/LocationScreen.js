@@ -52,14 +52,8 @@ export default class LocationScreen extends React.Component {
 
     return (
       <SafeAreaView>
-        <ScrollView>
-          <TouchableOpacity style={style.button} onPress={() => {
-            this.props.navigation.navigate('AddLocationScreen', {
-              locations: this.state.locations
-            })
-          }}>
-            <Text style={style.h1}>Add Location</Text>
-          </TouchableOpacity>
+        <ScrollView style={{ height: '100%' }}>
+          <Text style={style.t3}>Where is this camera located?</Text>
           {this.state.locations.map((location) => {
             return (
               <SwipeRow key={location['id']} item={location} onDelete={this.deleteLocation.bind(this)}>
@@ -78,6 +72,13 @@ export default class LocationScreen extends React.Component {
               </SwipeRow>
             );
           })}
+          <TouchableOpacity style={style.button} onPress={() => {
+            this.props.navigation.navigate('AddLocationScreen', {
+              locations: this.state.locations
+            })
+          }}>
+            <Text style={style.h1}>New Location</Text>
+          </TouchableOpacity>
         </ScrollView>
       </SafeAreaView >
     );

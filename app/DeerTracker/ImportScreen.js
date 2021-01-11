@@ -4,22 +4,16 @@ import {
   SafeAreaView,
   ActivityIndicator,
   Text,
-  Modal,
   View,
-  FlatList,
   TouchableOpacity,
-  Image,
 } from 'react-native';
-
-import ImageResizer from 'react-native-image-resizer';
-
-import ImageViewer from 'react-native-image-zoom-viewer';
 
 import RNFS from 'react-native-fs';
 import Database from './Database';
 
+import PhotoGallery from './PhotoGallery';
+
 import style from './style';
-import { thumbWidth, thumbHeight } from './style';
 
 const root = RNFS.DocumentDirectoryPath;
 
@@ -76,33 +70,7 @@ export default class ImportScreen extends React.Component {
           {this.state.files && this.state.files.length <= 0 &&
             <Text style={style.t3}>No Photos found, insert camera card and use the Files app to move photos to DeerTracker folder.</Text>
           }
-          <View style={{ alignItems: 'center' }}>
-            <FlatList
-              style={{ height: '100%', width: '100%' }}
-              contentContainerStyle={{ alignItems: 'center' }}
-              numColumns={2}
-              data={this.state.thumbUrls}
-              renderItem={(item) => (
-                <TouchableOpacity onPress={() => {
-                  this.setState({ modalVisible: true, imageIndex: item.index })
-                }}>
-                  <Image
-                    source={{ uri: this.state.thumbUrls[item.index].uri }}
-                    style={style.thumbnail} />
-                </TouchableOpacity>
-              )}
-              keyExtractor={item => item.uri}
-            />
-          </View>
-          <Modal visible={this.state.modalVisible} transparent={true}>
-            <ImageViewer
-              imageUrls={this.state.imageUrls}
-              index={this.state.imageIndex}
-              enableSwipeDown={true}
-              swipeDownThreshold={80}
-              onSwipeDown={() => { this.setState({ modalVisible: false }) }}
-            />
-          </Modal>
+          <PhotoGallery imageUrls={this.state.imageUrls} />
         </View>
       </SafeAreaView >
     );
@@ -124,22 +92,24 @@ export default class ImportScreen extends React.Component {
           this.setState({ isLoading: true });
           this.db.insertBatch(location['id']).then((rs) => {
             let batchId = rs[0]['insertId'];
-            let destPath = root + '/.data/batch/' + batchId;
+            let relativePath = '.data/batch/' + batchId;
+            let destPath = root + '/' + relativePath;
             RNFS.mkdir(destPath, { NSURLIsExcludedFromBackupKey: true }).then(() => {
               Promise.all(this.state.files.map(async (file) => {
                 return RNFS.hash(file.path, 'md5').then((hash) => {
-                  let destFile = destPath + '/' + hash + '.jpg';
+                  let destFile = relativePath + '/' + hash + '.jpg';
                   this.db.insertPhoto(hash, destFile, batchId).then(() => {
-                    RNFS.moveFile(file.path, destFile);
+                    RNFS.moveFile(file.path, root + '/' + destFile);
                   }).catch((error) => {
                     console.log(error);
+                    console.log("deleting " + file.path);
                     RNFS.unlink(file.path);
                   });
                 });
               })).then(() => {
                 this.removeEmptyFolders();
                 this.db.selectBatches().then((batches) => {
-                  this.props.navigation.replace('LocationScreen');
+                  this.props.navigation.popToTop('LocationScreen');
                   this.props.navigation.navigate('BatchScreen', {
                     batches: batches
                   });
@@ -177,14 +147,6 @@ export default class ImportScreen extends React.Component {
       })
     });
 
-    Promise.all(files.map((file) => {
-      return ImageResizer.createResizedImage(file.path, thumbWidth, thumbHeight, 'JPEG', 50, 0);
-    })).then((thumbUrls) => {
-      this.setState({
-        thumbUrls: thumbUrls
-      });
-    });
-
   }
 
   async removeEmptyFolders() {
@@ -197,6 +159,7 @@ export default class ImportScreen extends React.Component {
         dir = result.path;
         files = await this.recursiveFindFiles(dir);
         if (files.length <= 0) {
+          console.log("deleting " + dir);
           RNFS.unlink(dir);
         }
       }

@@ -41,26 +41,6 @@ const ImportScreenNavigator = createStackNavigator({
       },
       headerTitleAlign: 'center'
     },
-  },
-  BatchScreen: {
-    screen: BatchScreen,
-    navigationOptions: {
-      title: 'Photos',
-      headerTitleStyle: {
-        fontSize: 20
-      },
-      headerTitleAlign: 'center'
-    },
-  },
-  PhotoScreen: {
-    screen: PhotoScreen,
-    navigationOptions: {
-      title: 'Gallery',
-      headerTitleStyle: {
-        fontSize: 20
-      },
-      headerTitleAlign: 'center'
-    },
   }
 });
 
@@ -107,7 +87,7 @@ const TabNavigator = createBottomTabNavigator(
         tabBarIcon: ({ tintColor }) => (
           <Icon name='camera' color={tintColor} size={20} />
         )
-      }
+      },
     },
   },
   {

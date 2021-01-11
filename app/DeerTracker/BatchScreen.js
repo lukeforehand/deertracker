@@ -10,8 +10,6 @@ import {
   TouchableOpacity
 } from 'react-native';
 
-import ImageViewer from 'react-native-image-zoom-viewer';
-
 import RNFS from 'react-native-fs';
 
 import Moment from 'moment';
@@ -20,6 +18,8 @@ import SwipeRow from './SwipeRow';
 import Database from './Database';
 
 import style from './style';
+
+const root = RNFS.DocumentDirectoryPath;
 
 export default class BatchScreen extends React.Component {
 
@@ -57,7 +57,7 @@ export default class BatchScreen extends React.Component {
     }
     return (
       <SafeAreaView>
-        <ScrollView>
+        <ScrollView style={{ height: '100%' }}>
           {this.state.batches.map((batch) => {
             return (
               <SwipeRow key={batch['id']} item={batch} onDelete={this.deleteBatch.bind(this)}>
@@ -76,7 +76,7 @@ export default class BatchScreen extends React.Component {
                     </Text>
                     <View>
                       {batch['photo_path'] &&
-                        <Image source={{ uri: batch['photo_path'] }} style={style.smallThumbnail} />
+                        <Image source={{ uri: root + '/' + batch['photo_path'] }} style={style.smallThumbnail} />
                       }
                     </View>
                   </View>
@@ -95,7 +95,7 @@ export default class BatchScreen extends React.Component {
         this.props.navigation.navigate('PhotoScreen', {
           imageUrls: photos.map((photo) => {
             return {
-              url: photo.path
+              url: root + '/' + photo.path
             };
           })
         });
@@ -111,7 +111,9 @@ export default class BatchScreen extends React.Component {
         onPress: () => {
           this.db.deleteBatch(batch['id']).then(() => {
             this.db.deleteBatchPhotos(batch['id']).then(() => {
-              RNFS.unlink(RNFS.DocumentDirectoryPath + '/.data/batch/' + batch['id']);
+              let dir = RNFS.DocumentDirectoryPath + '/.data/batch/' + batch['id'];
+              console.log("deleting " + dir);
+              RNFS.unlink(dir);
               this.db.selectBatches().then((batches) => {
                 this.props.navigation.navigate('BatchScreen', {
                   batches: batches

@@ -3,8 +3,6 @@ import { SafeAreaView } from 'react-native';
 
 import PhotoGallery from './PhotoGallery';
 
-import style from './style';
-
 export default class PhotoScreen extends React.Component {
 
   constructor(props) {

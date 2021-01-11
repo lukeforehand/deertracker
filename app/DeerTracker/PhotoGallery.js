@@ -1,9 +1,5 @@
 import React from 'react';
 import {
-  Alert,
-  SafeAreaView,
-  ActivityIndicator,
-  Text,
   Modal,
   View,
   FlatList,
@@ -22,16 +18,17 @@ export default class PhotoGallery extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { modalVisible: false };
+    this.state = { modalVisible: false, thumbUrls: [] };
   }
 
   componentDidMount() {
+    // FIXME: this only gets called once and the child thumbUrls does not update!
     let imageUrls = this.props.imageUrls;
-    Promise.all(imageUrls.map((imageUrl) => {
-      return ImageResizer.createResizedImage(imageUrl.url, thumbWidth, thumbHeight, 'JPEG', 50, 0);
-    })).then((thumbUrls) => {
-      this.setState({
-        thumbUrls: thumbUrls
+    imageUrls.map((imageUrl) => {
+      ImageResizer.createResizedImage(imageUrl.url, thumbWidth, thumbHeight, 'JPEG', 50, 0).then((thumb) => {
+        this.setState((prevState) => ({
+          thumbUrls: prevState.thumbUrls.concat([thumb])
+        }));
       });
     });
   }
@@ -69,7 +66,7 @@ export default class PhotoGallery extends React.Component {
             onSwipeDown={() => { this.setState({ modalVisible: false }) }}
           />
         </Modal>
-      </View>
+      </View >
     );
   }
 
