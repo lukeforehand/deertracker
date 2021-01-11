@@ -22,6 +22,7 @@ import style from './style';
 import { thumbWidth, thumbHeight } from './style';
 
 const root = RNFS.DocumentDirectoryPath;
+
 RNFS.mkdir(root + '/.data', { NSURLIsExcludedFromBackupKey: true });
 
 export default class ImportScreen extends React.Component {
@@ -67,7 +68,7 @@ export default class ImportScreen extends React.Component {
             style={this.importDisabled() ? style.buttonDisabled : style.button} onPress={this.importPhotos.bind(this)}>
             <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <ActivityIndicator animating={this.importDisabled()} size='small' />
-              <Text style={this.importDisabled() ? style.h4 : style.h1}>Import {this.state.files.length} Photos</Text>
+              <Text style={this.importDisabled() ? style.h1 : style.h1}>Import {this.state.files.length} Photos</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -75,44 +76,37 @@ export default class ImportScreen extends React.Component {
           {this.state.files && this.state.files.length <= 0 &&
             <Text style={style.t3}>No Photos found, insert camera card and use the Files app to move photos to DeerTracker folder.</Text>
           }
-          {this.state.files && this.state.files.length > 0 &&
-            <View style={{ alignItems: 'center' }}>
-              <FlatList
-                numColumns={2}
-                data={this.state.thumbUrls}
-                renderItem={this.renderThumbnail.bind(this)}
-                keyExtractor={item => item.uri}
-              />
-            </View>
-          }
-          {this.state.fileIndex &&
-            <Modal visible={this.state.modalVisible} transparent={true}>
-              <ImageViewer
-                imageUrls={this.state.imageUrls}
-                index={this.state.fileIndex}
-                enableSwipeDown={true}
-                swipeDownThreshold={80}
-                onSwipeDown={() => { this.setState({ modalVisible: false }) }}
-              />
-            </Modal>
-          }
+          <View style={{ alignItems: 'center' }}>
+            <FlatList
+              style={{ height: '100%', width: '100%' }}
+              contentContainerStyle={{ alignItems: 'center' }}
+              numColumns={2}
+              data={this.state.thumbUrls}
+              renderItem={(item) => (
+                <TouchableOpacity onPress={() => {
+                  this.setState({ modalVisible: true, imageIndex: item.index })
+                }}>
+                  <Image
+                    source={{ uri: this.state.thumbUrls[item.index].uri }}
+                    style={style.thumbnail} />
+                </TouchableOpacity>
+              )}
+              keyExtractor={item => item.uri}
+            />
+          </View>
+          <Modal visible={this.state.modalVisible} transparent={true}>
+            <ImageViewer
+              imageUrls={this.state.imageUrls}
+              index={this.state.imageIndex}
+              enableSwipeDown={true}
+              swipeDownThreshold={80}
+              onSwipeDown={() => { this.setState({ modalVisible: false }) }}
+            />
+          </Modal>
         </View>
       </SafeAreaView >
     );
   }
-
-  renderThumbnail(item) {
-    const thumb = item.item;
-    return (
-      <TouchableOpacity key={thumb.path} onPress={() => { this.setState({ modalVisible: true, fileIndex: item.index }) }}>
-        <Image
-          key={thumb.path}
-          source={{ uri: thumb.uri }}
-          style={style.thumbnail} />
-      </TouchableOpacity>
-    );
-  }
-
 
   importDisabled() {
     return !this.state.files ||
@@ -159,30 +153,38 @@ export default class ImportScreen extends React.Component {
 
   async setFiles() {
     if (this.state.modalVisible) {
-      // don't affect the modal file index
+      return;
+    }
+    let files = await this.recursiveFindFiles(root);
+    let previousFiles = this.state.files ? this.state.files.length : 0;
+
+    if (files.length > 0 && files.length === previousFiles) {
+      this.setState({
+        isLoading: false,
+        previousFiles: files.length,
+      });
       return;
     }
 
-    let files = await this.recursiveFindFiles(root);
-    let thumbUrls = files.map((file) => {
-      return ImageResizer.createResizedImage(file.path, thumbWidth, thumbHeight, 'JPEG', 50, 0);
-    });
-    Promise.all(thumbUrls).then((urls) => {
-      this.setState({ thumbUrls: urls });
-    });
-
-    let previousFiles = this.state.files ? this.state.files.length : 0;
-    let imageUrls = files.map((file) => {
-      return {
-        url: file.path
-      };
-    })
     this.setState({
       isLoading: false,
       previousFiles: previousFiles,
       files: files,
-      imageUrls: imageUrls
+      imageUrls: files.map((file) => {
+        return {
+          url: file.path
+        };
+      })
     });
+
+    Promise.all(files.map((file) => {
+      return ImageResizer.createResizedImage(file.path, thumbWidth, thumbHeight, 'JPEG', 50, 0);
+    })).then((thumbUrls) => {
+      this.setState({
+        thumbUrls: thumbUrls
+      });
+    });
+
   }
 
   async removeEmptyFolders() {

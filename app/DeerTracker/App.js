@@ -9,6 +9,7 @@ import AddLocationScreen from './AddLocationScreen';
 import ImportScreen from './ImportScreen';
 
 import BatchScreen from './BatchScreen';
+import PhotoScreen from './PhotoScreen';
 
 const ImportScreenNavigator = createStackNavigator({
   LocationScreen: {
@@ -51,6 +52,16 @@ const ImportScreenNavigator = createStackNavigator({
       headerTitleAlign: 'center'
     },
   },
+  PhotoScreen: {
+    screen: PhotoScreen,
+    navigationOptions: {
+      title: 'Gallery',
+      headerTitleStyle: {
+        fontSize: 20
+      },
+      headerTitleAlign: 'center'
+    },
+  }
 });
 
 
@@ -65,6 +76,16 @@ const BatchScreenNavigator = createStackNavigator({
       headerTitleAlign: 'center'
     },
   },
+  PhotoScreen: {
+    screen: PhotoScreen,
+    navigationOptions: {
+      title: 'Gallery',
+      headerTitleStyle: {
+        fontSize: 20
+      },
+      headerTitleAlign: 'center'
+    },
+  }
 });
 
 

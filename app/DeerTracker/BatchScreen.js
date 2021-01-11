@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   Alert,
-  Modal,
   SafeAreaView,
   ActivityIndicator,
   ScrollView,
@@ -27,7 +26,7 @@ export default class BatchScreen extends React.Component {
   constructor(props) {
     super(props);
     this.db = new Database();
-    this.state = { isLoading: true, modalVisible: false }
+    this.state = { isLoading: true }
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -65,8 +64,7 @@ export default class BatchScreen extends React.Component {
                 <TouchableOpacity
                   key={batch['id']}
                   style={style.locationButton}
-                  onPress={() => { this.getPhotos(batch['id']) }}
-                >
+                  onPress={() => { this.getPhotos(batch['id']) }}>
                   <Text style={style.h3}>
                     {Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY hh:mm A')}
                   </Text>
@@ -86,13 +84,6 @@ export default class BatchScreen extends React.Component {
               </SwipeRow>
             );
           })}
-          <Modal visible={this.state.modalVisible} transparent={true}>
-            <ImageViewer imageUrls={this.state.imageUrls}
-              enableSwipeDown={true}
-              swipeDownThreshold={80}
-              onSwipeDown={() => { this.setState({ modalVisible: false }) }}
-            />
-          </Modal>
         </ScrollView>
       </SafeAreaView >
     );
@@ -101,14 +92,13 @@ export default class BatchScreen extends React.Component {
   getPhotos(batchId) {
     this.db.selectBatchPhotos(batchId).then((photos) => {
       if (photos.length > 0) {
-        this.setState({
-          modalVisible: true,
+        this.props.navigation.navigate('PhotoScreen', {
           imageUrls: photos.map((photo) => {
             return {
               url: photo.path
             };
           })
-        })
+        });
       }
     });
   }

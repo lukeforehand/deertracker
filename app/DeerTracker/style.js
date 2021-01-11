@@ -31,13 +31,6 @@ export default StyleSheet.create({
     fontSize: 18,
     padding: 10
   },
-  h4: {
-    color: '#667f7f',
-    textAlign: 'center',
-    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
-    fontSize: 20,
-    margin: 10,
-  },
   t1: {
     color: 'black',
     textAlign: 'center',
