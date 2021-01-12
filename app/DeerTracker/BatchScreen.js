@@ -58,6 +58,9 @@ export default class BatchScreen extends React.Component {
     return (
       <SafeAreaView>
         <ScrollView style={{ height: '100%' }}>
+          {this.state.batches && this.state.batches.length <= 0 &&
+            <Text style={style.t3}>No Photos found, please Load Card.</Text>
+          }
           {this.state.batches.map((batch) => {
             return (
               <SwipeRow key={batch['id']} item={batch} onDelete={this.deleteBatch.bind(this)}>

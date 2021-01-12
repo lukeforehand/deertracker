@@ -3,6 +3,7 @@ import {
   Modal,
   View,
   FlatList,
+  Text,
   TouchableOpacity,
   Image,
 } from 'react-native';
@@ -18,24 +19,30 @@ export default class PhotoGallery extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { modalVisible: false, thumbUrls: [] };
+    this.state = { modalVisible: false, imageUrls: [] };
   }
 
-  componentDidMount() {
-    // FIXME: this only gets called once and the child thumbUrls does not update!
-    let imageUrls = this.props.imageUrls;
-    imageUrls.map((imageUrl) => {
-      ImageResizer.createResizedImage(imageUrl.url, thumbWidth, thumbHeight, 'JPEG', 50, 0).then((thumb) => {
-        this.setState((prevState) => ({
-          thumbUrls: prevState.thumbUrls.concat([thumb])
-        }));
+  componentWillReceiveProps(nextProps) {
+
+    // compare new image urls to previous
+    let newImageUrls = nextProps.imageUrls.filter((imageUrl) => {
+      return this.state.imageUrls.indexOf(imageUrl) == -1;
+    });
+    // generate thumbnails for new image urls
+    let imageUrls = nextProps.imageUrls;
+    newImageUrls.map((newImageUrl) => {
+      ImageResizer.createResizedImage(newImageUrl.url, thumbWidth, thumbHeight, 'JPEG', 50, 0).then((newThumbUrl) => {
+        imageUrls[imageUrls.indexOf(newImageUrl)].thumbUrl = newThumbUrl.uri;
+        this.setState({
+          imageUrls: imageUrls
+        });
       });
     });
   }
 
   render() {
 
-    const imageUrls = this.props.imageUrls;
+    const imageUrls = this.state.imageUrls;
 
     return (
       <View>
@@ -44,17 +51,17 @@ export default class PhotoGallery extends React.Component {
             style={{ height: '100%', width: '100%' }}
             contentContainerStyle={{ alignItems: 'center' }}
             numColumns={2}
-            data={this.state.thumbUrls}
+            data={imageUrls}
             renderItem={(item) => (
               <TouchableOpacity onPress={() => {
-                this.setState({ modalVisible: true, imageIndex: item.index })
+                this.setState({ modalVisible: true, imageIndex: imageUrls.indexOf(item.item) })
               }}>
                 <Image
-                  source={{ uri: this.state.thumbUrls[item.index].uri }}
+                  source={{ uri: imageUrls[imageUrls.indexOf(item.item)].thumbUrl }}
                   style={style.thumbnail} />
               </TouchableOpacity>
             )}
-            keyExtractor={item => item.uri}
+            keyExtractor={item => item.url}
           />
         </View>
         <Modal visible={this.state.modalVisible} transparent={true}>

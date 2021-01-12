@@ -24,12 +24,12 @@ export default class ImportScreen extends React.Component {
   constructor(props) {
     super(props);
     this.db = new Database();
-    this.state = { isLoading: true, modalVisible: false, previousFiles: 0 }
+    this.state = { isLoading: true, importDisabled: true }
   }
 
   componentDidMount() {
-    this.setFiles();
-    this.checkFiles = setInterval(() => { this.setFiles() }, 3000);
+    this.findFiles();
+    this.checkFiles = setInterval(() => { this.findFiles() }, 3000);
   }
 
   componentWillUnmount() {
@@ -52,17 +52,18 @@ export default class ImportScreen extends React.Component {
     }
 
     const location = this.props.navigation.getParam('location');
+    const importDisabled = this.state.importDisabled;
 
     return (
       <SafeAreaView>
         <View style={style.importScreenTop}>
           <Text style={style.t2}>{location['name']}</Text>
           <TouchableOpacity
-            disabled={this.importDisabled()}
-            style={this.importDisabled() ? style.buttonDisabled : style.button} onPress={this.importPhotos.bind(this)}>
+            disabled={importDisabled}
+            style={importDisabled ? style.buttonDisabled : style.button} onPress={this.importPhotos.bind(this)}>
             <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <ActivityIndicator animating={this.importDisabled()} size='small' />
-              <Text style={this.importDisabled() ? style.h1 : style.h1}>Import {this.state.files.length} Photos</Text>
+              <ActivityIndicator animating={importDisabled} size='small' />
+              <Text style={importDisabled ? style.h1 : style.h1}>Import {this.state.files.length} Photos</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -74,12 +75,6 @@ export default class ImportScreen extends React.Component {
         </View>
       </SafeAreaView >
     );
-  }
-
-  importDisabled() {
-    return !this.state.files ||
-      this.state.previousFiles != this.state.files.length ||
-      this.state.files.length <= 0;
   }
 
   importPhotos() {
@@ -121,32 +116,28 @@ export default class ImportScreen extends React.Component {
       }, { text: 'No' }], { cancelable: false });
   }
 
-  async setFiles() {
-    if (this.state.modalVisible) {
-      return;
+  async findFiles() {
+    if (this.state.importDisabled) {
+      let files = await this.recursiveFindFiles(root);
+      if (this.state.files && this.state.files.length === files.length && files.length > 0) {
+        // found files is same length as previous attempt, to enable import button.
+        this.setState({
+          importDisabled: false
+        });
+        return;
+      } else {
+        // update files and imageUrls
+        this.setState({
+          isLoading: false,
+          files: files,
+          imageUrls: files.map((file) => {
+            return {
+              url: file.path
+            };
+          })
+        });
+      }
     }
-    let files = await this.recursiveFindFiles(root);
-    let previousFiles = this.state.files ? this.state.files.length : 0;
-
-    if (files.length > 0 && files.length === previousFiles) {
-      this.setState({
-        isLoading: false,
-        previousFiles: files.length,
-      });
-      return;
-    }
-
-    this.setState({
-      isLoading: false,
-      previousFiles: previousFiles,
-      files: files,
-      imageUrls: files.map((file) => {
-        return {
-          url: file.path
-        };
-      })
-    });
-
   }
 
   async removeEmptyFolders() {
