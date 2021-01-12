@@ -20,10 +20,14 @@ export default class PhotoGallery extends React.Component {
   constructor(props) {
     super(props);
     this.state = { modalVisible: false, imageUrls: [] };
+    this.generateThumbs(props);
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentDidUpdate() {
+    this.generateThumbs(this.props);
+  }
 
+  generateThumbs(nextProps) {
     // compare new image urls to previous
     let newImageUrls = nextProps.imageUrls.filter((imageUrl) => {
       return this.state.imageUrls.indexOf(imageUrl) == -1;
@@ -41,9 +45,7 @@ export default class PhotoGallery extends React.Component {
   }
 
   render() {
-
     const imageUrls = this.state.imageUrls;
-
     return (
       <View>
         <View style={{ alignItems: 'center' }}>
