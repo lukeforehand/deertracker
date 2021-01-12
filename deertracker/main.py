@@ -72,47 +72,52 @@ def server():
 
 
 @server.command(help="Start")
-@click.option("--port", required=False, default=10001, help="Listen port")
+@click.option("--port", required=False, default=5000, help="Listen port")
 def start(port):
-    import grpc
-    from concurrent import futures
-    from deertracker.grpc import detector_pb2_grpc
+    print(f"Starting detector service on port {port}")
 
-    print("Starting detector service...")
-    options = [("grpc.max_receive_message_length", 100 * 1024 * 1024)]
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10), options=options)
-    detector_pb2_grpc.add_DetectorServicer_to_server(
-        detector_pb2_grpc.DetectorServicer(), server
+    from flask import Flask, jsonify, request
+    from deertracker.model import Detector
+
+    app = Flask(__name__)
+    detector = Detector()
+
+    @app.route(
+        "/",
+        methods=["POST"],
     )
-    server.add_insecure_port(f"[::]:{port}")
-    server.start()
+    def predict():
+        lat = request.form["lat"]
+        lon = request.form["lon"]
+        image = request.files["image"]
+        return jsonify(detector.predict(image.read(), lat=lat, lon=lon))
+
+    app.run(host="0.0.0.0", port=port)
     print(f"Detector service started on port {port}")
-    server.wait_for_termination()
 
 
 @server.command(help="Test Server")
-@click.option("--port", required=False, default=10001, help="Send port")
+@click.option("--port", required=False, default=5000, help="Send port")
 @click.option("--photos", required=True, help="Location of photos to test")
 def test_server(port, photos):
-    import grpc
-    from deertracker.grpc import detector_pb2_grpc, detector_pb2
-    from PIL import Image
-    import io
     from datetime import datetime
-
-    channel = grpc.insecure_channel(f"localhost:{port}")
-    stub = detector_pb2_grpc.DetectorStub(channel)
+    import requests
 
     file_paths = find_files(photos)
     for file_path in file_paths:
-        b = io.BytesIO()
-        Image.open(file_path).save(b, "JPEG")
         now = datetime.now()
         lat = 43.08154
         lon = -89.31911
-        result = stub.predict(detector_pb2.Image(value=b.getvalue(), lat=lat, lon=lon))
+        multipart_form_data = (
+            ("image", (file_path, open(file_path, "rb"))),
+            ("lat", (None, str(lat))),
+            ("lon", (None, str(lon))),
+        )
+        response = requests.post(f"http://localhost:{port}/", files=multipart_form_data)
+        response.raise_for_status()
+
         print(f"input: {file_path}")
-        print(f"result: {result}")
+        print(f"result: {response.json()}")
         print(f"took: {datetime.now() - now}")
 
 

@@ -66,7 +66,19 @@ class Detector:
                 photo_hash,
             ),
         )
-        return bboxes, labels, scores
+        return [
+            {
+                "bbox": {
+                    "x": int(bbox[0]),
+                    "y": int(bbox[1]),
+                    "w": int(bbox[2]),
+                    "h": int(bbox[3]),
+                },
+                "label": label,
+                "score": float(score),
+            }
+            for bbox, label, score in zip(bboxes, labels, scores)
+        ]
 
     def _predict(self, image: np.ndarray, confidence: float = 0.98):
         bboxes, labels, scores = self.detector.predict(image)
@@ -88,9 +100,9 @@ class Detector:
                 score = predictions[high_score]
                 label = self.classifier.classes[high_score]
             if score > confidence:
-                r_bboxes.append((x, y, w, h))
+                r_bboxes.append((int(x), int(y), int(w), int(h)))
                 r_labels.append(label)
-                r_scores.append(score)
+                r_scores.append(float(score))
         return r_bboxes, r_labels, r_scores
 
 
