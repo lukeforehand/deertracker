@@ -112,14 +112,16 @@ export default class BatchScreen extends React.Component {
       {
         text: 'Yes',
         onPress: () => {
-          this.db.deleteBatch(batch['id']).then(() => {
+          this.db.deleteBatchObjects(batch['id']).then(() => {
             this.db.deleteBatchPhotos(batch['id']).then(() => {
-              let dir = RNFS.DocumentDirectoryPath + '/.data/batch/' + batch['id'];
-              console.log("deleting " + dir);
-              RNFS.unlink(dir);
-              this.db.selectBatches().then((batches) => {
-                this.props.navigation.navigate('BatchScreen', {
-                  batches: batches
+              this.db.deleteBatch(batch['id']).then(() => {
+                let dir = RNFS.DocumentDirectoryPath + '/.data/batch/' + batch['id'];
+                console.log("deleting " + dir);
+                RNFS.unlink(dir);
+                this.db.selectBatches().then((batches) => {
+                  this.props.navigation.navigate('BatchScreen', {
+                    batches: batches
+                  });
                 });
               });
             });

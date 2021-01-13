@@ -72,6 +72,13 @@ export default class Database {
             'DELETE FROM photo WHERE batch_id = ?', [batchId]);
     }
 
+    async deleteBatchObjects(batchId) {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        return await db.executeSql(
+            `DELETE FROM object WHERE photo_id IN
+            (SELECT p.id FROM photo p WHERE p.batch_id = ?)`, [batchId]);
+    }
+
     async selectLocations() {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql('SELECT * FROM location ORDER BY name ASC')
@@ -92,6 +99,27 @@ export default class Database {
         return await db.executeSql(
             'DELETE FROM location WHERE id = ?', [id]);
     }
+
+    async insertObject(obj) {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        return await db.executeSql(
+            'INSERT INTO object(id, x, y, w, h, lat, lon, time, label, score, photo_id, location_id) VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [
+                obj['bbox']['x'],
+                obj['bbox']['y'],
+                obj['bbox']['w'],
+                obj['bbox']['h'],
+                obj['lat'],
+                obj['lon'],
+                obj['time'],
+                obj['label'],
+                obj['score'],
+                obj['photo_id'],
+                obj['location_id'],
+            ]
+        );
+    }
+
 }
 
 CREATE_TABLE_LOCATION = `
@@ -124,20 +152,18 @@ CREATE TABLE IF NOT EXISTS photo (
 
 CREATE_TABLE_OBJECT = `
 CREATE TABLE IF NOT EXISTS object (
-    id CHARACTER(32) PRIMARY KEY NOT NULL,
-    path VARCHAR(255) NOT NULL UNIQUE,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     x INTEGER NOT NULL,
     y INTEGER NOT NULL,
     w INTEGER NOT NULL,
     h INTEGER NOT NULL,
-    lat FLOAT,
-    lon FLOAT,
-    time DATETIME,
+    lat FLOAT NOT NULL,
+    lon FLOAT NOT NULL,
+    time DATETIME NOT NULL,
     label VARCHAR(255) NOT NULL,
-    confidence FLOAT NOT NULL,
-    ground_truth BOOLEAN NOT NULL,
+    score FLOAT NOT NULL,
     photo_id CHARACTER(32) NOT NULL,
-    location_id INTEGER,
+    location_id INTEGER NOT NULL,
     FOREIGN KEY(photo_id) REFERENCES photo(id),
     FOREIGN KEY(location_id) REFERENCES location(id)
 )

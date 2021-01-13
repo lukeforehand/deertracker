@@ -80,6 +80,15 @@ const TabNavigator = createBottomTabNavigator(
         )
       }
     },
+    History: {
+      screen: BatchScreenNavigator,
+      navigationOptions: {
+        tabBarLabel: 'Card History',
+        tabBarIcon: ({ tintColor }) => (
+          <Icon name='history' color={tintColor} size={20} />
+        )
+      }
+    },
     Photos: {
       screen: BatchScreenNavigator,
       navigationOptions: {

@@ -66,19 +66,24 @@ class Detector:
                 photo_hash,
             ),
         )
-        return [
-            {
-                "bbox": {
-                    "x": int(bbox[0]),
-                    "y": int(bbox[1]),
-                    "w": int(bbox[2]),
-                    "h": int(bbox[3]),
-                },
-                "label": label,
-                "score": float(score),
-            }
-            for bbox, label, score in zip(bboxes, labels, scores)
-        ]
+        return {
+            "time": photo_time.timestamp() * 1000,
+            "lat": lat,
+            "lon": lon,
+            "objects": [
+                {
+                    "bbox": {
+                        "x": int(bbox[0]),
+                        "y": int(bbox[1]),
+                        "w": int(bbox[2]),
+                        "h": int(bbox[3]),
+                    },
+                    "label": label,
+                    "score": float(score),
+                }
+                for bbox, label, score in zip(bboxes, labels, scores)
+            ],
+        }
 
     def _predict(self, image: np.ndarray, confidence: float = 0.98):
         bboxes, labels, scores = self.detector.predict(image)
