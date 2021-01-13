@@ -38,6 +38,9 @@ export default class Database {
                 (SELECT COUNT(*) FROM photo p
                 WHERE p.batch_id = b.id)
                 AS num_photos,
+                (SELECT COUNT(*) FROM photo p
+                WHERE p.batch_id = b.id AND p.processed = TRUE)
+                AS num_processed,
                 FIRST_VALUE(p.path) OVER (PARTITION BY b.id ORDER BY b.id DESC)
                 AS photo_path
             FROM batch b
@@ -56,6 +59,20 @@ export default class Database {
         return await db.executeSql(
             'INSERT INTO photo(id, path, processed, batch_id) VALUES(?, ?, FALSE, ?)',
             [id, path, batchId]);
+    }
+
+    async selectUnprocessedPhotos() {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        rs = await db.executeSql(
+            `SELECT p.*, l.id AS location_id, l.lat AS location_lat, l.lon AS location_lon
+            FROM photo p
+            JOIN batch b ON b.id = p.batch_id
+            JOIN location l ON l.id = b.location_id
+            WHERE p.processed = FALSE
+            ORDER BY p.batch_id ASC`);
+        return rs.map((r) => {
+            return r.rows.raw();
+        })[0];
     }
 
     async processPhoto(photoId) {

@@ -68,7 +68,6 @@ const BatchScreenNavigator = createStackNavigator({
   }
 });
 
-
 const TabNavigator = createBottomTabNavigator(
   {
     Import: {

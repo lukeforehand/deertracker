@@ -162,5 +162,14 @@ export default StyleSheet.create({
   },
   importScreenBottom: {
     height: screenHeight - 150 - 100, // tab nav
-  }
+  },
+  progress: {
+    color: '#e3e8e8',
+    backgroundColor: 'green',
+    textAlign: 'left',
+    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontSize: 18,
+    padding: 10,
+    height: 40
+  },
 });

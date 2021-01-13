@@ -29,7 +29,7 @@ export default class AddLocationScreen extends React.Component {
   }
 
   componentDidMount() {
-    this.fetchData();
+    this.getCurrentPosition();
   }
 
   refreshing() {
@@ -130,7 +130,7 @@ export default class AddLocationScreen extends React.Component {
     }
   }
 
-  fetchData() {
+  getCurrentPosition() {
     this.setState({
       isLoading: true
     });

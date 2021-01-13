@@ -8,8 +8,6 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
-import Upload from 'react-native-background-upload';
-
 import RNFS from 'react-native-fs';
 import Database from './Database';
 
@@ -18,7 +16,6 @@ import PhotoGallery from './PhotoGallery';
 import style from './style';
 
 const root = RNFS.DocumentDirectoryPath;
-const detectorUrl = "http://192.168.0.157:5000/";
 
 RNFS.mkdir(root + '/.data', { NSURLIsExcludedFromBackupKey: true });
 
@@ -33,6 +30,7 @@ export default class ImportScreen extends React.Component {
   componentDidMount() {
     this.findFiles();
     this.checkFiles = setInterval(() => { this.findFiles() }, 3000);
+    console.log(this.props.navigation.dangerouslyGetParent());
   }
 
   componentWillUnmount() {
@@ -97,36 +95,7 @@ export default class ImportScreen extends React.Component {
                 return RNFS.hash(file.path, 'md5').then((hash) => {
                   let relativeDestFile = relativePath + '/' + hash + '.jpg';
                   this.db.insertPhoto(hash, relativeDestFile, batchId).then(() => {
-                    let absoluteDestFile = root + '/' + relativeDestFile;
-                    RNFS.moveFile(file.path, absoluteDestFile).then(() => {
-                      Upload.startUpload({
-                        url: detectorUrl,
-                        path: absoluteDestFile,
-                        type: 'multipart',
-                        field: 'image',
-                        parameters: {
-                          'lat': location['lat'],
-                          'lon': location['lon']
-                        }
-                      }).then((id) => {
-                        Upload.addListener('completed', id, (data) => {
-                          let r = JSON.parse(data.responseBody);
-                          if (r.objects.length > 0) {
-                            for (o of r.objects) {
-                              o['lat'] = r['lat'];
-                              o['lon'] = r['lon'];
-                              o['time'] = r['time'];
-                              o['photo_id'] = hash;
-                              o['location_id'] = location['id'];
-                              this.db.insertObject(o);
-                            }
-                          }
-                          this.db.processPhoto(hash);
-                        });
-                      }).catch((err) => {
-                        console.log('Upload error!', err);
-                      })
-                    });
+                    RNFS.moveFile(file.path, root + '/' + relativeDestFile);
                   }).catch((error) => {
                     console.log(error);
                     console.log("deleting " + file.path);

@@ -23,12 +23,13 @@ export default class LocationScreen extends React.Component {
     this.state = { isLoading: true }
   }
 
-  static getDerivedStateFromProps(props, state) {
-    // state may come from initial fetch of data, or from AddLocationScreen
-    locations = props.navigation.getParam('locations');
-    return locations === undefined || locations === state.locations ? {} : {
-      locations: locations
-    };
+  componentDidUpdate() {
+    let locations = this.props.navigation.getParam('locations');
+    if (locations && locations !== this.state.locations) {
+      this.setState({
+        locations: locations
+      });
+    }
   }
 
   componentDidMount() {
