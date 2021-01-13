@@ -58,6 +58,13 @@ export default class Database {
             [id, path, batchId]);
     }
 
+    async processPhoto(photoId) {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        return await db.executeSql(
+            'UPDATE photo SET processed = TRUE WHERE id = ?', [photoId]
+        );
+    }
+
     async selectBatchPhotos(batchId) {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql('SELECT * FROM photo WHERE batch_id = ?', [batchId]);

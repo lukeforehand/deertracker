@@ -121,6 +121,7 @@ export default class ImportScreen extends React.Component {
                               this.db.insertObject(o);
                             }
                           }
+                          this.db.processPhoto(hash);
                         });
                       }).catch((err) => {
                         console.log('Upload error!', err);
