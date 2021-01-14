@@ -47,6 +47,7 @@ class Detector:
         """
         with database.conn() as db:
             photo = db.select_photo(hash)
+            photo = {"id": photo["id"], "processed": photo["processed"]}
             if photo is not None and photo["processed"]:
                 photo["objects"] = [
                     {
@@ -56,7 +57,12 @@ class Detector:
                         "h": obj["h"],
                         "lat": str(obj["lat"]),
                         "lon": str(obj["lon"]),
-                        "time": obj["time"].timestamp() * 1000,
+                        "time": str(
+                            datetime.strptime(
+                                obj["time"], "%Y-%m-%d %H:%M:%S"
+                            ).timestamp()
+                            * 1000
+                        ),
                         "label": obj["label"],
                         "score": str(obj["confidence"]),
                     }

@@ -63,8 +63,16 @@ class Connection:
 
     def select_photo(self, photo_id):
         cur = self.conn.cursor()
-        cur.execute("SELECT * FROM photo WHERE id = ?", [photo_id])
-        return cur.fetchone()
+        cur.execute(
+            "SELECT id, path, processed, batch_id FROM photo WHERE id = ?", [photo_id]
+        )
+        photo = cur.fetchone()
+        return {
+            "id": photo[0],
+            "path": photo[1],
+            "processed": photo[2],
+            "batch_id": photo[3],
+        }
 
     def select_photo_objects(self, photo_id):
         return [
