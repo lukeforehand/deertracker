@@ -22,14 +22,14 @@ import Database from './Database';
 import style from './style';
 
 const root = RNFS.DocumentDirectoryPath;
-const detectorUrl = "http://192.168.0.157:5000/";
+const detectorUrl = "http://192.168.0.157:5000";
 
 export default class BatchScreen extends React.Component {
 
   constructor(props) {
     super(props);
     this.db = new Database();
-    this.state = { isLoading: true, photosToUpload: 0 }
+    this.state = { isLoading: true, photosToUpload: 0, photosToProcess: 0 }
   }
 
   componentDidUpdate() {
@@ -44,11 +44,14 @@ export default class BatchScreen extends React.Component {
   componentDidMount() {
     this.fetchData();
     this.uploadPhotos();
+    this.processPhotos();
     this.checkUploads = setInterval(() => { this.uploadPhotos() }, 3000);
+    this.checkProcess = setInterval(() => { this.processPhotos() }, 3000);
   }
 
   componentWillUnmount() {
     clearInterval(this.checkUploads);
+    clearInterval(this.checkProcess);
   }
 
   refreshing() {
@@ -72,7 +75,7 @@ export default class BatchScreen extends React.Component {
             <Text style={style.t3}>No Photos found, please Load Card.</Text>
           }
           {this.state.batches.map((batch) => {
-            let uploadProgress = parseInt(100 * (batch['num_uploaded'] / batch['num_photos']));
+            let progress = parseInt(100 * ((batch['num_uploaded'] + batch['num_processed']) / (batch['num_photos'] * 2)));
             return (
               <SwipeRow key={batch['id']} item={batch} onDelete={this.deleteBatch.bind(this)}>
                 <TouchableOpacity
@@ -84,11 +87,11 @@ export default class BatchScreen extends React.Component {
                   </Text>
                   <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                     <Text style={style.h2}>{batch['location_name']}</Text>
-                    {uploadProgress < 100 &&
+                    {progress < 100 &&
                       <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end' }}>
-                        <Text style={style.t4}>Uploading...</Text>
+                        <Text style={style.t4}>Processing...</Text>
                         <ActivityIndicator size='small' />
-                        <Text style={style.t4}>{uploadProgress}%</Text>
+                        <Text style={style.t4}>{progress}%</Text>
                       </View>
                     }
                   </View>
@@ -96,7 +99,8 @@ export default class BatchScreen extends React.Component {
                     <Text style={style.t4}>
                       Sightings: {batch['num_objects']}{'\n'}
                       Photos: {batch['num_photos']}{'\n'}
-                      Uploaded: {batch['num_uploaded']}
+                      Uploaded: {batch['num_uploaded']}{'\n'}
+                      Processed: {batch['num_processed']}{'\n'}
                     </Text>
                     <View>
                       {batch['photo_path'] &&
@@ -111,6 +115,53 @@ export default class BatchScreen extends React.Component {
         </ScrollView>
       </SafeAreaView >
     );
+  }
+
+  processPhotos() {
+    if (this.state.photosToProcess <= 0) {
+      this.db.selectPhotosToProcess().then((photos) => {
+        if (photos.length == 0) {
+          console.log("no photos to process");
+          return;
+        }
+        this.setState({
+          photosToProcess: photos.length
+        }, () => {
+          for (photo of photos) {
+            fetch(detectorUrl + '/' + photo['id']).then((response) => {
+              if (response.status !== 200) {
+                console.log("not found: " + photo['id']);
+                this.setState(prevState => ({
+                  photosToProcess: prevState.photosToProcess - 1
+                }));
+                return;
+              }
+              let r = response.json();
+              if (r.objects.length > 0) {
+                for (o of r.objects) {
+                  o['photo_id'] = photo['id'];
+                  o['location_id'] = photo['location_id'];
+                  this.db.insertObject(o);
+                }
+              }
+              this.db.processPhoto(photo['id']).then(() => {
+                let batchId = photo['batch_id'];
+                this.setState(prevState => ({
+                  batches: prevState.batches.map((batch) => {
+                    if (batch['id'] === batchId) {
+                      batch['num_processed'] = batch['num_processed'] + 1;
+                      batch['num_objects'] = batch['num_objects'] + r.objects.length;
+                    }
+                    return batch;
+                  }),
+                  photosToProcess: prevState.photosToProcess - 1
+                }));
+              });
+            });
+          }
+        });
+      });
+    }
   }
 
   uploadPhotos() {
@@ -143,45 +194,23 @@ export default class BatchScreen extends React.Component {
               Upload.addListener('completed', id, (data) => {
                 console.log('completed ' + photo['id']);
                 if (data.responseCode == 200) {
-                  this.db.setPhotoUploadId(photo['id'], data.responseBody).then(() => {
-                    let batchId = photo['batch_id'];
-                    this.setState(prevState => ({
-                      batches: prevState.batches.map((batch) => {
-                        if (batch['id'] === batchId) {
-                          batch['num_uploaded'] = batch['num_uploaded'] + 1;
-                        }
-                        return batch;
-                      }),
-                      photosToUpload: prevState.photosToUpload - 1
-                    }));
-                  });
+                  let r = JSON.parse(data.responseBody);
+                  this.db.setPhotoUpload(
+                    photo['id'],
+                    r['upload_id'],
+                    r['time']).then(() => {
+                      let batchId = photo['batch_id'];
+                      this.setState(prevState => ({
+                        batches: prevState.batches.map((batch) => {
+                          if (batch['id'] === batchId) {
+                            batch['num_uploaded'] = batch['num_uploaded'] + 1;
+                          }
+                          return batch;
+                        }),
+                        photosToUpload: prevState.photosToUpload - 1
+                      }));
+                    });
                 }
-                /*
-                if (r.objects.length > 0) {
-                  for (o of r.objects) {
-                    o['lat'] = r['lat'];
-                    o['lon'] = r['lon'];
-                    o['time'] = r['time'];
-                    o['photo_id'] = photo['id'];
-                    o['location_id'] = photo['location_id'];
-                    this.db.insertObject(o);
-                  }
-                }
-                this.db.processPhoto(photo['id']).then(() => {
-                  let batchId = photo['batch_id'];
-                  this.setState(prevState => ({
-                    batches: prevState.batches.map((batch) => {
-                      if (batch['id'] === batchId) {
-                        batch['num_processed'] = batch['num_processed'] + 1;
-                        batch['num_objects'] = batch['num_objects'] + r.objects.length;
-                      }
-                      return batch;
-                    }),
-                    // the last photo in a batch should trigger more processing
-                    processDisabled: false
-                  }));
-                });
-                */
               });
             }).catch((err) => {
               console.log(err);

@@ -61,21 +61,22 @@ export default class Database {
         })[0];
     }
 
-    async insertPhoto(id, path, batchId) {
+    async insertPhoto(id, path, lat, lon, batchId) {
         const db = await SQLite.openDatabase({ name: database, location: location });
         return await db.executeSql(
-            'INSERT INTO photo(id, path, processed, upload_id, batch_id) VALUES(?, ?, FALSE, NULL, ?)',
-            [id, path, batchId]);
+            'INSERT INTO photo(id, path, processed, upload_id, lat, lon, batch_id) VALUES(?, ?, FALSE, NULL, ?, ?, ?)',
+            [id, path, lat, lon, batchId]);
     }
 
-    async selectUnprocessedPhotos() {
+    async selectPhotosToProcess() {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql(
-            `SELECT p.*
+            `SELECT p.*, l.id AS location_id, l.lat AS location_lat, l.lon AS location_lon
             FROM photo p
             JOIN batch b ON b.id = p.batch_id
+            JOIN location l ON l.id = b.location_id
             WHERE p.processed = FALSE AND p.upload_id IS NOT NULL
-            ORDER BY p.batch_id ASC`);
+            ORDER BY p.batch_id ASC, p.id ASC`);
         return rs.map((r) => {
             return r.rows.raw();
         })[0];
@@ -89,16 +90,17 @@ export default class Database {
             JOIN batch b ON b.id = p.batch_id
             JOIN location l ON l.id = b.location_id
             WHERE p.upload_id IS NULL
-            ORDER BY p.batch_id ASC`);
+            ORDER BY p.batch_id ASC, p.id ASC`);
         return rs.map((r) => {
             return r.rows.raw();
         })[0];
     }
 
-    async setPhotoUploadId(photoId, uploadId) {
+    async setPhotoUpload(photoId, uploadId, time) {
         const db = await SQLite.openDatabase({ name: database, location: location });
         return await db.executeSql(
-            'UPDATE photo SET upload_id = ? WHERE id = ?', [uploadId, photoId]
+            'UPDATE photo SET upload_id = ?, time = ? WHERE id = ?',
+            [uploadId, time, photoId]
         );
     }
 
@@ -197,6 +199,9 @@ CREATE TABLE IF NOT EXISTS photo (
     path VARCHAR(255) NOT NULL,
     processed BOOLEAN NOT NULL,
     upload_id NULL,
+    time DATETIME,
+    lat FLOAT NOT NULL,
+    lon FLOAT NOT NULL,
     batch_id INTEGER,
     FOREIGN KEY(batch_id) REFERENCES batch(id)
 )

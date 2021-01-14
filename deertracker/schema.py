@@ -19,6 +19,9 @@ CREATE TABLE IF NOT EXISTS photo (
     id CHARACTER(32) PRIMARY KEY NOT NULL,
     path VARCHAR(255) NOT NULL,
     processed BOOLEAN NOT NULL,
+    lat FLOAT,
+    lon FLOAT,
+    time DATETIME,
     batch_id INTEGER,
     FOREIGN KEY(batch_id) REFERENCES batch(id)
 )

@@ -93,7 +93,7 @@ export default class ImportScreen extends React.Component {
               Promise.all(this.state.files.map(async (file) => {
                 return RNFS.hash(file.path, 'md5').then((hash) => {
                   let relativeDestFile = relativePath + '/' + hash + '.jpg';
-                  this.db.insertPhoto(hash, relativeDestFile, batchId).then(() => {
+                  this.db.insertPhoto(hash, relativeDestFile, location['lat'], location['lon'], batchId).then(() => {
                     RNFS.moveFile(file.path, root + '/' + relativeDestFile);
                   }).catch((error) => {
                     console.log(error);

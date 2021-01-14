@@ -64,14 +64,20 @@ class Connection:
     def select_photo(self, photo_id):
         cur = self.conn.cursor()
         cur.execute(
-            "SELECT id, path, processed, batch_id FROM photo WHERE id = ?", [photo_id]
+            "SELECT id, path, processed, lat, lon, time, batch_id FROM photo WHERE id = ?",
+            [photo_id],
         )
         photo = cur.fetchone()
+        if photo is None:
+            return None
         return {
             "id": photo[0],
             "path": photo[1],
             "processed": photo[2],
-            "batch_id": photo[3],
+            "lat": photo[3],
+            "lon": photo[4],
+            "time": photo[5],
+            "batch_id": photo[6],
         }
 
     def select_photo_objects(self, photo_id):
@@ -99,10 +105,17 @@ class Connection:
 
     def insert_photo(self, photo):
         try:
-            sql = "INSERT INTO photo(id, path, batch_id) VALUES(?, ?, ?)"
+            sql = "INSERT INTO photo(id, path, processed, lat, lon, time, batch_id) VALUES(?, ?, FALSE, ?, ?, ?, ?)"
             cur = self.conn.cursor()
             cur.execute(sql, photo)
-            return {"id": photo[0], "path": photo[1]}
+            return {
+                "id": photo[0],
+                "path": photo[1],
+                "processed": False,
+                "lat": photo[2],
+                "lon": photo[3],
+                "time": photo[4],
+            }
         except sqlite3.IntegrityError:
             return {"error": f"Photo `{photo[1]}` already exists."}
 

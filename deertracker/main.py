@@ -75,40 +75,9 @@ def server():
 @click.option("--port", required=False, default=5000, help="Listen port")
 def start(port):
     print(f"Starting detector service on port {port}")
+    from deertracker import server
 
-    from flask import Flask, jsonify, request
-    from werkzeug.exceptions import NotFound
-    from deertracker.model import Detector
-
-    app = Flask(__name__)
-    detector = Detector()
-
-    @app.route(
-        "/",
-        methods=["POST"],
-    )
-    def upload():
-        lat = request.form["lat"]
-        lon = request.form["lon"]
-        image = request.files["image"]
-        upload_id = detector.upload(image.read(), lat=lat, lon=lon)
-        print(f"uploaded {upload_id}")
-        return upload_id
-
-    @app.route(
-        "/<upload_id>",
-        methods=["GET"],
-    )
-    def status(upload_id):
-        print(f"fetching {upload_id}")
-        photo = detector.get(upload_id)
-        if photo is None:
-            raise NotFound()
-        photo = jsonify(photo)
-        print(photo)
-        return photo
-
-    app.run(host="0.0.0.0", port=port)
+    server.start(port)
     print(f"Detector service started on port {port}")
 
 

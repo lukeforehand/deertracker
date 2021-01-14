@@ -3,7 +3,7 @@ import pathlib
 
 from PIL import Image
 
-from deertracker import database, logger, model
+from deertracker import database, logger, model, server
 
 from deertracker.model import Detector
 
@@ -46,14 +46,21 @@ class PhotoProcessor:
     def process_photo(self, file_path):
         try:
             if pathlib.Path(file_path).suffix.lower() in VIDEO_EXTS:
-                image = first_frame(file_path)
+                image = first_frame(file_path).tobytes()
                 if image is None:
                     return {"error": f"Video `{file_path}` could not be processed."}
             else:
-                image = Image.open(file_path)
+                image = Image.open(file_path).tobytes()
+
+            photo = server.upload(image, self.location["lat"], self.location["lon"])
             return self.detector.predict(
-                image, lat=self.location["lat"], lon=self.location["lon"]
+                image,
+                photo["upload_id"],
+                photo["time"],
+                lat=self.location["lat"],
+                lon=self.location["lon"],
             )
+
         except Exception:
             msg = f"Error processing photo `{file_path}`"
             LOGGER.exception(msg)
