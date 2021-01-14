@@ -121,7 +121,6 @@ export default class BatchScreen extends React.Component {
     if (this.state.photosToProcess <= 0) {
       this.db.selectPhotosToProcess().then((photos) => {
         if (photos.length == 0) {
-          console.log("no photos to process");
           return;
         }
         this.setState({
@@ -137,8 +136,8 @@ export default class BatchScreen extends React.Component {
                 return;
               }
               response.json().then((r) => {
+                console.log(r);
                 if (!r.objects) {
-                  console.log("still processing: " + photo['id']);
                   this.setState(prevState => ({
                     photosToProcess: prevState.photosToProcess - 1
                   }));
@@ -182,7 +181,6 @@ export default class BatchScreen extends React.Component {
     if (this.state.photosToUpload <= 0) {
       this.db.selectPhotosToUpload().then((photos) => {
         if (photos.length == 0) {
-          console.log("no photos to upload");
           return;
         }
         this.setState({
