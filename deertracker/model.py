@@ -1,7 +1,6 @@
 from datetime import datetime
 import hashlib
 import io
-import multiprocessing
 import numpy as np
 import pathlib
 import tarfile
@@ -38,53 +37,12 @@ class Detector:
         self.labels = self.classifier.classes + list(self.detector.labels.values())
         for label in self.labels:
             (DEFAULT_CROP_STORE / label).mkdir(exist_ok=True)
-        self.pool = multiprocessing.Pool(1)
 
-    def predict(
-        self, image: bytes, photo_hash, photo_time, confidence=0.98, lat=None, lon=None
-    ):
+    def predict(self, image: np.ndarray, photo_hash, confidence=0.98):
         """
         Runs predictions, but pads crops before storage (for training), and result data structure
         is a bit different
         """
-        image = Image.open(io.BytesIO(image))
-        if lat is None or lon is None:
-            lat, lon = get_gps(image)
-        image = np.array(image)
-        bboxes, labels, scores = self._predict(image, confidence=confidence)
-        self.pool.apply_async(
-            process_image,
-            (
-                bboxes,
-                labels,
-                scores,
-                image,
-                lat,
-                lon,
-                photo_time,
-                photo_hash,
-            ),
-        )
-        return {
-            "time": photo_time.timestamp() * 1000,
-            "lat": lat,
-            "lon": lon,
-            "objects": [
-                {
-                    "bbox": {
-                        "x": int(bbox[0]),
-                        "y": int(bbox[1]),
-                        "w": int(bbox[2]),
-                        "h": int(bbox[3]),
-                    },
-                    "label": label,
-                    "score": float(score),
-                }
-                for bbox, label, score in zip(bboxes, labels, scores)
-            ],
-        }
-
-    def _predict(self, image: np.ndarray, confidence: float = 0.98):
         bboxes, labels, scores = self.detector.predict(image)
         r_bboxes = []
         r_labels = []
@@ -110,9 +68,10 @@ class Detector:
         return r_bboxes, r_labels, r_scores
 
 
-def process_image(bboxes, labels, scores, image, lat, lon, image_time, image_hash):
+def process_crops(
+    bboxes, labels, scores, image: np.ndarray, lat, lon, image_time, image_hash
+):
     try:
-        file_path = f"{image_hash}.jpg"
         for bbox, label, score in zip(bboxes, labels, scores):
             x, y, w, h = bbox
             pw = max(int(w * 0.01), 10)
@@ -145,6 +104,9 @@ def process_image(bboxes, labels, scores, image, lat, lon, image_time, image_has
                         None,
                     )
                 )
+        with database.conn() as db:
+            db.update_unprocessed_photo(image_hash)
+            print(f"processed {image_hash}")
     except Exception as e:
         LOGGER.exception(e)
 
@@ -246,31 +208,5 @@ def get_time(image):
         return datetime.strptime(
             image.getexif()[EXIF_TAGS["DateTime"]], "%Y:%m:%d %H:%M:%S"
         )
-    except KeyError:
-        return None
-
-
-def get_gps(image):
-    def get_decimal_from_dms(dms, ref):
-        degrees = dms[0]
-        minutes = dms[1] / 60.0
-        seconds = dms[2] / 3600.0
-        if ref in ["S", "W"]:
-            degrees = -degrees
-            minutes = -minutes
-            seconds = -seconds
-        return round(degrees + minutes + seconds, 5)
-
-    def get_coordinates(geo):
-        lat = get_decimal_from_dms(
-            geo[GPS_TAGS["GPSLatitude"]], geo[GPS_TAGS["GPSLatitudeRef"]]
-        )
-        lon = get_decimal_from_dms(
-            geo[GPS_TAGS["GPSLongitude"]], geo[GPS_TAGS["GPSLongitudeRef"]]
-        )
-        return (lat, lon)
-
-    try:
-        return get_coordinates(image.getexif()[EXIF_TAGS["GPSInfo"]])
     except KeyError:
         return None

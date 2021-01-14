@@ -74,11 +74,9 @@ def server():
 @server.command(help="Start")
 @click.option("--port", required=False, default=5000, help="Listen port")
 def start(port):
-    print(f"Starting detector service on port {port}")
     from deertracker import server
 
     server.start(port)
-    print(f"Detector service started on port {port}")
 
 
 @server.command(help="Test Server")

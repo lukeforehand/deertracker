@@ -1,5 +1,6 @@
 import cv2
 import pathlib
+import numpy as np
 
 from PIL import Image
 
@@ -46,19 +47,28 @@ class PhotoProcessor:
     def process_photo(self, file_path):
         try:
             if pathlib.Path(file_path).suffix.lower() in VIDEO_EXTS:
-                image = first_frame(file_path).tobytes()
+                image = first_frame(file_path)
                 if image is None:
                     return {"error": f"Video `{file_path}` could not be processed."}
             else:
-                image = Image.open(file_path).tobytes()
+                image = Image.open(file_path)
 
-            photo = server.upload(image, self.location["lat"], self.location["lon"])
-            return self.detector.predict(
-                image,
-                photo["upload_id"],
-                photo["time"],
-                lat=self.location["lat"],
-                lon=self.location["lon"],
+            photo = server.upload(
+                image.tobytes(), self.location["lat"], self.location["lon"]
+            )
+            image = np.array(image)
+            bboxes, labels, scores = self.detector.predict(image, photo["upload_id"])
+            model.process_crops(
+                (
+                    bboxes,
+                    labels,
+                    scores,
+                    image,
+                    self.location["lat"],
+                    self.location["lon"],
+                    photo["time"],
+                    photo["upload_id"],
+                ),
             )
 
         except Exception:

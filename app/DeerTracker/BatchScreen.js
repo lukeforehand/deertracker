@@ -136,27 +136,41 @@ export default class BatchScreen extends React.Component {
                 }));
                 return;
               }
-              let r = response.json();
-              if (r.objects.length > 0) {
-                for (o of r.objects) {
-                  o['photo_id'] = photo['id'];
-                  o['location_id'] = photo['location_id'];
-                  this.db.insertObject(o);
+              response.json().then((r) => {
+                if (!r.objects) {
+                  console.log("still processing: " + photo['id']);
+                  this.setState(prevState => ({
+                    photosToProcess: prevState.photosToProcess - 1
+                  }));
+                  return;
                 }
-              }
-              this.db.processPhoto(photo['id']).then(() => {
-                let batchId = photo['batch_id'];
-                this.setState(prevState => ({
-                  batches: prevState.batches.map((batch) => {
-                    if (batch['id'] === batchId) {
-                      batch['num_processed'] = batch['num_processed'] + 1;
-                      batch['num_objects'] = batch['num_objects'] + r.objects.length;
-                    }
-                    return batch;
-                  }),
-                  photosToProcess: prevState.photosToProcess - 1
-                }));
+                if (r.objects.length > 0) {
+                  for (o of r.objects) {
+                    o['photo_id'] = photo['id'];
+                    o['location_id'] = photo['location_id'];
+                    this.db.insertObject(o);
+                  }
+                }
+                this.db.processPhoto(photo['id']).then(() => {
+                  let batchId = photo['batch_id'];
+                  this.setState(prevState => ({
+                    batches: prevState.batches.map((batch) => {
+                      if (batch['id'] === batchId) {
+                        batch['num_processed'] = batch['num_processed'] + 1;
+                        batch['num_objects'] = batch['num_objects'] + r.objects.length;
+                      }
+                      return batch;
+                    }),
+                    photosToProcess: prevState.photosToProcess - 1
+                  }));
+                });
               });
+            }).catch((err) => {
+              console.log(err);
+              this.setState(prevState => ({
+                photosToProcess: prevState.photosToProcess - 1
+              }));
+              return;
             });
           }
         });

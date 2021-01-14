@@ -80,6 +80,33 @@ class Connection:
             "batch_id": photo[6],
         }
 
+    def select_unprocessed_photos(self):
+        return [
+            {
+                "id": photo[0],
+                "path": photo[1],
+                "processed": photo[2],
+                "lat": photo[3],
+                "lon": photo[4],
+                "time": photo[5],
+                "batch_id": photo[6],
+            }
+            for photo in self.conn.cursor()
+            .execute(
+                """
+                SELECT id, path, processed, lat, lon, time, batch_id FROM photo
+                WHERE processed IS FALSE
+                ORDER BY id ASC
+            """
+            )
+            .fetchall()
+        ]
+
+    def update_unprocessed_photo(self, photo_id):
+        self.conn.cursor().execute(
+            "UPDATE photo SET processed = TRUE WHERE id = ?", [photo_id]
+        )
+
     def select_photo_objects(self, photo_id):
         return [
             self._object_from_tuple(obj)
