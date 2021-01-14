@@ -20,7 +20,6 @@ import SwipeRow from './SwipeRow';
 import Database from './Database';
 
 import style from './style';
-import { screenWidth } from './style';
 
 const root = RNFS.DocumentDirectoryPath;
 const detectorUrl = "http://192.168.0.157:5000/";
@@ -30,7 +29,7 @@ export default class BatchScreen extends React.Component {
   constructor(props) {
     super(props);
     this.db = new Database();
-    this.state = { isLoading: true }
+    this.state = { isLoading: true, photosToUpload: 0 }
   }
 
   componentDidUpdate() {
@@ -44,7 +43,12 @@ export default class BatchScreen extends React.Component {
 
   componentDidMount() {
     this.fetchData();
-    this.processPhotos();
+    this.uploadPhotos();
+    this.checkUploads = setInterval(() => { this.uploadPhotos() }, 3000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.checkUploads);
   }
 
   refreshing() {
@@ -68,8 +72,7 @@ export default class BatchScreen extends React.Component {
             <Text style={style.t3}>No Photos found, please Load Card.</Text>
           }
           {this.state.batches.map((batch) => {
-            let batchProgress = parseInt((batch['num_processed'] / batch['num_photos']) * 100);
-            let progressX = Math.max(70, parseInt(screenWidth * (batchProgress / 100)));
+            let uploadProgress = parseInt(100 * (batch['num_uploaded'] / batch['num_photos']));
             return (
               <SwipeRow key={batch['id']} item={batch} onDelete={this.deleteBatch.bind(this)}>
                 <TouchableOpacity
@@ -79,12 +82,21 @@ export default class BatchScreen extends React.Component {
                   <Text style={style.h3}>
                     {Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY hh:mm A')}
                   </Text>
-                  <Text style={[{ width: progressX }, style.progress]}>{batchProgress}%</Text>
-                  <Text style={style.h2}>{batch['location_name']}</Text>
+                  <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Text style={style.h2}>{batch['location_name']}</Text>
+                    {uploadProgress < 100 &&
+                      <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end' }}>
+                        <Text style={style.t4}>Uploading...</Text>
+                        <ActivityIndicator size='small' />
+                        <Text style={style.t4}>{uploadProgress}%</Text>
+                      </View>
+                    }
+                  </View>
                   <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                     <Text style={style.t4}>
-                      Batch {batch['id']}{'\n'}
-                      Photos:{batch['num_photos']}
+                      Sightings: {batch['num_objects']}{'\n'}
+                      Photos: {batch['num_photos']}{'\n'}
+                      Uploaded: {batch['num_uploaded']}
                     </Text>
                     <View>
                       {batch['photo_path'] &&
@@ -101,42 +113,83 @@ export default class BatchScreen extends React.Component {
     );
   }
 
-  processPhotos() {
-    this.db.selectUnprocessedPhotos().then((photos) => {
-      for (photo of photos) {
-        let path = root + '/' + photo.path;
-        Upload.startUpload({
-          url: detectorUrl,
-          path: path,
-          type: 'multipart',
-          field: 'image',
-          parameters: {
-            'lat': photo['location_lat'],
-            'lon': photo['location_lon']
-          }
-        }).then((id) => {
-          Upload.addListener('completed', id, (data) => {
-            let r = JSON.parse(data.responseBody);
-            if (r.objects.length > 0) {
-              for (o of r.objects) {
-                o['lat'] = r['lat'];
-                o['lon'] = r['lon'];
-                o['time'] = r['time'];
-                o['photo_id'] = photo['id'];
-                o['location_id'] = photo['location_id'];
-                this.db.insertObject(o);
+  uploadPhotos() {
+    if (this.state.photosToUpload <= 0) {
+      this.db.selectPhotosToUpload().then((photos) => {
+        if (photos.length == 0) {
+          console.log("no photos to upload");
+          return;
+        }
+        this.setState({
+          photosToUpload: photos.length
+        }, () => {
+          for (photo of photos) {
+            let path = root + '/' + photo.path;
+            Upload.startUpload({
+              url: detectorUrl,
+              path: path,
+              type: 'multipart',
+              field: 'image',
+              parameters: {
+                'lat': photo['location_lat'],
+                'lon': photo['location_lon']
               }
-            }
-            this.db.processPhoto(photo['id']).then(() => {
-              // update progress on this.state.batches
-              console.log(photo['batch_id']);
+            }).then((id) => {
+              console.log("waiting for server: " + photo['id']);
+              Upload.addListener('error', id, (data) => {
+                console.log('error ' + photo['id']);
+                console.log(data);
+              });
+              Upload.addListener('completed', id, (data) => {
+                console.log('completed ' + photo['id']);
+                if (data.responseCode == 200) {
+                  this.db.setPhotoUploadId(photo['id'], data.responseBody).then(() => {
+                    let batchId = photo['batch_id'];
+                    this.setState(prevState => ({
+                      batches: prevState.batches.map((batch) => {
+                        if (batch['id'] === batchId) {
+                          batch['num_uploaded'] = batch['num_uploaded'] + 1;
+                        }
+                        return batch;
+                      }),
+                      photosToUpload: prevState.photosToUpload - 1
+                    }));
+                  });
+                }
+                /*
+                if (r.objects.length > 0) {
+                  for (o of r.objects) {
+                    o['lat'] = r['lat'];
+                    o['lon'] = r['lon'];
+                    o['time'] = r['time'];
+                    o['photo_id'] = photo['id'];
+                    o['location_id'] = photo['location_id'];
+                    this.db.insertObject(o);
+                  }
+                }
+                this.db.processPhoto(photo['id']).then(() => {
+                  let batchId = photo['batch_id'];
+                  this.setState(prevState => ({
+                    batches: prevState.batches.map((batch) => {
+                      if (batch['id'] === batchId) {
+                        batch['num_processed'] = batch['num_processed'] + 1;
+                        batch['num_objects'] = batch['num_objects'] + r.objects.length;
+                      }
+                      return batch;
+                    }),
+                    // the last photo in a batch should trigger more processing
+                    processDisabled: false
+                  }));
+                });
+                */
+              });
+            }).catch((err) => {
+              console.log(err);
             });
-          });
-        }).catch((err) => {
-          console.log('Upload error!', err);
+          }
         });
-      }
-    });
+      });
+    }
   }
 
   getPhotos(batchId) {

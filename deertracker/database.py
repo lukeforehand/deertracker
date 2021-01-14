@@ -66,6 +66,20 @@ class Connection:
         cur.execute("SELECT * FROM photo WHERE id = ?", [photo_id])
         return cur.fetchone()
 
+    def select_photo_objects(self, photo_id):
+        return [
+            self._object_from_tuple(obj)
+            for obj in self.conn.cursor()
+            .execute(
+                """
+                SELECT id, path, x, y, w, h, lat, lon, time, label, confidence, ground_truth, location_id, photo_id
+                FROM object WHERE photo_id = ?
+                """,
+                [photo_id],
+            )
+            .fetchall()
+        ]
+
     def insert_batch(self):
         batch_time = datetime.now()
         sql = "INSERT INTO batch(id, time) VALUES(NULL, ?)"

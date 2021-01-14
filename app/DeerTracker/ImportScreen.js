@@ -30,7 +30,6 @@ export default class ImportScreen extends React.Component {
   componentDidMount() {
     this.findFiles();
     this.checkFiles = setInterval(() => { this.findFiles() }, 3000);
-    console.log(this.props.navigation.dangerouslyGetParent());
   }
 
   componentWillUnmount() {

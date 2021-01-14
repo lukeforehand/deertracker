@@ -41,6 +41,13 @@ export default class Database {
                 (SELECT COUNT(*) FROM photo p
                 WHERE p.batch_id = b.id AND p.processed = TRUE)
                 AS num_processed,
+                (SELECT COUNT(*) FROM photo p
+                WHERE p.batch_id = b.id AND p.upload_id IS NOT NULL)
+                AS num_uploaded,
+                (SELECT COUNT(*) FROM object o
+                JOIN photo p ON o.photo_id = p.id
+                WHERE o.photo_id = p.id)
+                AS num_objects,
                 FIRST_VALUE(p.path) OVER (PARTITION BY b.id ORDER BY b.id DESC)
                 AS photo_path
             FROM batch b
@@ -57,22 +64,42 @@ export default class Database {
     async insertPhoto(id, path, batchId) {
         const db = await SQLite.openDatabase({ name: database, location: location });
         return await db.executeSql(
-            'INSERT INTO photo(id, path, processed, batch_id) VALUES(?, ?, FALSE, ?)',
+            'INSERT INTO photo(id, path, processed, upload_id, batch_id) VALUES(?, ?, FALSE, NULL, ?)',
             [id, path, batchId]);
     }
 
     async selectUnprocessedPhotos() {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql(
-            `SELECT p.*, l.id AS location_id, l.lat AS location_lat, l.lon AS location_lon
+            `SELECT p.*
             FROM photo p
             JOIN batch b ON b.id = p.batch_id
-            JOIN location l ON l.id = b.location_id
-            WHERE p.processed = FALSE
+            WHERE p.processed = FALSE AND p.upload_id IS NOT NULL
             ORDER BY p.batch_id ASC`);
         return rs.map((r) => {
             return r.rows.raw();
         })[0];
+    }
+
+    async selectPhotosToUpload() {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        rs = await db.executeSql(
+            `SELECT p.*, l.id AS location_id, l.lat AS location_lat, l.lon AS location_lon
+            FROM photo p
+            JOIN batch b ON b.id = p.batch_id
+            JOIN location l ON l.id = b.location_id
+            WHERE p.upload_id IS NULL
+            ORDER BY p.batch_id ASC`);
+        return rs.map((r) => {
+            return r.rows.raw();
+        })[0];
+    }
+
+    async setPhotoUploadId(photoId, uploadId) {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        return await db.executeSql(
+            'UPDATE photo SET upload_id = ? WHERE id = ?', [uploadId, photoId]
+        );
     }
 
     async processPhoto(photoId) {
@@ -129,10 +156,10 @@ export default class Database {
         return await db.executeSql(
             'INSERT INTO object(id, x, y, w, h, lat, lon, time, label, score, photo_id, location_id) VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
-                obj['bbox']['x'],
-                obj['bbox']['y'],
-                obj['bbox']['w'],
-                obj['bbox']['h'],
+                obj['x'],
+                obj['y'],
+                obj['w'],
+                obj['h'],
                 obj['lat'],
                 obj['lon'],
                 obj['time'],
@@ -169,6 +196,7 @@ CREATE TABLE IF NOT EXISTS photo (
     id CHARACTER(32) PRIMARY KEY NOT NULL,
     path VARCHAR(255) NOT NULL,
     processed BOOLEAN NOT NULL,
+    upload_id NULL,
     batch_id INTEGER,
     FOREIGN KEY(batch_id) REFERENCES batch(id)
 )

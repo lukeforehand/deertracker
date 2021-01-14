@@ -29,17 +29,51 @@ class Detector:
     Performs predictions using mega detector and defers to classifier
     """
 
-    def __init__(self):
-        from deertracker.detector import MegaDetector
+    # def __init__(self):
+    # from deertracker.detector import MegaDetector
 
-        self.detector = MegaDetector()
-        from deertracker.classifier import load_model as Classifier
+    # self.detector = MegaDetector()
+    # from deertracker.classifier import load_model as Classifier
 
-        self.classifier = Classifier()
-        self.labels = self.classifier.classes + list(self.detector.labels.values())
-        for label in self.labels:
-            (DEFAULT_CROP_STORE / label).mkdir(exist_ok=True)
-        self.pool = multiprocessing.Pool(10)
+    # self.classifier = Classifier()
+    # self.labels = self.classifier.classes + list(self.detector.labels.values())
+    # for label in self.labels:
+    #    (DEFAULT_CROP_STORE / label).mkdir(exist_ok=True)
+    # self.pool = multiprocessing.Pool(1)
+
+    def get(self, hash):
+        """
+        Gets the prediction result, if any, for the given photo hash (upload_id)
+        """
+        with database.conn() as db:
+            photo = db.select_photo(hash)
+            if photo is not None and photo["processed"]:
+                photo["objects"] = [
+                    {
+                        "x": obj["x"],
+                        "y": obj["y"],
+                        "w": obj["w"],
+                        "h": obj["h"],
+                        "lat": str(obj["lat"]),
+                        "lon": str(obj["lon"]),
+                        "time": obj["time"].timestamp() * 1000,
+                        "label": obj["label"],
+                        "score": str(obj["confidence"]),
+                    }
+                    for obj in db.select_photo_objects(hash)
+                ]
+            return photo
+
+    def upload(self, image: bytes, lat, lon):
+        photo_hash = hashlib.md5(image).hexdigest()
+        with database.conn() as db:
+            if db.select_photo(photo_hash) is not None:
+                return photo_hash
+        image = Image.open(io.BytesIO(image))
+        store_photo(photo_hash, image)
+        with database.conn() as db:
+            db.insert_photo((photo_hash, f"{photo_hash}.jpg", None))
+        return photo_hash
 
     def predict(self, image: bytes, confidence=0.98, lat=None, lon=None):
         """

@@ -169,7 +169,6 @@ export default StyleSheet.create({
     textAlign: 'left',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
     fontSize: 18,
-    padding: 10,
     height: 40
   },
 });
