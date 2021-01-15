@@ -127,24 +127,24 @@ export default class BatchScreen extends React.Component {
           photosToProcess: photos.length
         }, () => {
           for (photo of photos) {
-            fetch(detectorUrl + '/' + photo['id']).then((response) => {
+            fetch(detectorUrl + '/' + photo['upload_id']).then((response) => {
               if (response.status !== 200) {
-                console.log('server response ' + response.status + ' ' + photo['id']);
+                console.log('GET response ' + response.status + ' ' + photo['upload_id']);
                 this.setState(prevState => ({
                   photosToProcess: prevState.photosToProcess - 1
                 }));
                 return;
               }
               response.json().then((r) => {
-                console.log('server response ' + r);
-                if (!Boolean(r['processed'])) {
+                console.log('GET response ' + r);
+                if (!Boolean(r.processed)) {
                   this.setState(prevState => ({
                     photosToProcess: prevState.photosToProcess - 1
                   }));
                   return;
                 }
-                if (r['objects'].length > 0) {
-                  for (o of r['objects']) {
+                if (r.objects.length > 0) {
+                  for (o of r.objects) {
                     o['lat'] = photo['lat'];
                     o['lon'] = photo['lon'];
                     o['time'] = photo['time'];
@@ -209,18 +209,18 @@ export default class BatchScreen extends React.Component {
               });
               Upload.addListener('completed', id, (data) => {
                 if (data.responseCode !== 200) {
-                  console.log('server response ' + data.responseCode + ' ' + photo['id']);
+                  console.log('POST response ' + data.responseCode + ' ' + photo['id']);
                   this.setState(prevState => ({
                     photosToUpload: prevState.photosToUpload - 1
                   }));
                   return;
                 }
+                console.log('POST response ' + data.responseBody);
                 let r = JSON.parse(data.responseBody);
-                console.log('server response ' + r);
                 this.db.setPhotoUpload(
                   photo['id'],
-                  r['upload_id'],
-                  r['time']).then(() => {
+                  r.upload_id,
+                  r.time).then(() => {
                     let batchId = photo['batch_id'];
                     this.setState(prevState => ({
                       batches: prevState.batches.map((batch) => {
