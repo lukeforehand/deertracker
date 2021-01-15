@@ -136,7 +136,7 @@ export default class BatchScreen extends React.Component {
                 return;
               }
               response.json().then((r) => {
-                console.log('GET response ' + r);
+                console.log('GET response ' + JSON.stringify(r));
                 if (!Boolean(r.processed)) {
                   this.setState(prevState => ({
                     photosToProcess: prevState.photosToProcess - 1
