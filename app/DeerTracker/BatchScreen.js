@@ -129,22 +129,22 @@ export default class BatchScreen extends React.Component {
           for (photo of photos) {
             fetch(detectorUrl + '/' + photo['id']).then((response) => {
               if (response.status !== 200) {
-                console.log("not found: " + photo['id']);
+                console.log('server response ' + response.status + ' ' + photo['id']);
                 this.setState(prevState => ({
                   photosToProcess: prevState.photosToProcess - 1
                 }));
                 return;
               }
               response.json().then((r) => {
-                console.log(r);
-                if (!r.objects) {
+                console.log('server response ' + r);
+                if (!Boolean(r['processed'])) {
                   this.setState(prevState => ({
                     photosToProcess: prevState.photosToProcess - 1
                   }));
                   return;
                 }
-                if (r.objects.length > 0) {
-                  for (o of r.objects) {
+                if (r['objects'].length > 0) {
+                  for (o of r['objects']) {
                     o['lat'] = photo['lat'];
                     o['lon'] = photo['lon'];
                     o['time'] = photo['time'];
@@ -190,7 +190,7 @@ export default class BatchScreen extends React.Component {
           photosToUpload: photos.length
         }, () => {
           for (photo of photos) {
-            let path = root + '/' + photo.path;
+            let path = root + '/' + photo['path'];
             Upload.startUpload({
               url: detectorUrl,
               path: path,
@@ -201,31 +201,37 @@ export default class BatchScreen extends React.Component {
                 'lon': photo['location_lon']
               }
             }).then((id) => {
-              console.log("waiting for server: " + photo['id']);
               Upload.addListener('error', id, (data) => {
                 console.log('error ' + photo['id']);
-                console.log(data);
+                this.setState(prevState => ({
+                  photosToUpload: prevState.photosToUpload - 1
+                }));
               });
               Upload.addListener('completed', id, (data) => {
-                console.log('completed ' + photo['id']);
-                if (data.responseCode == 200) {
-                  let r = JSON.parse(data.responseBody);
-                  this.db.setPhotoUpload(
-                    photo['id'],
-                    r['upload_id'],
-                    r['time']).then(() => {
-                      let batchId = photo['batch_id'];
-                      this.setState(prevState => ({
-                        batches: prevState.batches.map((batch) => {
-                          if (batch['id'] === batchId) {
-                            batch['num_uploaded'] = batch['num_uploaded'] + 1;
-                          }
-                          return batch;
-                        }),
-                        photosToUpload: prevState.photosToUpload - 1
-                      }));
-                    });
+                if (data.responseCode !== 200) {
+                  console.log('server response ' + data.responseCode + ' ' + photo['id']);
+                  this.setState(prevState => ({
+                    photosToUpload: prevState.photosToUpload - 1
+                  }));
+                  return;
                 }
+                let r = JSON.parse(data.responseBody);
+                console.log('server response ' + r);
+                this.db.setPhotoUpload(
+                  photo['id'],
+                  r['upload_id'],
+                  r['time']).then(() => {
+                    let batchId = photo['batch_id'];
+                    this.setState(prevState => ({
+                      batches: prevState.batches.map((batch) => {
+                        if (batch['id'] === batchId) {
+                          batch['num_uploaded'] = batch['num_uploaded'] + 1;
+                        }
+                        return batch;
+                      }),
+                      photosToUpload: prevState.photosToUpload - 1
+                    }));
+                  });
               });
             }).catch((err) => {
               console.log(err);

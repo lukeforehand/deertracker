@@ -44,6 +44,7 @@ class Detector:
         is a bit different
         """
         bboxes, labels, scores = self.detector.predict(image)
+        print(f"{photo_hash} {bboxes}, {labels}, {scores}")
         r_bboxes = []
         r_labels = []
         r_scores = []
@@ -106,7 +107,6 @@ def process_crops(
                 )
         with database.conn() as db:
             db.update_unprocessed_photo(image_hash)
-            print(f"processed {image_hash}")
     except Exception as e:
         LOGGER.exception(e)
 

@@ -30,7 +30,8 @@ def start_detector(pool):
     while True:
         with database.conn() as db:
             photos = db.select_unprocessed_photos()
-        print(f"processing {len(photos)} photos")
+        if len(photos) > 0:
+            print(f"processing {len(photos)} photos")
         for photo in photos:
             photo_path = DEFAULT_PHOTO_STORE / photo["path"]
             image = Image.open(photo_path)
@@ -63,7 +64,9 @@ def start_server(port):
         lat = request.form["lat"]
         lon = request.form["lon"]
         image = request.files["image"]
-        return upload(image.read(), lat, lon)
+        photo = upload(image.read(), lat, lon)
+        print(f"sending response {photo}")
+        return jsonify(photo)
 
     @app.route(
         "/<upload_id>",
@@ -73,6 +76,7 @@ def start_server(port):
         photo = status(upload_id)
         if photo is None:
             raise NotFound()
+        print(f"sending response {photo}")
         return jsonify(photo)
 
     print(f"HTTP service starting on port {port}")
