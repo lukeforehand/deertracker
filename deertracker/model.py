@@ -38,7 +38,7 @@ class Detector:
         for label in self.labels:
             (DEFAULT_CROP_STORE / label).mkdir(exist_ok=True)
 
-    def predict(self, image: np.ndarray, photo_hash, confidence=0.98):
+    def predict(self, image: np.ndarray, photo_hash, confidence=0.50):
         """
         Runs predictions, but pads crops before storage (for training), and result data structure
         is a bit different
@@ -90,12 +90,12 @@ def process_crops(
                     (
                         crop_id,
                         crop_path,
-                        x,
-                        y,
-                        w,
-                        h,
-                        lat,
-                        lon,
+                        int(x),
+                        int(y),
+                        int(w),
+                        int(h),
+                        float(lat),
+                        float(lon),
                         image_time,
                         label,
                         float(score),

@@ -84,6 +84,7 @@ def start(port):
 @click.option("--photos", required=True, help="Location of photos to test")
 def test_server(port, photos):
     from datetime import datetime
+    import time
     import requests
 
     file_paths = find_files(photos)
@@ -97,11 +98,21 @@ def test_server(port, photos):
             ("lon", (None, str(lon))),
         )
         response = requests.post(f"http://localhost:{port}/", files=multipart_form_data)
-        response.raise_for_status()
+        if response.status_code == 200:
 
-        print(f"input: {file_path}")
-        print(f"result: {response.json()}")
-        print(f"took: {datetime.now() - now}")
+            r = response.json()
+
+            print(f"input: {file_path}")
+            print(f"result: {r}")
+            print(f"took: {datetime.now() - now}")
+
+            while True:
+                print(f"checking status of {r['upload_id']}")
+                response = requests.get(f"http://localhost:{port}/{r['upload_id']}")
+                if response.status_code == 200:
+                    print(response.json())
+                    break
+                time.sleep(3)
 
 
 # Labeling subcommands

@@ -145,6 +145,9 @@ export default class BatchScreen extends React.Component {
                 }
                 if (r.objects.length > 0) {
                   for (o of r.objects) {
+                    o['lat'] = photo['lat'];
+                    o['lon'] = photo['lon'];
+                    o['time'] = photo['time'];
                     o['photo_id'] = photo['id'];
                     o['location_id'] = photo['location_id'];
                     this.db.insertObject(o);

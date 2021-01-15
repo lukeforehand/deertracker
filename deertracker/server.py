@@ -6,8 +6,8 @@ import time
 
 from datetime import datetime
 from flask import Flask, jsonify, request
-from PIL import Image
-from werkzeug.exceptions import NotFound
+from PIL import Image, UnidentifiedImageError
+from werkzeug.exceptions import NotFound, BadRequest
 
 from deertracker import model, database, DEFAULT_PHOTO_STORE
 
@@ -33,8 +33,7 @@ def start_detector(pool):
         print(f"processing {len(photos)} photos")
         for photo in photos:
             photo_path = DEFAULT_PHOTO_STORE / photo["path"]
-            with open(photo_path, "rb") as image:
-                image = Image.open(io.BytesIO(image.read()))
+            image = Image.open(photo_path)
             image = np.array(image)
             bboxes, labels, scores = detector.predict(image, photo["id"])
             pool.apply_async(
@@ -93,10 +92,10 @@ def status(upload_id):
         with database.conn() as db:
             photo["objects"] = [
                 {
-                    "x": obj["x"],
-                    "y": obj["y"],
-                    "w": obj["w"],
-                    "h": obj["h"],
+                    "x": str(obj["x"]),
+                    "y": str(obj["y"]),
+                    "w": str(obj["w"]),
+                    "h": str(obj["h"]),
                     "label": obj["label"],
                     "score": str(obj["confidence"]),
                 }
@@ -106,15 +105,18 @@ def status(upload_id):
 
 
 def upload(image: bytes, lat, lon):
-    photo_hash = hashlib.md5(image).hexdigest()
-    file_path = f"{photo_hash}.jpg"
-    with database.conn() as db:
-        photo = db.select_photo(photo_hash)
-        if photo is not None:
-            return {"upload_id": photo_hash, "time": photo["time"]}
-    image = Image.open(io.BytesIO(image))
-    time = model.get_time(image)
-    model.store_photo(file_path, image)
-    with database.conn() as db:
-        db.insert_photo((photo_hash, file_path, lat, lon, time, None))
-    return {"upload_id": photo_hash, "time": time}
+    try:
+        image = Image.open(io.BytesIO(image))
+        photo_hash = hashlib.md5(image.tobytes()).hexdigest()
+        file_path = f"{photo_hash}.jpg"
+        with database.conn() as db:
+            photo = db.select_photo(photo_hash)
+            if photo is not None:
+                return {"upload_id": photo_hash, "time": photo["time"]}
+        time = model.get_time(image)
+        model.store_photo(file_path, image)
+        with database.conn() as db:
+            db.insert_photo((photo_hash, file_path, lat, lon, time, None))
+        return {"upload_id": photo_hash, "time": time}
+    except UnidentifiedImageError:
+        raise BadRequest()
