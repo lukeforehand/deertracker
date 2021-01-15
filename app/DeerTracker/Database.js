@@ -42,7 +42,7 @@ export default class Database {
                 WHERE p.batch_id = b.id AND p.processed = TRUE)
                 AS num_processed,
                 (SELECT COUNT(*) FROM photo p
-                WHERE p.batch_id = b.id AND p.upload_id IS NOT NULL)
+                WHERE p.batch_id = b.id AND (p.upload_id IS NOT NULL OR p.processed = TRUE))
                 AS num_uploaded,
                 (SELECT COUNT(*) FROM object o
                 JOIN photo p ON o.photo_id = p.id
@@ -89,7 +89,7 @@ export default class Database {
             FROM photo p
             JOIN batch b ON b.id = p.batch_id
             JOIN location l ON l.id = b.location_id
-            WHERE p.upload_id IS NULL
+            WHERE p.upload_id IS NULL AND p.processed = FALSE
             ORDER BY p.batch_id ASC, p.id ASC`);
         return rs.map((r) => {
             return r.rows.raw();

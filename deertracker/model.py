@@ -44,7 +44,6 @@ class Detector:
         is a bit different
         """
         bboxes, labels, scores = self.detector.predict(image)
-        print(f"{photo_hash} {bboxes}, {labels}, {scores}")
         r_bboxes = []
         r_labels = []
         r_scores = []

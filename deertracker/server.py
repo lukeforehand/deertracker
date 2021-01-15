@@ -36,7 +36,11 @@ def start_detector(pool):
             photo_path = DEFAULT_PHOTO_STORE / photo["path"]
             image = Image.open(photo_path)
             image = np.array(image)
+            now = datetime.now()
             bboxes, labels, scores = detector.predict(image, photo["id"])
+            print(
+                f"{photo['id']} {bboxes}, {labels}, {scores} took {datetime.now() - now} seconds"
+            )
             pool.apply_async(
                 model.process_crops,
                 (

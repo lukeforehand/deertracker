@@ -208,7 +208,7 @@ export default class BatchScreen extends React.Component {
                 }));
               });
               Upload.addListener('completed', id, (data) => {
-                if (data.responseCode !== 200) {
+                if (data.responseCode !== 200 && data.responseCode !== 400) {
                   console.log('POST response ' + data.responseCode + ' ' + photo['id']);
                   this.setState(prevState => ({
                     photosToUpload: prevState.photosToUpload - 1
@@ -216,22 +216,40 @@ export default class BatchScreen extends React.Component {
                   return;
                 }
                 console.log('POST response ' + data.responseBody);
-                let r = JSON.parse(data.responseBody);
-                this.db.setPhotoUpload(
-                  photo['id'],
-                  r.upload_id,
-                  r.time).then(() => {
+
+                // FIXME: unsure if allowing 400 is a good idea...
+                if (data.responseCode == 400) {
+                  this.db.processPhoto(photo['id']).then(() => {
                     let batchId = photo['batch_id'];
                     this.setState(prevState => ({
                       batches: prevState.batches.map((batch) => {
                         if (batch['id'] === batchId) {
                           batch['num_uploaded'] = batch['num_uploaded'] + 1;
+                          batch['num_processed'] = batch['num_processed'] + 1;
                         }
                         return batch;
                       }),
                       photosToUpload: prevState.photosToUpload - 1
                     }));
                   });
+                } else {
+                  let r = JSON.parse(data.responseBody);
+                  this.db.setPhotoUpload(
+                    photo['id'],
+                    r.upload_id,
+                    r.time).then(() => {
+                      let batchId = photo['batch_id'];
+                      this.setState(prevState => ({
+                        batches: prevState.batches.map((batch) => {
+                          if (batch['id'] === batchId) {
+                            batch['num_uploaded'] = batch['num_uploaded'] + 1;
+                          }
+                          return batch;
+                        }),
+                        photosToUpload: prevState.photosToUpload - 1
+                      }));
+                    });
+                }
               });
             }).catch((err) => {
               console.log(err);
