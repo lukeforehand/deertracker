@@ -37,9 +37,11 @@ def start_detector(pool):
             image = Image.open(photo_path)
             image = np.array(image)
             now = datetime.now()
-            bboxes, labels, scores = detector.predict(image, photo["id"])
+            bboxes, labels, scores, label_arrays, score_arrays = detector.predict(
+                image, photo["id"]
+            )
             print(
-                f"{photo['id']} {bboxes}, {labels}, {scores} took {datetime.now() - now} seconds"
+                f"{photo['id']} {bboxes}, {labels}, {scores} {label_arrays} {score_arrays} took {datetime.now() - now} seconds"
             )
             pool.apply_async(
                 model.process_crops,
@@ -47,6 +49,8 @@ def start_detector(pool):
                     bboxes,
                     labels,
                     scores,
+                    label_arrays,
+                    score_arrays,
                     image,
                     photo["lat"],
                     photo["lon"],
@@ -67,8 +71,9 @@ def start_server(port):
     def post():
         lat = request.form["lat"]
         lon = request.form["lon"]
+        rescore = request.form.get("rescore", False)
         image = request.files["image"]
-        photo = upload(image.read(), lat, lon)
+        photo = upload(image.read(), lat, lon, rescore)
         print(f"sending response {photo}")
         return jsonify(photo)
 
@@ -105,14 +110,16 @@ def status(upload_id):
                     "w": str(obj["w"]),
                     "h": str(obj["h"]),
                     "label": obj["label"],
-                    "score": str(obj["confidence"]),
+                    "label_array": obj["label_array"],
+                    "score": str(obj["score"]),
+                    "score": obj["score_array"],
                 }
                 for obj in db.select_photo_objects(upload_id)
             ]
     return photo
 
 
-def upload(image: bytes, lat, lon):
+def upload(image: bytes, lat, lon, rescore=False):
     try:
         image = Image.open(io.BytesIO(image))
         photo_hash = hashlib.md5(image.tobytes()).hexdigest()
@@ -120,6 +127,9 @@ def upload(image: bytes, lat, lon):
         with database.conn() as db:
             photo = db.select_photo(photo_hash)
             if photo is not None:
+                if rescore:
+                    db.update_photo(photo_hash, processed=False)
+                    db.delete_objects(photo_hash)
                 return {"upload_id": photo_hash, "time": photo["time"]}
         time = model.get_time(image)
         model.store_photo(file_path, image)

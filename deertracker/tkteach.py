@@ -379,7 +379,7 @@ class tkteach:
 
         new_image_path = f"{label}/100_{image_id}.jpg"
         self.cursor.execute(
-            "UPDATE object SET path = ?, label = ?, confidence = 1.0, ground_truth = TRUE WHERE id = ?",
+            "UPDATE object SET path = ?, label = ?, score = 1.0, ground_truth = TRUE WHERE id = ?",
             (new_image_path, label, image_id),
         )
         (self.ds / image_path).replace(self.ds / new_image_path)

@@ -57,12 +57,16 @@ class PhotoProcessor:
                 image.tobytes(), self.location["lat"], self.location["lon"]
             )
             image = np.array(image)
-            bboxes, labels, scores = self.detector.predict(image, photo["upload_id"])
+            bboxes, labels, scores, label_arrays, score_arrays = self.detector.predict(
+                image, photo["upload_id"]
+            )
             model.process_crops(
                 (
                     bboxes,
                     labels,
                     scores,
+                    label_arrays,
+                    score_arrays,
                     image,
                     self.location["lat"],
                     self.location["lon"],

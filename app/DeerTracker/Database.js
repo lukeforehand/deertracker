@@ -90,7 +90,8 @@ export default class Database {
             JOIN batch b ON b.id = p.batch_id
             JOIN location l ON l.id = b.location_id
             WHERE p.upload_id IS NULL AND p.processed = FALSE
-            ORDER BY p.batch_id ASC, p.id ASC`);
+            ORDER BY p.batch_id ASC, p.id ASC
+            LIMIT 20`);
         return rs.map((r) => {
             return r.rows.raw();
         })[0];
@@ -98,10 +99,14 @@ export default class Database {
 
     async setPhotoUpload(photoId, uploadId, time) {
         const db = await SQLite.openDatabase({ name: database, location: location });
-        return await db.executeSql(
+        db.executeSql(
             'UPDATE photo SET upload_id = ?, time = ? WHERE id = ?',
             [uploadId, time, photoId]
         );
+        rs = await db.executeSql('SELECT * from photo WHERE id = ?', [photoId]);
+        return rs.map((r) => {
+            return r.rows.raw();
+        })[0][0];
     }
 
     async processPhoto(photoId) {
@@ -114,6 +119,21 @@ export default class Database {
     async selectBatchPhotos(batchId) {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql('SELECT * FROM photo WHERE batch_id = ?', [batchId]);
+        return rs.map((r) => {
+            return r.rows.raw();
+        })[0];
+    }
+
+    async selectObjects() {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        rs = await db.executeSql(`
+        SELECT
+            STRFTIME('%Y-%m-%d', o.time) AS day, o.label, o.photo_id, p.path
+            COUNT(*) AS num_objects
+        FROM object o JOIN photo p ON p.id = o.photo_id
+        GROUP BY o.label, day
+        ORDER BY o.time DESC
+        `);
         return rs.map((r) => {
             return r.rows.raw();
         })[0];
@@ -156,7 +176,8 @@ export default class Database {
     async insertObject(obj) {
         const db = await SQLite.openDatabase({ name: database, location: location });
         return await db.executeSql(
-            'INSERT INTO object(id, x, y, w, h, lat, lon, time, label, score, photo_id, location_id) VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            `INSERT INTO object(id, x, y, w, h, lat, lon, time, label, label_array, score, score_array, photo_id, location_id)
+            VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 obj['x'],
                 obj['y'],
@@ -166,7 +187,9 @@ export default class Database {
                 obj['lon'],
                 obj['time'],
                 obj['label'],
+                obj['label_array'],
                 obj['score'],
+                obj['score_array'],
                 obj['photo_id'],
                 obj['location_id'],
             ]
@@ -218,7 +241,9 @@ CREATE TABLE IF NOT EXISTS object (
     lon FLOAT NOT NULL,
     time DATETIME NOT NULL,
     label VARCHAR(255) NOT NULL,
+    label_array VARCHAR(255) NOT NULL,
     score FLOAT NOT NULL,
+    score_array VARCHAR(255) NOT NULL,
     photo_id CHARACTER(32) NOT NULL,
     location_id INTEGER NOT NULL,
     FOREIGN KEY(photo_id) REFERENCES photo(id),

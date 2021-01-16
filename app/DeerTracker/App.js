@@ -10,6 +10,7 @@ import ImportScreen from './ImportScreen';
 
 import BatchScreen from './BatchScreen';
 import PhotoScreen from './PhotoScreen';
+import SightingScreen from './SightingScreen';
 
 const ImportScreenNavigator = createStackNavigator({
   LocationScreen: {
@@ -68,6 +69,19 @@ const BatchScreenNavigator = createStackNavigator({
   }
 });
 
+const SightingScreenNavigator = createStackNavigator({
+  SightingScreen: {
+    screen: SightingScreen,
+    navigationOptions: {
+      title: 'Sightings',
+      headerTitleStyle: {
+        fontSize: 20
+      },
+      headerTitleAlign: 'center'
+    },
+  }
+});
+
 const TabNavigator = createBottomTabNavigator(
   {
     Import: {
@@ -84,16 +98,16 @@ const TabNavigator = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: 'Card History',
         tabBarIcon: ({ tintColor }) => (
-          <Icon name='history' color={tintColor} size={20} />
+          <Icon name='camera' color={tintColor} size={20} />
         )
       }
     },
-    Photos: {
-      screen: BatchScreenNavigator,
+    Sightings: {
+      screen: SightingScreenNavigator,
       navigationOptions: {
-        tabBarLabel: 'Photos',
+        tabBarLabel: 'Sightings',
         tabBarIcon: ({ tintColor }) => (
-          <Icon name='camera' color={tintColor} size={20} />
+          <Icon name='eye' color={tintColor} size={20} />
         )
       },
     },

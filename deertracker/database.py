@@ -102,9 +102,9 @@ class Connection:
             .fetchall()
         ]
 
-    def update_unprocessed_photo(self, photo_id):
+    def update_photo(self, photo_id, processed=True):
         self.conn.cursor().execute(
-            "UPDATE photo SET processed = TRUE WHERE id = ?", [photo_id]
+            "UPDATE photo SET processed = ? WHERE id = ?", [processed, photo_id]
         )
 
     def select_photo_objects(self, photo_id):
@@ -113,7 +113,7 @@ class Connection:
             for obj in self.conn.cursor()
             .execute(
                 """
-                SELECT id, path, x, y, w, h, lat, lon, time, label, confidence, ground_truth, location_id, photo_id
+                SELECT id, path, x, y, w, h, lat, lon, time, label, label_array, score, score_array, ground_truth, location_id, photo_id
                 FROM object WHERE photo_id = ?
                 """,
                 [photo_id],
@@ -146,11 +146,15 @@ class Connection:
         except sqlite3.IntegrityError:
             return {"error": f"Photo `{photo[1]}` already exists."}
 
+    def delete_objects(self, photo_id):
+        cur = self.conn.cursor()
+        cur.execute("DELETE FROM object where photo_id = ?", [photo_id])
+
     def insert_object(self, obj):
         try:
             sql = """
-                INSERT INTO object(id, path, x, y, w, h, lat, lon, time, label, confidence, ground_truth, photo_id, location_id)
-                VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO object(id, path, x, y, w, h, lat, lon, time, label, label_array, score, score_array, ground_truth, photo_id, location_id)
+                VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """
             cur = self.conn.cursor()
             cur.execute(sql, obj)
@@ -165,10 +169,12 @@ class Connection:
                 "lon": obj[7],
                 "time": obj[8],
                 "label": obj[9],
-                "confidence": obj[10],
-                "ground_truth": obj[11],
-                "photo_id": obj[12],
-                "location_id": obj[13],
+                "label_array": obj[10],
+                "score": obj[11],
+                "score_array": obj[12],
+                "ground_truth": obj[13],
+                "photo_id": obj[14],
+                "location_id": obj[15],
             }
         except sqlite3.IntegrityError:
             return {"error": f"Object `{obj[1]}` already exists."}
@@ -179,7 +185,7 @@ class Connection:
             for obj in self.conn.cursor()
             .execute(
                 """
-                    SELECT id, path, x, y, w, h, lat, lon, time, label, confidence, ground_truth, location_id, photo_id
+                    SELECT id, path, x, y, w, h, lat, lon, time, label, label_array, score, score_array, ground_truth, location_id, photo_id
                     FROM object WHERE ground_truth IS TRUE AND label NOT IN ('animal', 'vehicle', 'person')
                 """
             )
@@ -200,10 +206,12 @@ class Connection:
             "lon": obj[7],
             "time": obj[8],
             "label": obj[9],
-            "confidence": obj[10],
-            "ground_truth": obj[11],
-            "location_id": obj[12],
-            "photo_id": obj[13],
+            "label_array": obj[10],
+            "score": obj[11],
+            "score_array": obj[12],
+            "ground_truth": obj[13],
+            "location_id": obj[14],
+            "photo_id": obj[15],
         }
 
     def training_dataset_report(self):

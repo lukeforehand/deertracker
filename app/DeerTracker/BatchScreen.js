@@ -43,10 +43,12 @@ export default class BatchScreen extends React.Component {
 
   componentDidMount() {
     this.fetchData();
-    this.uploadPhotos();
-    this.processPhotos();
-    this.checkUploads = setInterval(() => { this.uploadPhotos() }, 3000);
-    this.checkProcess = setInterval(() => { this.processPhotos() }, 3000);
+    this.uploadPhotos().then(() => {
+      this.checkUploads = setInterval(() => { this.uploadPhotos() }, 500);
+    });
+    this.processPhotos().then(() => {
+      this.checkProcess = setInterval(() => { this.processPhotos() }, 5000);
+    });
   }
 
   componentWillUnmount() {
@@ -100,7 +102,7 @@ export default class BatchScreen extends React.Component {
                       Sightings: {batch['num_objects']}{'\n'}
                       Photos: {batch['num_photos']}{'\n'}
                       Uploaded: {batch['num_uploaded']}{'\n'}
-                      Processed: {batch['num_processed']}{'\n'}
+                      Processed: {batch['num_processed']}
                     </Text>
                     <View>
                       {batch['photo_path'] &&
@@ -117,146 +119,132 @@ export default class BatchScreen extends React.Component {
     );
   }
 
-  processPhotos() {
+  async processPhotos() {
     if (this.state.photosToProcess <= 0) {
-      this.db.selectPhotosToProcess().then((photos) => {
-        if (photos.length == 0) {
+      const photos = await this.db.selectPhotosToProcess();
+      if (photos.length == 0) {
+        return;
+      }
+      this.setState({
+        photosToProcess: photos.length
+      });
+      for (p of photos) {
+        let photo = p;
+        try {
+          let response = await fetch(detectorUrl + '/' + photo['upload_id']);
+          console.log(photo['id'] + ' GET ' + response.status);
+          if (response.status !== 200) {
+            this.setState(prevState => ({
+              photosToProcess: 0
+            }));
+            return;
+          }
+          let r = await response.json();
+          console.log(photo['id'] + ' responseBody: ' + JSON.stringify(r));
+          if (!Boolean(r.processed)) {
+            this.setState(prevState => ({
+              photosToProcess: 0
+            }));
+            return;
+          }
+          if (r.objects.length > 0) {
+            for (o of r.objects) {
+              o['lat'] = photo['lat'];
+              o['lon'] = photo['lon'];
+              o['time'] = photo['time'];
+              o['photo_id'] = photo['id'];
+              o['location_id'] = photo['location_id'];
+              this.db.insertObject(o);
+            }
+          }
+          this.db.processPhoto(photo['id']).then(() => {
+            let batchId = photo['batch_id'];
+            this.setState(prevState => ({
+              batches: prevState.batches.map((batch) => {
+                if (batch['id'] === batchId) {
+                  batch['num_processed'] = batch['num_processed'] + 1;
+                  batch['num_objects'] = batch['num_objects'] + r.objects.length;
+                }
+                return batch;
+              }),
+              photosToProcess: prevState.photosToProcess - 1
+            }));
+          });
+        } catch (err) {
+          console.log(err);
+          this.setState(prevState => ({
+            photosToProcess: 0
+          }));
           return;
         }
-        this.setState({
-          photosToProcess: photos.length
-        }, () => {
-          for (photo of photos) {
-            fetch(detectorUrl + '/' + photo['upload_id']).then((response) => {
-              if (response.status !== 200) {
-                console.log('GET response ' + response.status + ' ' + photo['upload_id']);
-                this.setState(prevState => ({
-                  photosToProcess: prevState.photosToProcess - 1
-                }));
-                return;
-              }
-              response.json().then((r) => {
-                console.log('GET response ' + JSON.stringify(r));
-                if (!Boolean(r.processed)) {
-                  this.setState(prevState => ({
-                    photosToProcess: prevState.photosToProcess - 1
-                  }));
-                  return;
-                }
-                if (r.objects.length > 0) {
-                  for (o of r.objects) {
-                    o['lat'] = photo['lat'];
-                    o['lon'] = photo['lon'];
-                    o['time'] = photo['time'];
-                    o['photo_id'] = photo['id'];
-                    o['location_id'] = photo['location_id'];
-                    this.db.insertObject(o);
-                  }
-                }
-                this.db.processPhoto(photo['id']).then(() => {
-                  let batchId = photo['batch_id'];
-                  this.setState(prevState => ({
-                    batches: prevState.batches.map((batch) => {
-                      if (batch['id'] === batchId) {
-                        batch['num_processed'] = batch['num_processed'] + 1;
-                        batch['num_objects'] = batch['num_objects'] + r.objects.length;
-                      }
-                      return batch;
-                    }),
-                    photosToProcess: prevState.photosToProcess - 1
-                  }));
-                });
-              });
-            }).catch((err) => {
-              console.log(err);
-              this.setState(prevState => ({
-                photosToProcess: prevState.photosToProcess - 1
-              }));
-              return;
-            });
-          }
-        });
-      });
+      }
     }
   }
 
-  uploadPhotos() {
+  async uploadPhotos() {
     if (this.state.photosToUpload <= 0) {
-      this.db.selectPhotosToUpload().then((photos) => {
-        if (photos.length == 0) {
-          return;
-        }
-        this.setState({
-          photosToUpload: photos.length
-        }, () => {
-          for (photo of photos) {
-            let path = root + '/' + photo['path'];
-            Upload.startUpload({
-              url: detectorUrl,
-              path: path,
-              type: 'multipart',
-              field: 'image',
-              parameters: {
-                'lat': photo['location_lat'],
-                'lon': photo['location_lon']
-              }
-            }).then((id) => {
-              Upload.addListener('error', id, (data) => {
-                console.log('error ' + photo['id']);
+      const photos = await this.db.selectPhotosToUpload();
+      if (photos.length == 0) {
+        return;
+      }
+      this.setState({
+        photosToUpload: photos.length
+      });
+      for (p of photos) {
+        let photo = p;
+        Upload.cancelUpload(photo['id']);
+        Upload.startUpload({
+          url: detectorUrl,
+          path: root + '/' + photo['path'],
+          type: 'multipart',
+          customUploadId: photo['id'],
+          field: 'image',
+          parameters: {
+            'lat': photo['location_lat'],
+            'lon': photo['location_lon'],
+            // FIXME: remove when not developing
+            'rescore': true
+          }
+        }).then((photoId) => {
+          Upload.addListener('error', photoId, (err) => {
+            console.log(photoId + ' ' + JSON.stringify(err));
+            this.setState(prevState => ({
+              photosToUpload: prevState.photosToUpload - 1
+            }));
+          });
+          Upload.addListener('completed', photoId, (data) => {
+            console.log(photoId + ' ' + ' POST ' + data.responseCode);
+            if (data.responseCode !== 200 || data.responseBody === null) {
+              console.log(photoId + ' responseBody: ' + data.responseBody);
+              this.setState(prevState => ({
+                photosToUpload: prevState.photosToUpload - 1
+              }));
+              return;
+            }
+            let r = JSON.parse(data.responseBody);
+            this.db.setPhotoUpload(
+              photoId,
+              r.upload_id,
+              r.time).then((uploadedPhoto) => {
+                let batchId = uploadedPhoto['batch_id'];
                 this.setState(prevState => ({
+                  batches: prevState.batches.map((batch) => {
+                    if (batch['id'] === batchId) {
+                      batch['num_uploaded'] = batch['num_uploaded'] + 1;
+                    }
+                    return batch;
+                  }),
                   photosToUpload: prevState.photosToUpload - 1
                 }));
               });
-              Upload.addListener('completed', id, (data) => {
-                if (data.responseCode !== 200 && data.responseCode !== 400) {
-                  console.log('POST response ' + data.responseCode + ' ' + photo['id']);
-                  this.setState(prevState => ({
-                    photosToUpload: prevState.photosToUpload - 1
-                  }));
-                  return;
-                }
-                console.log('POST response ' + data.responseBody);
-
-                // FIXME: unsure if allowing 400 is a good idea...
-                if (data.responseCode == 400) {
-                  this.db.processPhoto(photo['id']).then(() => {
-                    let batchId = photo['batch_id'];
-                    this.setState(prevState => ({
-                      batches: prevState.batches.map((batch) => {
-                        if (batch['id'] === batchId) {
-                          batch['num_uploaded'] = batch['num_uploaded'] + 1;
-                          batch['num_processed'] = batch['num_processed'] + 1;
-                        }
-                        return batch;
-                      }),
-                      photosToUpload: prevState.photosToUpload - 1
-                    }));
-                  });
-                } else {
-                  let r = JSON.parse(data.responseBody);
-                  this.db.setPhotoUpload(
-                    photo['id'],
-                    r.upload_id,
-                    r.time).then(() => {
-                      let batchId = photo['batch_id'];
-                      this.setState(prevState => ({
-                        batches: prevState.batches.map((batch) => {
-                          if (batch['id'] === batchId) {
-                            batch['num_uploaded'] = batch['num_uploaded'] + 1;
-                          }
-                          return batch;
-                        }),
-                        photosToUpload: prevState.photosToUpload - 1
-                      }));
-                    });
-                }
-              });
-            }).catch((err) => {
-              console.log(err);
-            });
-          }
+          });
+        }).catch((err) => {
+          console.log(err);
+          this.setState(prevState => ({
+            photosToUpload: prevState.photosToUpload - 1
+          }));
         });
-      });
+      }
     }
   }
 

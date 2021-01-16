@@ -1,6 +1,7 @@
 from datetime import datetime
 import hashlib
 import io
+import json
 import numpy as np
 import pathlib
 import tarfile
@@ -38,7 +39,7 @@ class Detector:
         for label in self.labels:
             (DEFAULT_CROP_STORE / label).mkdir(exist_ok=True)
 
-    def predict(self, image: np.ndarray, photo_hash, confidence=0.50):
+    def predict(self, image: np.ndarray, photo_hash, confidence=0.97):
         """
         Runs predictions, but pads crops before storage (for training), and result data structure
         is a bit different
@@ -47,6 +48,8 @@ class Detector:
         r_bboxes = []
         r_labels = []
         r_scores = []
+        r_label_arrays = []
+        r_score_arrays = []
         for bbox, label, score in zip(bboxes, labels, scores):
             x = bbox[0]
             y = bbox[1]
@@ -56,23 +59,41 @@ class Detector:
                 max(y, 0) : min(y + h, image.shape[0]),
                 max(x, 0) : min(x + w, image.shape[1]),
             ]
+            score_array = np.array([score])
+            label_array = np.array([label])
             if label == "animal":
-                predictions = self.classifier.predict(crop)
-                high_score = np.argmax(predictions)
-                score = predictions[high_score]
-                label = self.classifier.classes[high_score]
+                score_array = self.classifier.predict(crop)
+                top_idx = np.argsort(-score_array)[:3]
+                score_array = score_array[[top_idx]]
+                label_array = np.array(self.classifier.classes)[top_idx]
+                high_score = np.argmax(score_array)
+                score = score_array[high_score]
+                label = label_array[high_score]
             if score > confidence:
                 r_bboxes.append((int(x), int(y), int(w), int(h)))
                 r_labels.append(label)
                 r_scores.append(float(score))
-        return r_bboxes, r_labels, r_scores
+                r_score_arrays.append(score_array.tolist())
+                r_label_arrays.append(label_array.tolist())
+        return r_bboxes, r_labels, r_scores, r_label_arrays, r_score_arrays
 
 
 def process_crops(
-    bboxes, labels, scores, image: np.ndarray, lat, lon, image_time, image_hash
+    bboxes,
+    labels,
+    scores,
+    label_arrays,
+    score_arrays,
+    image: np.ndarray,
+    lat,
+    lon,
+    image_time,
+    image_hash,
 ):
     try:
-        for bbox, label, score in zip(bboxes, labels, scores):
+        for bbox, label, score, label_array, score_array in zip(
+            bboxes, labels, scores, label_arrays, score_arrays
+        ):
             x, y, w, h = bbox
             pw = max(int(w * 0.01), 10)
             ph = max(int(h * 0.01), 10)
@@ -98,14 +119,16 @@ def process_crops(
                         float(lon),
                         image_time,
                         label,
+                        json.dumps(label_array),
                         float(score),
+                        json.dumps(score_array),
                         False,
                         image_hash,
                         None,
                     )
                 )
         with database.conn() as db:
-            db.update_unprocessed_photo(image_hash)
+            db.update_photo(image_hash, processed=True)
     except Exception as e:
         LOGGER.exception(e)
 
