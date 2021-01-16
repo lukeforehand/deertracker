@@ -79,7 +79,11 @@ export default class BatchScreen extends React.Component {
           {this.state.batches.map((batch) => {
             let progress = parseInt(100 * ((batch['num_uploaded'] + batch['num_processed']) / (batch['num_photos'] * 2)));
             return (
-              <SwipeRow key={batch['id']} item={batch} onDelete={this.deleteBatch.bind(this)}>
+              <SwipeRow
+                key={batch['id']}
+                item={batch}
+                onDelete={this.deleteBatch.bind(this)}
+                onArchive={this.archiveBatch.bind(this)}>
                 <TouchableOpacity
                   key={batch['id']}
                   style={style.locationButton}
@@ -262,9 +266,22 @@ export default class BatchScreen extends React.Component {
     });
   }
 
+  archiveBatch(batch, callback) {
+    Alert.alert(
+      `Archive ${batch['num_photos']} Photo(s) ?`, '', [
+      {
+        text: 'Yes',
+        onPress: () => {
+          alert("todo");
+          callback();
+        }
+      },
+      { text: 'No', onPress: callback }], { cancelable: false });
+  }
+
   deleteBatch(batch, callback) {
     Alert.alert(
-      'Delete Batch ' + batch['id'] + '?', '', [
+      `Permanently Delete ${batch['num_photos']} Photo(s) ?`, '', [
       {
         text: 'Yes',
         onPress: () => {

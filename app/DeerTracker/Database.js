@@ -14,6 +14,11 @@ export default class Database {
                 tx.executeSql(CREATE_TABLE_BATCH);
                 tx.executeSql(CREATE_TABLE_PHOTO);
                 tx.executeSql(CREATE_TABLE_OBJECT);
+                tx.executeSql(CREATE_TABLE_CONFIG);
+                tx.executeSql(`INSERT INTO config (key, value) SELECT 'discard_empty', 'true' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'discard_empty')`);
+                tx.executeSql(`INSERT INTO config (key, value) SELECT 'auto_archive', 'false' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'auto_archive')`);
+                tx.executeSql(`INSERT INTO config (key, value) SELECT 'auto_archive_days', '30' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'auto_archive_days')`);
+                tx.executeSql(`INSERT INTO config (key, value) SELECT 'google_drive_key', 'password' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'google_drive_key')`);
             });
         });
     }
@@ -196,6 +201,22 @@ export default class Database {
         );
     }
 
+    async selectConfig() {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        rs = await db.executeSql('SELECT * FROM config');
+        return rs.map((r) => {
+            return r.rows.raw();
+        })[0];
+    }
+
+    async updateConfig(key, value) {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        rs = await db.executeSql('UPDATE config SET value = ? WHERE key = ?', [value, key]);
+        return rs.map((r) => {
+            return r.rows.raw();
+        })[0];
+    }
+
 }
 
 CREATE_TABLE_LOCATION = `
@@ -248,5 +269,12 @@ CREATE TABLE IF NOT EXISTS object (
     location_id INTEGER NOT NULL,
     FOREIGN KEY(photo_id) REFERENCES photo(id),
     FOREIGN KEY(location_id) REFERENCES location(id)
+)
+`
+
+CREATE_TABLE_CONFIG = `
+CREATE TABLE IF NOT EXISTS config (
+    key VARCHAR(255) PRIMARY KEY NOT NULL,
+    value VARCHAR(255) NOT NULL
 )
 `

@@ -6,13 +6,13 @@ import { RectButton } from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 export default class SwipeRow extends Component {
-  renderRightAction = (onDelete, item, text, color, x, progress) => {
+  renderRightAction = (onPress, item, text, color, x, progress) => {
     const trans = progress.interpolate({
       inputRange: [0, 1],
       outputRange: [x, 0],
     });
     const pressHandler = () => {
-      onDelete(item, this.close);
+      onPress(item, this.close);
     };
     return (
       <Animated.View style={{ flex: 1, transform: [{ translateX: trans }] }}>
@@ -27,11 +27,14 @@ export default class SwipeRow extends Component {
   renderRightActions = progress => (
     <View
       style={{
-        width: 100,
+        width: 200,
         flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
       }}>
       {this.renderRightAction(
         this.props.onDelete, this.props.item, 'Delete', 'darkred', 64, progress
+      )}
+      {this.renderRightAction(
+        this.props.onArchive, this.props.item, 'Archive', 'darkgreen', 64, progress
       )}
     </View>
   );
@@ -48,7 +51,6 @@ export default class SwipeRow extends Component {
         ref={this.updateRef}
         friction={2}
         enableTrackpadTwoFingerGesture
-        rightThreshold={40}
         renderRightActions={this.renderRightActions}>
         {children}
       </Swipeable>
@@ -59,7 +61,7 @@ export default class SwipeRow extends Component {
 const styles = StyleSheet.create({
   actionText: {
     color: 'white',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
     backgroundColor: 'transparent',
     padding: 10,

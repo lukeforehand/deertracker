@@ -11,6 +11,7 @@ import ImportScreen from './ImportScreen';
 import BatchScreen from './BatchScreen';
 import PhotoScreen from './PhotoScreen';
 import SightingScreen from './SightingScreen';
+import ConfigScreen from './ConfigScreen';
 
 const ImportScreenNavigator = createStackNavigator({
   LocationScreen: {
@@ -82,6 +83,20 @@ const SightingScreenNavigator = createStackNavigator({
   }
 });
 
+const ConfigScreenNavigator = createStackNavigator({
+  SightingScreen: {
+    screen: ConfigScreen,
+    navigationOptions: {
+      title: 'Settings',
+      headerTitleStyle: {
+        fontSize: 20
+      },
+      headerTitleAlign: 'center'
+    },
+  }
+});
+
+
 const TabNavigator = createBottomTabNavigator(
   {
     Import: {
@@ -108,6 +123,15 @@ const TabNavigator = createBottomTabNavigator(
         tabBarLabel: 'Sightings',
         tabBarIcon: ({ tintColor }) => (
           <Icon name='eye' color={tintColor} size={20} />
+        )
+      },
+    },
+    Settings: {
+      screen: ConfigScreenNavigator,
+      navigationOptions: {
+        tabBarLabel: 'Settings',
+        tabBarIcon: ({ tintColor }) => (
+          <Icon name='cog' color={tintColor} size={20} />
         )
       },
     },
