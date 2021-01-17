@@ -44,41 +44,42 @@ export default class ConfigScreen extends React.Component {
     let config = this.state.config;
     return (
       <SafeAreaView>
-        <ScrollView style={{ height: '100%' }}>
-          <View style={style.input}>
-            <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={style.h2}>Discard Empty Photos:</Text>
-              <Switch
-                trackColor={{ false: '#767577', true: 'darkred' }}
-                onValueChange={(v) => this.toggle('discard_empty', v)}
-                value={config.get('discard_empty') == 'true'}
-              />
-            </View>
-            <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={style.h2}>Auto Archive Photos:</Text>
-              <Switch
-                trackColor={{ false: '#767577', true: 'darkred' }}
-                onValueChange={(v) => this.toggle('auto_archive', v)}
-                value={config.get('auto_archive') == 'true'}
-              />
-            </View>
-            {config.get('auto_archive') == 'true' &&
+        <View style={style.input}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Text style={style.h2}>Discard Empty Photos:</Text>
+            <Switch
+              trackColor={{ false: '#767577', true: 'darkred' }}
+              onValueChange={(v) => this.toggle('discard_empty', v)}
+              value={config.get('discard_empty') == 'true'}
+            />
+          </View>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Text style={style.h2}>Auto Archive Photos:</Text>
+            <Switch
+              trackColor={{ false: '#767577', true: 'darkred' }}
+              onValueChange={(v) => this.toggle('auto_archive', v)}
+              value={config.get('auto_archive') == 'true'}
+            />
+          </View>
+          {config.get('auto_archive') == 'true' &&
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <Picker
                 selectedValue={config.get('auto_archive_days')}
-                style={{ height: 50, width: 100 }}
+                style={{ width: '100%' }}
+                itemStyle={{ height: 80 }}
                 onValueChange={(itemValue, itemIndex) => this.pickArchiveDays(itemValue)}>
                 <Picker.Item label="3 days" value="3" />
                 <Picker.Item label="1 week" value="7" />
                 <Picker.Item label="2 weeks" value="14" />
                 <Picker.Item label="1 month" value="30" />
               </Picker>
-            }
-            <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={style.h2}>Google Drive Key:</Text>
-              <TextInput secureTextEntry={true} style={style.h2}>{config.get('google_drive_key')}</TextInput>
             </View>
+          }
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Text style={style.h2}>Google Drive Key:</Text>
+            <TextInput secureTextEntry={true} style={style.h2}>{config.get('google_drive_key')}</TextInput>
           </View>
-        </ScrollView >
+        </View>
       </SafeAreaView >
     );
   }
@@ -96,16 +97,10 @@ export default class ConfigScreen extends React.Component {
   }
 
   fetchData() {
-    this.setState({
-      isLoading: true
-    });
     this.db.selectConfig().then((config) => {
-      let configMap = new Map(config.map((c) => {
-        return [c['key'], c['value']];
-      }));
       this.setState({
         isLoading: false,
-        config: configMap
+        config: config
       });
     }).catch((error) => {
       console.log(error);

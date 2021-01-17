@@ -44,7 +44,7 @@ export default class BatchScreen extends React.Component {
   componentDidMount() {
     this.fetchData();
     this.uploadPhotos().then(() => {
-      this.checkUploads = setInterval(() => { this.uploadPhotos() }, 500);
+      this.checkUploads = setInterval(() => { this.uploadPhotos() }, 5000);
     });
     this.processPhotos().then(() => {
       this.checkProcess = setInterval(() => { this.processPhotos() }, 5000);
@@ -75,6 +75,12 @@ export default class BatchScreen extends React.Component {
         <ScrollView style={{ height: '100%' }}>
           {this.state.batches && this.state.batches.length <= 0 &&
             <Text style={style.t3}>No Photos found, please Load Card.</Text>
+          }
+          {this.state.batches && this.state.batches.length > 0 && this.state.config &&
+            <View style={[style.input, { flex: 1, flexDirection: 'row', justifyContent: 'space-between' }]}>
+              <Text style={style.h2}>Discard Empty Photos:</Text>
+              <Text style={style.h2}>{this.state.config.get('discard_empty')}</Text>
+            </View>
           }
           {this.state.batches.map((batch) => {
             let progress = parseInt(100 * ((batch['num_uploaded'] + batch['num_processed']) / (batch['num_photos'] * 2)));
@@ -138,17 +144,17 @@ export default class BatchScreen extends React.Component {
           let response = await fetch(detectorUrl + '/' + photo['upload_id']);
           console.log(photo['id'] + ' GET ' + response.status);
           if (response.status !== 200) {
-            this.setState(prevState => ({
+            this.setState({
               photosToProcess: 0
-            }));
+            });
             return;
           }
           let r = await response.json();
           console.log(photo['id'] + ' responseBody: ' + JSON.stringify(r));
           if (!Boolean(r.processed)) {
-            this.setState(prevState => ({
+            this.setState({
               photosToProcess: 0
-            }));
+            });
             return;
           }
           if (r.objects.length > 0) {
@@ -159,6 +165,28 @@ export default class BatchScreen extends React.Component {
               o['photo_id'] = photo['id'];
               o['location_id'] = photo['location_id'];
               this.db.insertObject(o);
+            }
+          } else {
+            if (this.state.config.get('discard_empty') == 'true') {
+
+              let path = root + '/' + photo['path'];
+              console.log("deleting " + path);
+              RNFS.unlink(path);
+              this.db.deletePhoto(photo['id']).then(() => {
+                let batchId = photo['batch_id'];
+                this.setState(prevState => ({
+                  batches: prevState.batches.map((batch) => {
+                    if (batch['id'] === batchId) {
+                      batch['num_photos'] = batch['num_photos'] - 1;
+                      batch['num_uploaded'] = batch['num_uploaded'] - 1;
+                      batch['num_processed'] = batch['num_processed'] - 1;
+                    }
+                    return batch;
+                  }),
+                  photosToProcess: prevState.photosToProcess - 1
+                }));
+              });
+              return;
             }
           }
           this.db.processPhoto(photo['id']).then(() => {
@@ -272,7 +300,7 @@ export default class BatchScreen extends React.Component {
       {
         text: 'Yes',
         onPress: () => {
-          alert("todo");
+          alert("Feature coming soon...");
           callback();
         }
       },
@@ -310,10 +338,13 @@ export default class BatchScreen extends React.Component {
       isLoading: true
     });
     this.db.selectBatches().then((batches) => {
-      this.setState({
-        isLoading: false,
-        batches: batches
-      });
+      this.db.selectConfig().then((config) => {
+        this.setState({
+          isLoading: false,
+          batches: batches,
+          config: config
+        });
+      })
     }).catch((error) => {
       console.log(error);
     });

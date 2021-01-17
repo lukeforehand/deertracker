@@ -32,8 +32,7 @@ export default class Database {
 
     async deleteBatch(id) {
         const db = await SQLite.openDatabase({ name: database, location: location });
-        return await db.executeSql(
-            'DELETE FROM batch where id = ?', [id]);
+        return await db.executeSql('DELETE FROM batch where id = ?', [id]);
     }
 
     async selectBatches() {
@@ -71,6 +70,11 @@ export default class Database {
         return await db.executeSql(
             'INSERT INTO photo(id, path, processed, upload_id, lat, lon, batch_id) VALUES(?, ?, FALSE, NULL, ?, ?, ?)',
             [id, path, lat, lon, batchId]);
+    }
+
+    async deletePhoto(id) {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        return await db.executeSql('DELETE FROM photo where id = ?', [id]);
     }
 
     async selectPhotosToProcess() {
@@ -133,7 +137,7 @@ export default class Database {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql(`
         SELECT
-            STRFTIME('%Y-%m-%d', o.time) AS day, o.label, o.photo_id, p.path
+            STRFTIME('%Y-%m-%d', o.time) AS day, o.label, o.photo_id, p.path,
             COUNT(*) AS num_objects
         FROM object o JOIN photo p ON p.id = o.photo_id
         GROUP BY o.label, day
@@ -204,9 +208,12 @@ export default class Database {
     async selectConfig() {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql('SELECT * FROM config');
-        return rs.map((r) => {
+        let config = rs.map((r) => {
             return r.rows.raw();
         })[0];
+        return new Map(config.map((c) => {
+            return [c['key'], c['value']];
+        }));
     }
 
     async updateConfig(key, value) {
