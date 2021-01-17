@@ -66,15 +66,17 @@ export default class PhotoGallery extends React.Component {
             keyExtractor={item => item.url}
           />
         </View>
-        <Modal visible={this.state.modalVisible} transparent={true}>
-          <ImageViewer
-            imageUrls={imageUrls}
-            index={this.state.imageIndex}
-            enableSwipeDown={true}
-            swipeDownThreshold={80}
-            onSwipeDown={() => { this.setState({ modalVisible: false }) }}
-          />
-        </Modal>
+        {this.state.modalVisible &&
+          <Modal transparent={true}>
+            <ImageViewer
+              imageUrls={imageUrls}
+              index={this.state.imageIndex}
+              enableSwipeDown={true}
+              swipeDownThreshold={80}
+              onSwipeDown={() => { this.setState({ modalVisible: false }) }}
+            />
+          </Modal>
+        }
       </View >
     );
   }

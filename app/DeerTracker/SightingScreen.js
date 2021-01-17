@@ -5,13 +5,18 @@ import {
   ScrollView,
   Text,
   View,
+  Image,
 } from 'react-native';
+
+import RNFS from 'react-native-fs';
 
 import Moment from 'moment';
 
 import Database from './Database';
 
 import style from './style';
+
+const root = RNFS.DocumentDirectoryPath;
 
 export default class SightingScreen extends React.Component {
 
@@ -42,13 +47,30 @@ export default class SightingScreen extends React.Component {
     return (
       <SafeAreaView>
         <ScrollView style={{ height: '100%' }}>
-          {this.state.objects.map((object) => {
+          {Object.keys(this.state.objects).map((day) => {
             return (
-              <View key={object['day']} style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View key={day}>
                 <Text style={style.h3}>
-                  {Moment(new Date(object['day'])).format('ddd, MMM Do YYYY hh:mm A')}
+                  {Moment(new Date(day)).format('ddd, MMM Do YYYY')}
                 </Text>
-                <Text style={style.h2}>{object['label']} {object['num_objects']}</Text>
+                {this.state.objects[day].map((object) => {
+                  return (
+                    <View key={object.label} >
+                      <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-evenly' }}>
+                        <Text style={style.t3}>
+                          {object.location_name}
+                        </Text>
+                        <Text style={style.t3}>
+                          {object.label}
+                        </Text>
+                        <Text style={style.t3}>
+                          {object.num_objects}
+                        </Text>
+                      </View>
+                      <Image source={{ uri: root + '/' + object.photo_path }} style={style.smallThumbnail} />
+                    </View>
+                  )
+                })}
               </View>
             );
           })}

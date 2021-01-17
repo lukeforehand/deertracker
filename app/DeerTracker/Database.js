@@ -85,7 +85,7 @@ export default class Database {
             JOIN batch b ON b.id = p.batch_id
             JOIN location l ON l.id = b.location_id
             WHERE p.processed = FALSE AND p.upload_id IS NOT NULL
-            ORDER BY p.batch_id ASC, p.upload_id ASC`);
+            ORDER BY p.time DESC`);
         return rs.map((r) => {
             return r.rows.raw();
         })[0];
@@ -137,15 +137,27 @@ export default class Database {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql(`
         SELECT
-            STRFTIME('%Y-%m-%d', o.time) AS day, o.label, o.photo_id, p.path,
-            COUNT(*) AS num_objects
+            STRFTIME('%Y-%m-%d', o.time) AS day, o.label, l.name AS location_name, COUNT(*) AS num_objects,
+            FIRST_VALUE(p.path) OVER (PARTITION BY o.id ORDER BY o.time DESC) AS photo_path
         FROM object o JOIN photo p ON p.id = o.photo_id
-        GROUP BY o.label, day
+        JOIN location l ON l.id = o.location_id
+        GROUP BY o.label, day, location_name
         ORDER BY o.time DESC
         `);
-        return rs.map((r) => {
+        objects = rs.map((r) => {
             return r.rows.raw();
         })[0];
+        let days = objects.reduce((map, o) => {
+            let day = map[o.day];
+            if (!day) {
+                day = [];
+                map[o.day] = day;
+            }
+            day.push(o);
+            return map;
+        }, {});
+        console.log(days);
+        return days;
     }
 
     async deleteBatchPhotos(batchId) {

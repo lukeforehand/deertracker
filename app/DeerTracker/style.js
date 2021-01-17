@@ -92,6 +92,21 @@ export default StyleSheet.create({
     alignItems: 'center',
     height: 60,
   },
+  locationArrow: {
+    color: 'blue',
+    borderRadius: 2,
+    margin: 25,
+    marginLeft: 0,
+    shadowColor: '#000',
+    shadowOpacity: 0.5,
+    shadowRadius: 1,
+    elevation: 1,
+    backgroundColor: 'lightgray',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 50,
+    width: 50
+  },
   buttonDisabled: {
     borderRadius: 2,
     margin: 20,

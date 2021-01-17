@@ -13,6 +13,8 @@ import {
   Alert,
 } from 'react-native';
 
+import Icon from 'react-native-vector-icons/FontAwesome5';
+
 import Geolocation from '@react-native-community/geolocation';
 import MapView, { Marker } from 'react-native-maps';
 
@@ -25,30 +27,15 @@ export default class AddLocationScreen extends React.Component {
   constructor(props) {
     super(props);
     this.db = new Database();
-    this.state = { isLoading: true, modalVisible: false }
+    this.state = { modalVisible: false }
   }
 
   componentDidMount() {
     this.getCurrentPosition();
   }
 
-  refreshing() {
-    return this.state.isLoading;
-  }
-
   render() {
-    if (this.refreshing()) {
-      return (
-        <SafeAreaView>
-          <View style={style.activity}>
-            <ActivityIndicator size='large' />
-          </View>
-        </SafeAreaView>
-      )
-    }
-
     const locations = this.props.navigation.getParam('locations');
-
     return (
       <SafeAreaView>
         <View style={style.container}>
@@ -57,7 +44,6 @@ export default class AddLocationScreen extends React.Component {
             style={{ ...StyleSheet.absoluteFillObject }}
             showsUserLocation={true}
             mapType="satellite"
-            initialRegion={this.state.region}
             region={this.state.region}
             onDoublePress={(ev) => { this.map.animateCamera({ center: ev.nativeEvent.coordinate }) }}
             onRegionChangeComplete={(region) => { this.setState({ region: region }) }}>
@@ -74,9 +60,14 @@ export default class AddLocationScreen extends React.Component {
             <Image source={require('./assets/images/crosshairs.png')} style={{ width: 80, height: 80 }} />
           </View>
           {!this.state.modalVisible &&
-            <TouchableOpacity style={style.button} onPress={() => { this.setState({ modalVisible: true }) }}>
-              <Text style={style.h1}>Save Location</Text>
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row' }}>
+              <TouchableOpacity style={[style.button, { flex: 1 }]} onPress={() => { this.setState({ modalVisible: true }) }}>
+                <Text style={style.h1}>Save Location</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={style.locationArrow} onPress={() => { this.getCurrentPosition() }}>
+                <Icon name='location-arrow' color={style.locationArrow.color} size={20} />
+              </TouchableOpacity>
+            </View>
           }
           {this.state.region &&
             <Modal
@@ -131,13 +122,9 @@ export default class AddLocationScreen extends React.Component {
   }
 
   getCurrentPosition() {
-    this.setState({
-      isLoading: true
-    });
     Geolocation.getCurrentPosition(
       (position) => {
         this.setState({
-          isLoading: false,
           region: {
             latitude: parseFloat(position.coords.latitude),
             longitude: parseFloat(position.coords.longitude),

@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>UISupportsDocumentBrowser</key>
-	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -40,7 +38,9 @@
 		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>To associate photos with camera location.</string>
+	<string>To associate photos with a location.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>To save photos to camera roll.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
@@ -71,6 +71,8 @@
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
+	<key>UISupportsDocumentBrowser</key>
+	<true/>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 </dict>

@@ -186,7 +186,6 @@ export default class BatchScreen extends React.Component {
                 photosToProcess: prevState.photosToProcess - 1
               }));
             });
-            return;
           }
           this.db.processPhoto(photo['id']).then(() => {
             let batchId = photo['batch_id'];
@@ -203,9 +202,9 @@ export default class BatchScreen extends React.Component {
           });
         } catch (err) {
           console.log(err);
-          this.setState(prevState => ({
+          this.setState({
             photosToProcess: 0
-          }));
+          });
           return;
         }
       }
