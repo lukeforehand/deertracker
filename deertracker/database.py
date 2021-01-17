@@ -146,10 +146,6 @@ class Connection:
         except sqlite3.IntegrityError:
             return {"error": f"Photo `{photo[1]}` already exists."}
 
-    def delete_objects(self, photo_id):
-        cur = self.conn.cursor()
-        cur.execute("DELETE FROM object where photo_id = ?", [photo_id])
-
     def insert_object(self, obj):
         try:
             sql = """

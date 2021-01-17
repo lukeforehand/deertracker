@@ -71,9 +71,8 @@ def start_server(port):
     def post():
         lat = request.form["lat"]
         lon = request.form["lon"]
-        rescore = request.form.get("rescore", False)
         image = request.files["image"]
-        photo = upload(image.read(), lat, lon, rescore)
+        photo = upload(image.read(), lat, lon)
         print(f"sending response {photo}")
         return jsonify(photo)
 
@@ -119,7 +118,7 @@ def status(upload_id):
     return photo
 
 
-def upload(image: bytes, lat, lon, rescore=False):
+def upload(image: bytes, lat, lon):
     try:
         image = Image.open(io.BytesIO(image))
         photo_hash = hashlib.md5(image.tobytes()).hexdigest()
@@ -127,9 +126,6 @@ def upload(image: bytes, lat, lon, rescore=False):
         with database.conn() as db:
             photo = db.select_photo(photo_hash)
             if photo is not None:
-                if rescore:
-                    db.update_photo(photo_hash, processed=False)
-                    db.delete_objects(photo_hash)
                 return {"upload_id": photo_hash, "time": photo["time"]}
         time = model.get_time(image)
         model.store_photo(file_path, image)

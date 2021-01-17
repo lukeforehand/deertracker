@@ -182,6 +182,9 @@ export default class BatchScreen extends React.Component {
                     batch['num_processed'] = batch['num_processed'] - 1;
                   }
                   return batch;
+                }).filter((batch) => {
+                  // TODO VERIFY THIS WORKS
+                  return batch['num_photos'] > 0;
                 }),
                 photosToProcess: prevState.photosToProcess - 1
               }));

@@ -39,8 +39,7 @@ export default class Database {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql(`
             SELECT b.*, l.name AS location_name,
-                (SELECT COUNT(*) FROM photo p
-                WHERE p.batch_id = b.id)
+                (SELECT COUNT(*) FROM photo p WHERE p.batch_id = b.id)
                 AS num_photos,
                 (SELECT COUNT(*) FROM photo p
                 WHERE p.batch_id = b.id AND p.processed = TRUE)
@@ -48,9 +47,7 @@ export default class Database {
                 (SELECT COUNT(*) FROM photo p
                 WHERE p.batch_id = b.id AND (p.upload_id IS NOT NULL OR p.processed = TRUE))
                 AS num_uploaded,
-                (SELECT COUNT(*) FROM object o
-                JOIN photo p ON o.photo_id = p.id
-                WHERE o.photo_id = p.id)
+                (SELECT COUNT(*) FROM object o WHERE o.photo_id = p.id)
                 AS num_objects,
                 FIRST_VALUE(p.path) OVER (PARTITION BY b.id ORDER BY b.id DESC)
                 AS photo_path
@@ -150,13 +147,17 @@ export default class Database {
         let days = objects.reduce((map, o) => {
             let day = map[o.day];
             if (!day) {
-                day = [];
+                day = {};
                 map[o.day] = day;
             }
-            day.push(o);
+            let location = day[o.location_name];
+            if (!location) {
+                location = [];
+                day[o.location_name] = location;
+            }
+            location.push(o);
             return map;
         }, {});
-        console.log(days);
         return days;
     }
 

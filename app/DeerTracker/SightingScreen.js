@@ -6,6 +6,7 @@ import {
   Text,
   View,
   Image,
+  TouchableOpacity
 } from 'react-native';
 
 import RNFS from 'react-native-fs';
@@ -53,24 +54,28 @@ export default class SightingScreen extends React.Component {
                 <Text style={style.h3}>
                   {Moment(new Date(day)).format('ddd, MMM Do YYYY')}
                 </Text>
-                {this.state.objects[day].map((object) => {
-                  return (
-                    <View key={object.label} >
-                      <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-evenly' }}>
-                        <Text style={style.t3}>
-                          {object.location_name}
-                        </Text>
-                        <Text style={style.t3}>
-                          {object.label}
-                        </Text>
-                        <Text style={style.t3}>
-                          {object.num_objects}
-                        </Text>
-                      </View>
-                      <Image source={{ uri: root + '/' + object.photo_path }} style={style.smallThumbnail} />
-                    </View>
-                  )
-                })}
+                <View>
+                  {Object.keys(this.state.objects[day]).map((location) => {
+                    return this.state.objects[day][location].map((object) => {
+                      return (
+                        <TouchableOpacity
+                          key={object.label}
+                          style={style.locationButton}
+                          onPress={() => { alert("fetch annotated photos for day, label") }}>
+                          <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={style.h2}>{object.location_name}</Text>
+                          </View>
+                          <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={style.t4}>
+                              {object.label}: {object.num_objects}{'\n'}
+                            </Text>
+                            <Image source={{ uri: root + '/' + object.photo_path }} style={style.smallThumbnail} />
+                          </View>
+                        </TouchableOpacity>
+                      );
+                    });
+                  })}
+                </View>
               </View>
             );
           })}
