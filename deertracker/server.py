@@ -112,7 +112,7 @@ def status(upload_id):
                     "label": obj["label"],
                     "label_array": obj["label_array"],
                     "score": str(obj["score"]),
-                    "score": obj["score_array"],
+                    "score_array": obj["score_array"],
                 }
                 for obj in db.select_photo_objects(upload_id)
             ]

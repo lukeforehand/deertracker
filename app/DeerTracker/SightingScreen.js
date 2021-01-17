@@ -44,7 +44,7 @@ export default class SightingScreen extends React.Component {
         <ScrollView style={{ height: '100%' }}>
           {this.state.objects.map((object) => {
             return (
-              <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View key={object['day']} style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Text style={style.h3}>
                   {Moment(new Date(object['day'])).format('ddd, MMM Do YYYY hh:mm A')}
                 </Text>

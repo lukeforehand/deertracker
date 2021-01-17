@@ -171,4 +171,9 @@ export default StyleSheet.create({
     fontSize: 18,
     height: 40
   },
+  config: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  }
 });
