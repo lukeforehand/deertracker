@@ -17,7 +17,7 @@ const ImportScreenNavigator = createStackNavigator({
   LocationScreen: {
     screen: LocationScreen,
     navigationOptions: {
-      title: 'Location',
+      title: 'Load Card',
       headerTitleStyle: {
         fontSize: 20
       },
@@ -111,7 +111,7 @@ const TabNavigator = createBottomTabNavigator(
     History: {
       screen: BatchScreenNavigator,
       navigationOptions: {
-        tabBarLabel: 'Card History',
+        tabBarLabel: 'History',
         tabBarIcon: ({ tintColor }) => (
           <Icon name='camera' color={tintColor} size={20} />
         )

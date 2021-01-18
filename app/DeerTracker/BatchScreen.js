@@ -234,9 +234,7 @@ export default class BatchScreen extends React.Component {
           field: 'image',
           parameters: {
             'lat': photo['location_lat'],
-            'lon': photo['location_lon'],
-            // FIXME: remove when not developing
-            'rescore': true
+            'lon': photo['location_lon']
           }
         }).then((photoId) => {
           Upload.addListener('error', photoId, (err) => {
@@ -246,7 +244,7 @@ export default class BatchScreen extends React.Component {
             }));
           });
           Upload.addListener('completed', photoId, (data) => {
-            console.log(photoId + ' ' + ' POST ' + data.responseCode);
+            console.log(photoId + ' ' + ' POST ' + data.responseCode + ' ' + data.responseBody);
             if (data.responseCode !== 200 || data.responseBody === null) {
               console.log(photoId + ' responseBody: ' + data.responseBody);
               this.setState(prevState => ({

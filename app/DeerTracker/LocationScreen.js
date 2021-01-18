@@ -54,7 +54,7 @@ export default class LocationScreen extends React.Component {
     return (
       <SafeAreaView>
         <ScrollView style={{ height: '100%' }}>
-          <Text style={style.t3}>Where is this camera located?</Text>
+          <Text style={style.t3}>Where were these photos taken?</Text>
           {this.state.locations.map((location) => {
             return (
               <SwipeRow key={location['id']} item={location} onDelete={this.deleteLocation.bind(this)}>
