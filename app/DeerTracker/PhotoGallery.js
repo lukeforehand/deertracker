@@ -67,7 +67,7 @@ export default class PhotoGallery extends React.Component {
           />
         </View>
         {this.state.modalVisible &&
-          <Modal transparent={true}>
+          <Modal transparent={true} onRequestClose={() => this.setState({ modalVisible: false })}>
             <ImageViewer
               imageUrls={imageUrls}
               index={this.state.imageIndex}

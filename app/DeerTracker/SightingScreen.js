@@ -79,8 +79,8 @@ export default class SightingScreen extends React.Component {
               </View>
             );
           })}
-        </ScrollView >
-      </SafeAreaView >
+        </ScrollView>
+      </SafeAreaView>
     );
   }
 
