@@ -6,7 +6,8 @@ import {
   Text,
   View,
   Image,
-  TouchableOpacity
+  TouchableOpacity,
+  RefreshControl
 } from 'react-native';
 
 import RNFS from 'react-native-fs';
@@ -36,7 +37,10 @@ export default class SightingScreen extends React.Component {
   }
 
   render() {
-    if (this.refreshing()) {
+
+    const objects = this.state.objects;
+
+    if (!objects) {
       return (
         <SafeAreaView>
           <View style={style.activity}>
@@ -47,7 +51,9 @@ export default class SightingScreen extends React.Component {
     }
     return (
       <SafeAreaView>
-        <ScrollView style={{ height: '100%' }}>
+        <ScrollView style={{ height: '100%' }} refreshControl={
+          <RefreshControl title='Refresh' refreshing={this.refreshing()} onRefresh={this.fetchData.bind(this)} />
+        }>
           {Object.keys(this.state.objects).map((day) => {
             return (
               <View key={day}>
@@ -83,6 +89,8 @@ export default class SightingScreen extends React.Component {
       </SafeAreaView>
     );
   }
+
+
 
   fetchData() {
     this.setState({

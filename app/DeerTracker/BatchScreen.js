@@ -7,7 +7,8 @@ import {
   Text,
   Image,
   View,
-  TouchableOpacity
+  TouchableOpacity,
+  RefreshControl
 } from 'react-native';
 
 import Upload from 'react-native-background-upload';
@@ -68,7 +69,10 @@ export default class BatchScreen extends React.Component {
   }
 
   render() {
-    if (this.refreshing()) {
+
+    const batches = this.state.batches;
+
+    if (!batches) {
       return (
         <SafeAreaView>
           <View style={style.activity}>
@@ -79,7 +83,9 @@ export default class BatchScreen extends React.Component {
     }
     return (
       <SafeAreaView>
-        <ScrollView style={{ height: '100%' }}>
+        <ScrollView style={{ height: '100%' }} refreshControl={
+          <RefreshControl title='Refresh' refreshing={this.refreshing()} onRefresh={this.fetchData.bind(this)} />
+        }>
           {this.state.batches && this.state.batches.length <= 0 &&
             <Text style={style.t3}>No Photos found, please Load Card.</Text>
           }
