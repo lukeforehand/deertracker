@@ -104,15 +104,10 @@ class Connection:
             .fetchall()
         ]
 
-    def update_photo(self, photo_id, processed=True, width=None, height=None):
+    def update_photo(self, photo_id, processed=True):
         self.conn.cursor().execute(
             "UPDATE photo SET processed = ? WHERE id = ?", [processed, photo_id]
         )
-        if width is not None and height is not None:
-            self.conn.cursor().execute(
-                "UPDATE photo SET width = ?, height = ? WHERE id = ?",
-                [width, height, photo_id],
-            )
 
     def select_photo_objects(self, photo_id):
         return [
@@ -151,6 +146,7 @@ class Connection:
                 "time": photo[4],
                 "width": photo[5],
                 "height": photo[6],
+                "batch_id": photo[7],
             }
         except sqlite3.IntegrityError:
             return {"error": f"Photo `{photo[1]}` already exists."}

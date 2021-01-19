@@ -209,7 +209,7 @@ def process_annotation(photos, filename, label, bbox=None, ground_truth=False):
                 None,
             )
         )
-        db.insert_photo((image_hash, filename, None, None, None, None, None))
+        db.insert_photo((image_hash, filename, None, None, None, None, None, None))
     return {"id": obj_id}
 
 

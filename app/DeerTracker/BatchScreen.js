@@ -245,9 +245,11 @@ export default class BatchScreen extends React.Component {
         }).then((photoId) => {
           Upload.addListener('error', photoId, (err) => {
             console.log(photoId + ' ' + JSON.stringify(err));
-            this.setState(prevState => ({
-              photosToUpload: prevState.photosToUpload - 1
-            }));
+            Upload.cancelUpload(photoId).then(() => {
+              this.setState(prevState => ({
+                photosToUpload: prevState.photosToUpload - 1
+              }));
+            });
           });
           Upload.addListener('completed', photoId, (data) => {
             console.log(photoId + ' ' + ' POST ' + data.responseCode + ' ' + data.responseBody);

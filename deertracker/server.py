@@ -127,9 +127,6 @@ def upload(image: bytes, lat, lon):
         with database.conn() as db:
             photo = db.select_photo(photo_hash)
             if photo is not None:
-                # REMOVE THIS AFTER IMPORTING SOUTH FIELD
-                db.update_photo(photo_hash, width=width, height=height)
-                photo = db.select_photo(photo_hash)
                 return {
                     "upload_id": photo_hash,
                     "time": photo["time"],
@@ -139,7 +136,9 @@ def upload(image: bytes, lat, lon):
         time = model.get_time(image)
         model.store_photo(file_path, image)
         with database.conn() as db:
-            db.insert_photo((photo_hash, file_path, lat, lon, time, width, height))
+            db.insert_photo(
+                (photo_hash, file_path, lat, lon, time, width, height, None)
+            )
         return {"upload_id": photo_hash, "time": time, "width": width, "height": height}
     except UnidentifiedImageError:
         raise BadRequest()

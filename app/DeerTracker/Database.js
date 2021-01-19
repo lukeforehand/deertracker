@@ -82,7 +82,7 @@ export default class Database {
             JOIN batch b ON b.id = p.batch_id
             JOIN location l ON l.id = b.location_id
             WHERE p.processed = FALSE AND p.upload_id IS NOT NULL
-            ORDER BY p.time DESC`);
+            ORDER BY p.batch_id ASC, p.id ASC`);
         return rs.map((r) => {
             return r.rows.raw();
         })[0];
