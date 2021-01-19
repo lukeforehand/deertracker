@@ -72,7 +72,7 @@ export default class ImportScreen extends React.Component {
           {this.state.files && this.state.files.length <= 0 &&
             <Text style={style.t3}>No Photos found, insert camera card and use the Files app to move photos to DeerTracker folder.</Text>
           }
-          <PhotoGallery imageUrls={this.state.imageUrls} />
+          <PhotoGallery photos={this.state.photos} />
         </View>
       </SafeAreaView >
     );
@@ -127,13 +127,13 @@ export default class ImportScreen extends React.Component {
         });
         return;
       } else {
-        // update files and imageUrls
+        // update files and photos
         this.setState({
           isLoading: false,
           files: files,
-          imageUrls: files.map((file) => {
+          photos: files.map((file) => {
             return {
-              url: file.path
+              photo_path: file.path
             };
           })
         });

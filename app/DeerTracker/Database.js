@@ -103,11 +103,11 @@ export default class Database {
         })[0];
     }
 
-    async setPhotoUpload(photoId, uploadId, time) {
+    async setPhotoUpload(photoId, uploadId, time, width, height) {
         const db = await SQLite.openDatabase({ name: database, location: location });
         db.executeSql(
-            'UPDATE photo SET upload_id = ?, time = ? WHERE id = ?',
-            [uploadId, time, photoId]
+            'UPDATE photo SET upload_id = ?, time = ?, width = ?, height = ? WHERE id = ?',
+            [uploadId, time, width, height, photoId]
         );
         rs = await db.executeSql('SELECT * from photo WHERE id = ?', [photoId]);
         return rs.map((r) => {
@@ -124,10 +124,31 @@ export default class Database {
 
     async selectBatchPhotos(batchId) {
         const db = await SQLite.openDatabase({ name: database, location: location });
-        rs = await db.executeSql('SELECT * FROM photo WHERE batch_id = ?', [batchId]);
-        return rs.map((r) => {
+        rs = await db.executeSql(`
+            SELECT p.batch_id, p.path as photo_path, p.width, p.height, o.*
+            FROM photo p LEFT OUTER JOIN object o ON o.photo_id = p.id
+            WHERE p.batch_id = ?
+        `, [batchId]);
+        let objects = rs.map((r) => {
             return r.rows.raw();
         })[0];
+        let photos = {}
+        for (o of objects) {
+            let photo = photos[o.photo_id];
+            if (!photo) {
+                photo = {
+                    batch_id: o.batch_id,
+                    photo_id: o.photo_id,
+                    photo_path: o.photo_path,
+                    width: o.width,
+                    height: o.height,
+                    objects: []
+                };
+                photos[o.photo_id] = photo;
+            }
+            photo.objects.push(o);
+        }
+        return Object.values(photos);
     }
 
     async selectObjects() {
@@ -141,7 +162,7 @@ export default class Database {
         GROUP BY o.label, day, location_name
         ORDER BY o.time DESC
         `);
-        objects = rs.map((r) => {
+        let objects = rs.map((r) => {
             return r.rows.raw();
         })[0];
         let days = {}
@@ -266,6 +287,8 @@ CREATE TABLE IF NOT EXISTS photo (
     time DATETIME,
     lat FLOAT NOT NULL,
     lon FLOAT NOT NULL,
+    width INTEGER,
+    height INTEGER,
     batch_id INTEGER,
     FOREIGN KEY(batch_id) REFERENCES batch(id)
 )

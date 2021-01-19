@@ -3,73 +3,95 @@ import {
   Modal,
   View,
   FlatList,
-  Text,
   TouchableOpacity,
   Image,
+  StyleSheet,
 } from 'react-native';
 
 import ImageResizer from 'react-native-image-resizer';
 
 import ImageViewer from 'react-native-image-zoom-viewer';
 
-import style from './style';
 import { thumbWidth, thumbHeight } from './style';
 
 export default class PhotoGallery extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { modalVisible: false, imageUrls: [] };
-    this.generateThumbs(props);
-  }
-
-  componentDidUpdate() {
-    this.generateThumbs(this.props);
-  }
-
-  generateThumbs(nextProps) {
-    // compare new image urls to previous
-    let newImageUrls = nextProps.imageUrls.filter((imageUrl) => {
-      return this.state.imageUrls.indexOf(imageUrl) == -1;
+    let photos = this.props.photos.map((photo) => {
+      photo.url = photo.photo_path;
+      return photo;
     });
-    // generate thumbnails for new image urls
-    let imageUrls = nextProps.imageUrls;
-    newImageUrls.map((newImageUrl) => {
-      ImageResizer.createResizedImage(newImageUrl.url, thumbWidth, thumbHeight, 'JPEG', 50, 0).then((newThumbUrl) => {
-        imageUrls[imageUrls.indexOf(newImageUrl)].thumbUrl = newThumbUrl.uri;
-        this.setState({
-          imageUrls: imageUrls
-        });
-      });
+    this.state = { modalVisible: false, photos: photos };
+    this.generateThumbs(this.state.photos);
+  }
+
+  generateThumbs(photos) {
+    // generate thumbnails for image urls
+    photos.map((photo) => {
+      let w = thumbWidth;
+      let h = thumbHeight;
+      if (photo.width && photo.height) {
+        let scale = w / photo.width;
+        h = scale * photo.height;
+      }
+      ImageResizer.createResizedImage(photo.photo_path, w, h, 'JPEG', 50, 0, null, false,
+        { mode: 'cover' }).then((thumb) => {
+          photo.thumb = thumb;
+          photos[photos.indexOf(photo)] = photo;
+          this.setState({
+            photos: [...photos]
+          });
+        }).catch((err) => {
+          console.log(err);
+        })
     });
   }
 
   render() {
-    const imageUrls = this.state.imageUrls;
+    const photos = this.state.photos;
     return (
       <View>
-        <View style={{ alignItems: 'center' }}>
-          <FlatList
-            style={{ height: '100%', width: '100%' }}
-            contentContainerStyle={{ alignItems: 'center' }}
-            numColumns={2}
-            data={imageUrls}
-            renderItem={(item) => (
-              <TouchableOpacity onPress={() => {
-                this.setState({ modalVisible: true, imageIndex: imageUrls.indexOf(item.item) })
+        <FlatList
+          style={{ height: '100%', width: '100%' }}
+          numColumns={2}
+          columnWrapperStyle={{ justifyContent: 'space-evenly' }}
+          data={photos}
+          renderItem={(item) => (
+            <TouchableOpacity
+              key={item.item.photo_path}
+              onPress={() => {
+                this.setState({ modalVisible: true, imageIndex: item.index })
               }}>
-                <Image
-                  source={{ uri: imageUrls[imageUrls.indexOf(item.item)].thumbUrl }}
-                  style={style.thumbnail} />
-              </TouchableOpacity>
-            )}
-            keyExtractor={item => item.url}
-          />
-        </View>
+              {item.item.thumb &&
+                <View>
+                  <Image
+                    source={{ uri: item.item.thumb.uri }}
+                    style={{ width: item.item.thumb.width, height: item.item.thumb.height }} />
+                  {item.item.objects && item.item.objects.map((o) => {
+                    let ratio = item.item.thumb.width / (o.width);
+                    return (
+                      <View key={o.id} style={{
+                        ...StyleSheet.absoluteFillObject,
+                        left: parseInt(o.x * ratio),
+                        top: parseInt(o.y * ratio),
+                        width: parseInt(o.w * ratio),
+                        height: parseInt(o.h * ratio),
+                        borderWidth: 2,
+                        borderColor: 'rgba(0,255,0,0.7)'
+                      }} />
+                    );
+                  })}
+                </View>
+              }
+            </TouchableOpacity>
+          )}
+          keyExtractor={photo => photo.photo_path}
+        />
         {this.state.modalVisible &&
           <Modal transparent={true} onRequestClose={() => this.setState({ modalVisible: false })}>
             <ImageViewer
-              imageUrls={imageUrls}
+              imageUrls={photos}
               index={this.state.imageIndex}
               enableSwipeDown={true}
               swipeDownThreshold={80}
@@ -77,7 +99,7 @@ export default class PhotoGallery extends React.Component {
             />
           </Modal>
         }
-      </View >
+      </View>
     );
   }
 

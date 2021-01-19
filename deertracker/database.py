@@ -64,7 +64,7 @@ class Connection:
     def select_photo(self, photo_id):
         cur = self.conn.cursor()
         cur.execute(
-            "SELECT id, path, processed, lat, lon, time, batch_id FROM photo WHERE id = ?",
+            "SELECT id, path, processed, lat, lon, time, width, height, batch_id FROM photo WHERE id = ?",
             [photo_id],
         )
         photo = cur.fetchone()
@@ -77,7 +77,9 @@ class Connection:
             "lat": photo[3],
             "lon": photo[4],
             "time": photo[5],
-            "batch_id": photo[6],
+            "width": photo[6],
+            "height": photo[7],
+            "batch_id": photo[8],
         }
 
     def select_unprocessed_photos(self):
@@ -102,10 +104,15 @@ class Connection:
             .fetchall()
         ]
 
-    def update_photo(self, photo_id, processed=True):
+    def update_photo(self, photo_id, processed=True, width=None, height=None):
         self.conn.cursor().execute(
             "UPDATE photo SET processed = ? WHERE id = ?", [processed, photo_id]
         )
+        if width is not None and height is not None:
+            self.conn.cursor().execute(
+                "UPDATE photo SET width = ?, height = ? WHERE id = ?",
+                [width, height, photo_id],
+            )
 
     def select_photo_objects(self, photo_id):
         return [
@@ -132,7 +139,7 @@ class Connection:
 
     def insert_photo(self, photo):
         try:
-            sql = "INSERT INTO photo(id, path, processed, lat, lon, time, batch_id) VALUES(?, ?, FALSE, ?, ?, ?, ?)"
+            sql = "INSERT INTO photo(id, path, processed, lat, lon, time, width, height, batch_id) VALUES(?, ?, FALSE, ?, ?, ?, ?, ?, ?)"
             cur = self.conn.cursor()
             cur.execute(sql, photo)
             return {
@@ -142,6 +149,8 @@ class Connection:
                 "lat": photo[2],
                 "lon": photo[3],
                 "time": photo[4],
+                "width": photo[5],
+                "height": photo[6],
             }
         except sqlite3.IntegrityError:
             return {"error": f"Photo `{photo[1]}` already exists."}

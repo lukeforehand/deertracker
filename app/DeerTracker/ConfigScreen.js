@@ -19,19 +19,16 @@ export default class ConfigScreen extends React.Component {
   constructor(props) {
     super(props);
     this.db = new Database();
-    this.state = { isLoading: true };
+    this.state = {};
   }
 
   componentDidMount() {
     this.fetchData();
   }
 
-  refreshing() {
-    return this.state.isLoading;
-  }
-
   render() {
-    if (this.refreshing()) {
+    let config = this.state.config;
+    if (!config) {
       return (
         <SafeAreaView>
           <View style={style.activity}>
@@ -40,7 +37,6 @@ export default class ConfigScreen extends React.Component {
         </SafeAreaView>
       )
     }
-    let config = this.state.config;
     return (
       <SafeAreaView>
         <View>
@@ -105,7 +101,6 @@ export default class ConfigScreen extends React.Component {
   fetchData() {
     this.db.selectConfig().then((config) => {
       this.setState({
-        isLoading: false,
         config: config
       });
     }).catch((error) => {

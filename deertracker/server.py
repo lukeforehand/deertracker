@@ -121,16 +121,25 @@ def status(upload_id):
 def upload(image: bytes, lat, lon):
     try:
         image = Image.open(io.BytesIO(image))
+        width, height = image.size
         photo_hash = hashlib.md5(image.tobytes()).hexdigest()
         file_path = f"{photo_hash}.jpg"
         with database.conn() as db:
             photo = db.select_photo(photo_hash)
             if photo is not None:
-                return {"upload_id": photo_hash, "time": photo["time"]}
+                # REMOVE THIS AFTER IMPORTING SOUTH FIELD
+                db.update_photo(photo_hash, width=width, height=height)
+                photo = db.select_photo(photo_hash)
+                return {
+                    "upload_id": photo_hash,
+                    "time": photo["time"],
+                    "width": photo["width"],
+                    "height": photo["height"],
+                }
         time = model.get_time(image)
         model.store_photo(file_path, image)
         with database.conn() as db:
-            db.insert_photo((photo_hash, file_path, lat, lon, time, None))
-        return {"upload_id": photo_hash, "time": time}
+            db.insert_photo((photo_hash, file_path, lat, lon, time, width, height))
+        return {"upload_id": photo_hash, "time": time, "width": width, "height": height}
     except UnidentifiedImageError:
         raise BadRequest()

@@ -22,6 +22,8 @@ CREATE TABLE IF NOT EXISTS photo (
     lat FLOAT,
     lon FLOAT,
     time DATETIME,
+    width INTEGER,
+    height INTEGER,
     batch_id INTEGER,
     FOREIGN KEY(batch_id) REFERENCES batch(id)
 )

@@ -259,21 +259,18 @@ export default class BatchScreen extends React.Component {
               return;
             }
             let r = JSON.parse(data.responseBody);
-            this.db.setPhotoUpload(
-              photoId,
-              r.upload_id,
-              r.time).then((uploadedPhoto) => {
-                let batchId = uploadedPhoto['batch_id'];
-                this.setState(prevState => ({
-                  batches: prevState.batches.map((batch) => {
-                    if (batch['id'] === batchId) {
-                      batch['num_uploaded'] = batch['num_uploaded'] + 1;
-                    }
-                    return batch;
-                  }),
-                  photosToUpload: prevState.photosToUpload - 1
-                }));
-              });
+            this.db.setPhotoUpload(photoId, r.upload_id, r.time, r.width, r.height).then((uploadedPhoto) => {
+              let batchId = uploadedPhoto['batch_id'];
+              this.setState(prevState => ({
+                batches: prevState.batches.map((batch) => {
+                  if (batch['id'] === batchId) {
+                    batch['num_uploaded'] = batch['num_uploaded'] + 1;
+                  }
+                  return batch;
+                }),
+                photosToUpload: prevState.photosToUpload - 1
+              }));
+            });
           });
         }).catch((err) => {
           console.log(err);
@@ -289,10 +286,9 @@ export default class BatchScreen extends React.Component {
     this.db.selectBatchPhotos(batchId).then((photos) => {
       if (photos.length > 0) {
         this.props.navigation.navigate('PhotoScreen', {
-          imageUrls: photos.map((photo) => {
-            return {
-              url: root + '/' + photo.path
-            };
+          photos: photos.map((photo) => {
+            photo.photo_path = root + '/' + photo.photo_path;
+            return photo;
           })
         });
       }

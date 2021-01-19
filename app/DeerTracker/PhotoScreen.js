@@ -10,10 +10,10 @@ export default class PhotoScreen extends React.Component {
   }
 
   render() {
-    const imageUrls = this.props.navigation.getParam('imageUrls');
+    const photos = this.props.navigation.getParam('photos');
     return (
       <SafeAreaView style={{ marginTop: 20 }}>
-        <PhotoGallery imageUrls={imageUrls} />
+        <PhotoGallery photos={photos} />
       </SafeAreaView >
     );
   }
