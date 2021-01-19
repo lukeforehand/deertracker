@@ -18,16 +18,19 @@ export default class PhotoGallery extends React.Component {
 
   constructor(props) {
     super(props);
-    let photos = this.props.photos.map((photo) => {
-      photo.url = photo.photo_path;
-      return photo;
+    this.state = { modalVisible: false, photos: [] };
+    this.generateThumbs(props.photos);
+  }
+
+  componentDidUpdate() {
+    // compare new image urls to previous
+    let newPhotos = this.props.photos.filter((photo) => {
+      return this.state.photos.indexOf(photo) == -1;
     });
-    this.state = { modalVisible: false, photos: photos };
-    this.generateThumbs(this.state.photos);
+    this.generateThumbs(newPhotos);
   }
 
   generateThumbs(photos) {
-    // generate thumbnails for image urls
     photos.map((photo) => {
       let w = thumbWidth;
       let h = thumbHeight;
@@ -37,8 +40,8 @@ export default class PhotoGallery extends React.Component {
       }
       ImageResizer.createResizedImage(photo.photo_path, w, h, 'JPEG', 50, 0, null, false,
         { mode: 'cover' }).then((thumb) => {
-          photo.thumb = thumb;
-          photos[photos.indexOf(photo)] = photo;
+          photos[photos.indexOf(photo)].thumb = thumb;
+          photos[photos.indexOf(photo)].url = photo.photo_path;
           this.setState({
             photos: [...photos]
           });
@@ -99,7 +102,7 @@ export default class PhotoGallery extends React.Component {
             />
           </Modal>
         }
-      </View>
+      </View >
     );
   }
 

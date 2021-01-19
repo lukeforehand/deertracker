@@ -154,13 +154,19 @@ export default class Database {
     async selectObjects() {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql(`
-        SELECT
-            STRFTIME('%Y-%m-%d', o.time) AS day, o.label, l.name AS location_name, COUNT(*) AS num_objects,
-            FIRST_VALUE(p.path) OVER (PARTITION BY o.id ORDER BY o.time DESC) AS photo_path
-        FROM object o JOIN photo p ON p.id = o.photo_id
-        JOIN location l ON l.id = o.location_id
-        GROUP BY o.label, day, location_name
-        ORDER BY o.time DESC
+        SELECT day, label, location_name, num_objects, photo_path, width, height, x, y, w, h FROM (
+            SELECT
+                STRFTIME('%Y-%m-%d', o.time) AS day, o.label, l.name AS location_name,
+                p.width, p.height, p.path AS photo_path, o.x, o.y, o.w, o.h, COUNT(*) AS num_objects,
+                ROW_NUMBER() OVER (
+                    PARTITION BY o.id
+                    ORDER BY o.time DESC
+                ) AS row_number
+            FROM object o JOIN photo p ON p.id = o.photo_id
+            JOIN location l ON l.id = o.location_id
+            GROUP BY o.label, day, location_name
+            ORDER BY o.time DESC
+        ) WHERE row_number = 1
         `);
         let objects = rs.map((r) => {
             return r.rows.raw();

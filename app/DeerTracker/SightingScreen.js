@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   SafeAreaView,
+  StyleSheet,
   ActivityIndicator,
   ScrollView,
   Text,
@@ -17,6 +18,8 @@ import Moment from 'moment';
 import Database from './Database';
 
 import style from './style';
+
+import { thumbWidth, thumbHeight } from './style';
 
 const root = RNFS.DocumentDirectoryPath;
 
@@ -63,6 +66,7 @@ export default class SightingScreen extends React.Component {
                 <View>
                   {Object.keys(this.state.objects[day]).map((location) => {
                     return this.state.objects[day][location].map((object) => {
+                      let ratio = thumbWidth / object.width;
                       return (
                         <TouchableOpacity
                           key={object.label}
@@ -71,11 +75,23 @@ export default class SightingScreen extends React.Component {
                           <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Text style={style.h2}>{object.location_name}</Text>
                           </View>
-                          <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+                          <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', padding: 10 }}>
                             <Text style={style.t4}>
-                              {object.label}: {object.num_objects}{'\n'}
+                              {object.label}: {object.num_objects}
                             </Text>
-                            <Image source={{ uri: root + '/' + object.photo_path }} style={style.smallThumbnail} />
+                            <View>
+                              <Image source={{ uri: root + '/' + object.photo_path }}
+                                style={{ width: parseInt(thumbWidth), height: parseInt(object.height * ratio) }} />
+                              <View style={{
+                                ...StyleSheet.absoluteFillObject,
+                                left: parseInt(object.x * ratio),
+                                top: parseInt(object.y * ratio),
+                                width: parseInt(object.w * ratio),
+                                height: parseInt(object.h * ratio),
+                                borderWidth: 2,
+                                borderColor: 'rgba(0,255,0,0.7)'
+                              }} />
+                            </View>
                           </View>
                         </TouchableOpacity>
                       );
