@@ -27,13 +27,13 @@ export default class SwipeRow extends Component {
   renderRightActions = progress => (
     <View
       style={{
-        width: 200,
+        width: this.props.onArchive ? 200 : 100,
         flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
       }}>
       {this.renderRightAction(
         this.props.onDelete, this.props.item, 'Delete', 'darkred', 64, progress
       )}
-      {this.renderRightAction(
+      {this.props.onArchive && this.renderRightAction(
         this.props.onArchive, this.props.item, 'Archive', 'darkgreen', 64, progress
       )}
     </View>
