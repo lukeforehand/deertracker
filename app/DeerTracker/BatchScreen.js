@@ -90,10 +90,10 @@ export default class BatchScreen extends React.Component {
             tintColor='black'
             refreshing={this.refreshing()} onRefresh={this.fetchData.bind(this)} />
         }>
-          {this.state.batches && this.state.batches.length <= 0 &&
-            <Text style={style.t3}>No Photos found, please Load Card.</Text>
+          {batches && batches.length <= 0 &&
+            <Text style={style.t3}>No photos, load card or pull down to refresh</Text>
           }
-          {this.state.batches.map((batch) => {
+          {batches.map((batch) => {
             let progress = parseInt(100 * ((batch['num_uploaded'] + batch['num_processed']) / (batch['num_photos'] * 2)));
             return (
               <SwipeRow

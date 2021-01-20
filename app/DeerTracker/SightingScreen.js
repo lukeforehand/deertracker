@@ -61,15 +61,18 @@ export default class SightingScreen extends React.Component {
             tintColor='black'
             refreshing={this.refreshing()} onRefresh={this.fetchData.bind(this)} />
         }>
-          {Object.keys(this.state.objects).sort().reverse().map((day) => {
+          {Object.keys(objects).length <= 0 &&
+            <Text style={style.t3}>No sightings, pull down to refresh</Text>
+          }
+          {Object.keys(objects).sort().reverse().map((day) => {
             return (
               <View key={day}>
                 <Text style={style.h3}>
                   {Moment(new Date(day)).format('ddd, MMM Do YYYY')}
                 </Text>
                 <View>
-                  {Object.keys(this.state.objects[day]).map((locationId) => {
-                    let location = this.state.objects[day][locationId];
+                  {Object.keys(objects[day]).map((locationId) => {
+                    let location = objects[day][locationId];
                     let photo = Object.values(location.photos)[0];
                     let ratio = thumbWidth / photo.width;
                     return (
