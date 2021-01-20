@@ -105,7 +105,8 @@ export default class Database {
         })[0];
     }
 
-    async setPhotoUpload(photoId, uploadId, time, width, height) {
+    async updatePhoto(photoId, uploadId, time, width, height) {
+        time = Moment(time).format('YYYY-MM-DD HH:mm:ss');
         const db = await SQLite.openDatabase({ name: database, location: location });
         db.executeSql(
             'UPDATE photo SET upload_id = ?, time = ?, width = ?, height = ? WHERE id = ?',
@@ -153,34 +154,41 @@ export default class Database {
         return Object.values(photos);
     }
 
-    async selectObjects() {
+    async selectObjects(day = null, locationId = null) {
         const db = await SQLite.openDatabase({ name: database, location: location });
-        rs = await db.executeSql(`
-        SELECT o.id, o.time, l.name AS location_name, o.label,
-        p.width, p.height, p.path AS photo_path, o.x, o.y, o.w, o.h
-        FROM object o JOIN photo p ON p.id = o.photo_id
-        JOIN location l ON l.id = o.location_id
-        ORDER BY o.time DESC
-        `);
+        let sql = `
+        SELECT * FROM (
+            SELECT o.id, STRFTIME('%Y-%m-%d', o.time) AS day, l.name AS location_name,
+                l.id AS location_id, o.label,
+                p.width, p.height, p.path AS photo_path, o.x, o.y, o.w, o.h
+            FROM object o
+            JOIN photo p ON p.id = o.photo_id
+            JOIN location l ON l.id = o.location_id
+            ORDER BY day DESC
+        )`;
+        if (day && locationId) {
+            sql = sql + ` WHERE day = ? AND location_id = ?`;
+        }
+        rs = await db.executeSql(sql, [day, locationId]);
         let objects = rs.map((r) => {
             return r.rows.raw();
         })[0];
         let days = {}
         for (o of objects) {
-            o.day = Moment(o.time).format('YYYY-MM-DD');
             let day = days[o.day];
             if (!day) {
                 day = {};
                 days[o.day] = day;
             }
-            let location = day[o.location_name];
+            let location = day[o.location_id];
             if (!location) {
                 location = {
                     location_name: o.location_name,
+                    location_id: o.location_id,
                     photos: {},
                     object_counts: {}
                 };
-                day[o.location_name] = location;
+                day[o.location_id] = location;
             }
 
             let object_count = location.object_counts[o.label];
@@ -240,6 +248,7 @@ export default class Database {
     }
 
     async insertObject(obj) {
+        obj['time'] = Moment(obj['time']).format('YYYY-MM-DD HH:mm:ss');
         const db = await SQLite.openDatabase({ name: database, location: location });
         return await db.executeSql(
             `INSERT INTO object(id, x, y, w, h, lat, lon, time, label, label_array, score, score_array, photo_id, location_id)

@@ -265,7 +265,7 @@ export default class BatchScreen extends React.Component {
               return;
             }
             let r = JSON.parse(data.responseBody);
-            this.db.setPhotoUpload(photoId, r.upload_id, r.time, r.width, r.height).then((uploadedPhoto) => {
+            this.db.updatePhoto(photoId, r.upload_id, r.time, r.width, r.height).then((uploadedPhoto) => {
               let batchId = uploadedPhoto['batch_id'];
               this.setState(prevState => ({
                 batches: prevState.batches.map((batch) => {

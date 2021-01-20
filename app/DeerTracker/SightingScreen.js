@@ -68,22 +68,22 @@ export default class SightingScreen extends React.Component {
                   {Moment(new Date(day)).format('ddd, MMM Do YYYY')}
                 </Text>
                 <View>
-                  {Object.keys(this.state.objects[day]).map((locationKey) => {
-                    let location = this.state.objects[day][locationKey];
+                  {Object.keys(this.state.objects[day]).map((locationId) => {
+                    let location = this.state.objects[day][locationId];
                     let photo = Object.values(location.photos)[0];
                     let ratio = thumbWidth / photo.width;
                     return (
-                      <View key={locationKey}>
+                      <View key={locationId}>
                         <TouchableOpacity
                           key={photo.photo_path}
                           style={style.locationButton}
-                          onPress={() => { this.getPhotos(location.photos) }}>
+                          onPress={() => { this.getPhotos(day, location.location_id) }}>
                           <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <View>
+                            <View style={{ flex: 1 }}>
                               <Text style={style.h2}>{location.location_name}</Text>
                               {Object.keys(location.object_counts).sort().map((object) => {
                                 return (
-                                  <View key={object} style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                  <View key={object} style={{ paddingRight: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
                                     <Text style={style.t5}>{object}</Text>
                                     <Text style={style.t5}>{location.object_counts[object]}</Text>
                                   </View>
@@ -122,12 +122,17 @@ export default class SightingScreen extends React.Component {
     );
   }
 
-  getPhotos(photos) {
-    this.props.navigation.navigate('PhotoScreen', {
-      photos: Object.values(photos).map((photo) => {
-        photo.photo_path = root + '/' + photo.photo_path;
-        return photo;
-      })
+  getPhotos(day, locationId) {
+    this.db.selectObjects(day, locationId).then((objects) => {
+      let photos = objects[day][locationId].photos;
+      this.props.navigation.navigate('PhotoScreen', {
+        photos: Object.values(photos).map((photo) => {
+          photo.photo_path = root + '/' + photo.photo_path;
+          return photo;
+        })
+      });
+    }).catch((error) => {
+      console.log(error);
     });
   }
 
