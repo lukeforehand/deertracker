@@ -66,15 +66,25 @@ class Detector:
                 top_idx = np.argsort(-score_array)[:3]
                 score_array = score_array[[top_idx]]
                 label_array = np.array(self.classifier.classes)[top_idx]
-                high_score = np.argmax(score_array)
-                score = score_array[high_score]
-                label = label_array[high_score]
-            if score > confidence:
-                r_bboxes.append((int(x), int(y), int(w), int(h)))
-                r_labels.append(label)
-                r_scores.append(float(score))
-                r_score_arrays.append(score_array.tolist())
-                r_label_arrays.append(label_array.tolist())
+                high_score_idx = np.argmax(score_array)
+                animal_score = score_array[high_score_idx]
+                animal_label = label_array[high_score_idx]
+                if animal_score > confidence:
+                    # append animal score to the end
+                    score_array = np.append(score_array, [score])
+                    label_array = np.append(label_array, [label])
+                    score = animal_score
+                    label = animal_label
+                else:
+                    # insert animal score in the beginning
+                    score_array = np.append([score], score_array)
+                    label_array = np.append([label], label_array)
+
+            r_bboxes.append((int(x), int(y), int(w), int(h)))
+            r_labels.append(label)
+            r_scores.append(float(score))
+            r_score_arrays.append(score_array.tolist())
+            r_label_arrays.append(label_array.tolist())
         return r_bboxes, r_labels, r_scores, r_label_arrays, r_score_arrays
 
 

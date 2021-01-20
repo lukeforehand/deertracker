@@ -57,45 +57,56 @@ export default class SightingScreen extends React.Component {
         <ScrollView style={{ height: '100%' }} refreshControl={
           <RefreshControl title='Refresh' refreshing={this.refreshing()} onRefresh={this.fetchData.bind(this)} />
         }>
-          {Object.keys(this.state.objects).map((day) => {
+          {Object.keys(this.state.objects).sort().reverse().map((day) => {
             return (
               <View key={day}>
                 <Text style={style.h3}>
                   {Moment(new Date(day)).format('ddd, MMM Do YYYY')}
                 </Text>
                 <View>
-                  {Object.keys(this.state.objects[day]).map((location) => {
-                    return this.state.objects[day][location].map((object) => {
-                      let ratio = thumbWidth / object.width;
-                      return (
+                  {Object.keys(this.state.objects[day]).map((locationKey) => {
+                    let location = this.state.objects[day][locationKey];
+                    let photo = Object.values(location.photos)[0];
+                    let ratio = thumbWidth / photo.width;
+                    return (
+                      <View>
                         <TouchableOpacity
-                          key={object.label}
+                          key={photo.photo_path}
                           style={style.locationButton}
-                          onPress={() => { alert("fetch annotated photos for day, label") }}>
+                          onPress={() => { this.getPhotos(location.photos) }}>
                           <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <Text style={style.h2}>{object.location_name}</Text>
-                          </View>
-                          <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', padding: 10 }}>
-                            <Text style={style.t4}>
-                              {object.label}: {object.num_objects}
-                            </Text>
                             <View>
-                              <Image source={{ uri: root + '/' + object.photo_path }}
-                                style={{ width: parseInt(thumbWidth), height: parseInt(object.height * ratio) }} />
-                              <View style={{
-                                ...StyleSheet.absoluteFillObject,
-                                left: parseInt(object.x * ratio),
-                                top: parseInt(object.y * ratio),
-                                width: parseInt(object.w * ratio),
-                                height: parseInt(object.h * ratio),
-                                borderWidth: 2,
-                                borderColor: 'rgba(0,255,0,0.7)'
-                              }} />
+                              <Text style={style.h2}>{location.location_name}</Text>
+                              {Object.keys(location.object_counts).sort().map((object) => {
+                                return (
+                                  <Text key={object} style={style.t4}>
+                                    {object}: {location.object_counts[object]}
+                                  </Text>
+                                );
+                              })}
+                            </View>
+                            <View>
+                              <Image source={{ uri: root + '/' + photo.photo_path }}
+                                style={{ width: parseInt(thumbWidth), height: parseInt(photo.height * ratio) }} />
+                              {photo.objects.map((object) => {
+                                return (
+                                  <View key={object.id}
+                                    style={{
+                                      ...StyleSheet.absoluteFillObject,
+                                      left: parseInt(object.x * ratio),
+                                      top: parseInt(object.y * ratio),
+                                      width: parseInt(object.w * ratio),
+                                      height: parseInt(object.h * ratio),
+                                      borderWidth: 2,
+                                      borderColor: 'rgba(0,255,0,1.0)'
+                                    }} />
+                                );
+                              })}
                             </View>
                           </View>
                         </TouchableOpacity>
-                      );
-                    });
+                      </View>
+                    );
                   })}
                 </View>
               </View>
@@ -106,7 +117,14 @@ export default class SightingScreen extends React.Component {
     );
   }
 
-
+  getPhotos(photos) {
+    this.props.navigation.navigate('PhotoScreen', {
+      photos: Object.values(photos).map((photo) => {
+        photo.photo_path = root + '/' + photo.photo_path;
+        return photo;
+      })
+    });
+  }
 
   fetchData() {
     this.setState({

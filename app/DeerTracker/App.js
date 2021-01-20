@@ -80,6 +80,16 @@ const SightingScreenNavigator = createStackNavigator({
       },
       headerTitleAlign: 'center'
     },
+  },
+  PhotoScreen: {
+    screen: PhotoScreen,
+    navigationOptions: {
+      title: 'Gallery',
+      headerTitleStyle: {
+        fontSize: 20
+      },
+      headerTitleAlign: 'center'
+    },
   }
 });
 

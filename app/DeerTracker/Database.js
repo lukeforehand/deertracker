@@ -1,5 +1,7 @@
 import SQLite from 'react-native-sqlite-storage';
 
+import Moment from 'moment';
+
 SQLite.enablePromise(true);
 
 let database = 'deertracker.db';
@@ -154,25 +156,18 @@ export default class Database {
     async selectObjects() {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql(`
-        SELECT day, label, location_name, num_objects, photo_path, width, height, x, y, w, h FROM (
-            SELECT
-                STRFTIME('%Y-%m-%d', o.time) AS day, o.label, l.name AS location_name,
-                p.width, p.height, p.path AS photo_path, o.x, o.y, o.w, o.h, COUNT(*) AS num_objects,
-                ROW_NUMBER() OVER (
-                    PARTITION BY o.id
-                    ORDER BY o.time DESC
-                ) AS row_number
-            FROM object o JOIN photo p ON p.id = o.photo_id
-            JOIN location l ON l.id = o.location_id
-            GROUP BY o.label, day, location_name
-            ORDER BY o.time DESC
-        ) WHERE row_number = 1
+        SELECT o.id, o.time, l.name AS location_name, o.label,
+        p.width, p.height, p.path AS photo_path, o.x, o.y, o.w, o.h
+        FROM object o JOIN photo p ON p.id = o.photo_id
+        JOIN location l ON l.id = o.location_id
+        ORDER BY o.time DESC
         `);
         let objects = rs.map((r) => {
             return r.rows.raw();
         })[0];
         let days = {}
         for (o of objects) {
+            o.day = Moment(o.time).format('YYYY-MM-DD');
             let day = days[o.day];
             if (!day) {
                 day = {};
@@ -180,10 +175,32 @@ export default class Database {
             }
             let location = day[o.location_name];
             if (!location) {
-                location = [];
+                location = {
+                    location_name: o.location_name,
+                    photos: {},
+                    object_counts: {}
+                };
                 day[o.location_name] = location;
             }
-            location.push(o);
+
+            let object_count = location.object_counts[o.label];
+            if (!object_count) {
+                object_count = 0;
+            }
+            location.object_counts[o.label] = object_count + 1;
+
+            let photo = location.photos[o.photo_path];
+            if (!photo) {
+                photo = {
+                    photo_path: o.photo_path,
+                    width: o.width,
+                    height: o.height,
+                    objects: []
+                };
+                location.photos[o.photo_path] = photo;
+            }
+            photo.objects.push(o);
+
         }
         return days;
     }
