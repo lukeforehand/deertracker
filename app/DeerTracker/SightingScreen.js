@@ -55,7 +55,11 @@ export default class SightingScreen extends React.Component {
     return (
       <SafeAreaView>
         <ScrollView style={{ height: '100%' }} refreshControl={
-          <RefreshControl title='Refresh' refreshing={this.refreshing()} onRefresh={this.fetchData.bind(this)} />
+          <RefreshControl
+            title='Refresh'
+            titleColor='black'
+            tintColor='black'
+            refreshing={this.refreshing()} onRefresh={this.fetchData.bind(this)} />
         }>
           {Object.keys(this.state.objects).sort().reverse().map((day) => {
             return (
@@ -69,7 +73,7 @@ export default class SightingScreen extends React.Component {
                     let photo = Object.values(location.photos)[0];
                     let ratio = thumbWidth / photo.width;
                     return (
-                      <View>
+                      <View key={locationKey}>
                         <TouchableOpacity
                           key={photo.photo_path}
                           style={style.locationButton}
@@ -79,9 +83,10 @@ export default class SightingScreen extends React.Component {
                               <Text style={style.h2}>{location.location_name}</Text>
                               {Object.keys(location.object_counts).sort().map((object) => {
                                 return (
-                                  <Text key={object} style={style.t4}>
-                                    {object}: {location.object_counts[object]}
-                                  </Text>
+                                  <View key={object} style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                    <Text style={style.t5}>{object}</Text>
+                                    <Text style={style.t5}>{location.object_counts[object]}</Text>
+                                  </View>
                                 );
                               })}
                             </View>

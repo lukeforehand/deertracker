@@ -84,7 +84,11 @@ export default class BatchScreen extends React.Component {
     return (
       <SafeAreaView>
         <ScrollView style={{ height: '100%' }} refreshControl={
-          <RefreshControl title='Refresh' refreshing={this.refreshing()} onRefresh={this.fetchData.bind(this)} />
+          <RefreshControl
+            title='Refresh'
+            titleColor='black'
+            tintColor='black'
+            refreshing={this.refreshing()} onRefresh={this.fetchData.bind(this)} />
         }>
           {this.state.batches && this.state.batches.length <= 0 &&
             <Text style={style.t3}>No Photos found, please Load Card.</Text>

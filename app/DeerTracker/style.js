@@ -14,14 +14,14 @@ export default StyleSheet.create({
     textAlign: 'center',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
     fontSize: 20,
-    margin: 10,
+    margin: 10
   },
   h2: {
     color: 'black',
     textAlign: 'left',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
     fontSize: 20,
-    margin: 10,
+    margin: 10
   },
   h3: {
     color: '#e3e8e8',
@@ -43,14 +43,14 @@ export default StyleSheet.create({
     textAlign: 'center',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
     fontSize: 20,
-    margin: 10,
+    margin: 10
   },
   t3: {
     color: 'black',
     textAlign: 'center',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
     fontSize: 18,
-    margin: 20,
+    margin: 20
   },
   t4: {
     color: 'black',
@@ -58,6 +58,14 @@ export default StyleSheet.create({
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
     fontSize: 18,
     margin: 10
+  },
+  t5: {
+    color: 'black',
+    textAlign: 'left',
+    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontSize: 18,
+    paddingBottom: 5,
+    paddingLeft: 10
   },
   activity: {
     paddingTop: screenHeight / 2,
@@ -90,7 +98,7 @@ export default StyleSheet.create({
     backgroundColor: 'darkred',
     justifyContent: 'center',
     alignItems: 'center',
-    height: 60,
+    height: 60
   },
   locationArrow: {
     color: 'blue',
@@ -113,7 +121,7 @@ export default StyleSheet.create({
     backgroundColor: 'lightgrey',
     justifyContent: 'center',
     alignItems: 'center',
-    height: 60,
+    height: 60
   },
   marker: {
     shadowColor: '#fff',
@@ -146,7 +154,8 @@ export default StyleSheet.create({
     borderRadius: 2,
     backgroundColor: 'white',
     borderColor: 'gray',
-    borderWidth: 1
+    borderWidth: 1,
+    padding: 5
   },
   thumbnail: {
     borderWidth: 1,
