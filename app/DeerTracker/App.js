@@ -51,7 +51,7 @@ const BatchScreenNavigator = createStackNavigator({
   BatchScreen: {
     screen: BatchScreen,
     navigationOptions: {
-      title: 'Photos',
+      title: 'Card History',
       headerTitleStyle: {
         fontSize: 20
       },

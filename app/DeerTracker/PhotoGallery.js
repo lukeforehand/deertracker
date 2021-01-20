@@ -80,7 +80,7 @@ export default class PhotoGallery extends React.Component {
                         top: parseInt(o.y * ratio),
                         width: parseInt(o.w * ratio),
                         height: parseInt(o.h * ratio),
-                        borderWidth: 2,
+                        borderWidth: 1,
                         borderColor: 'rgba(0,255,0,1.0)'
                       }} />
                     );

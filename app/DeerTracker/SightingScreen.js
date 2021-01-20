@@ -105,7 +105,7 @@ export default class SightingScreen extends React.Component {
                                       top: parseInt(object.y * ratio),
                                       width: parseInt(object.w * ratio),
                                       height: parseInt(object.h * ratio),
-                                      borderWidth: 2,
+                                      borderWidth: 1,
                                       borderColor: 'rgba(0,255,0,1.0)'
                                     }} />
                                 );
