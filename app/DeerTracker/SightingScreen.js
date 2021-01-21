@@ -18,8 +18,7 @@ import Moment from 'moment';
 import Database from './Database';
 
 import style from './style';
-
-import { thumbWidth, thumbHeight } from './style';
+import { thumbWidth } from './style';
 
 const root = RNFS.DocumentDirectoryPath;
 
