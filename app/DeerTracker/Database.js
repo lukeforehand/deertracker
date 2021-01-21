@@ -184,6 +184,7 @@ export default class Database {
         let days = {}
         for (o of objects) {
             o.label_array = JSON.parse(o.label_array);
+            o.score_array = JSON.parse(o.score_array);
 
             let day = days[o.day];
             if (!day) {

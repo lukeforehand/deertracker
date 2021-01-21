@@ -130,6 +130,7 @@ export default class SightingScreen extends React.Component {
       let title = Moment(new Date(day)).format('ddd, MMM Do YYYY');
       this.props.navigation.navigate('PhotoScreen', {
         title: title,
+        showCrops: true,
         photos: Object.values(photos).map((photo) => {
           photo.photo_path = root + '/' + photo.photo_path;
           return photo;

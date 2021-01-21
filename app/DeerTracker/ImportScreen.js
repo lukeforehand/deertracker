@@ -72,7 +72,7 @@ export default class ImportScreen extends React.Component {
           {this.state.files && this.state.files.length <= 0 &&
             <Text style={style.t3}>No Photos found, insert camera card and use the Files app to move photos to DeerTracker folder.</Text>
           }
-          <PhotoGallery photos={this.state.photos} />
+          <PhotoGallery photos={this.state.photos} showCrops={false} />
         </View>
       </SafeAreaView >
     );

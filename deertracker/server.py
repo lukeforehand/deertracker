@@ -97,9 +97,10 @@ def start_server(port):
         w = int(request.form["w"])
         h = int(request.form["h"])
         label = request.form["label"]
+        score = request.form["score"]
         with database.conn() as db:
-            db.update_object(upload_id, x, y, w, h, label)
-        return jsonify({"label": label, "x": x, "y": y, "w": w, "h": h})
+            db.update_object(upload_id, x, y, w, h, label, score)
+        return jsonify({"label": label, "score": score, "x": x, "y": y, "w": w, "h": h})
 
     print(f"HTTP service starting on port {port}")
     app.run(host="0.0.0.0", port=port)

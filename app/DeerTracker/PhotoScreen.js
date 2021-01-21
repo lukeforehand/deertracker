@@ -12,11 +12,13 @@ export default class PhotoScreen extends React.Component {
   }
 
   render() {
+    const title = this.props.navigation.getParam('title');
     const photos = this.props.navigation.getParam('photos');
+    const showCrops = this.props.navigation.getParam('showCrops');
     return (
       <SafeAreaView>
-        <Text style={style.t3}>{this.props.navigation.getParam('title')}</Text>
-        <PhotoGallery photos={photos} />
+        <Text style={style.t3}>{title}</Text>
+        <PhotoGallery photos={photos} showCrops={showCrops} />
       </SafeAreaView >
     );
   }

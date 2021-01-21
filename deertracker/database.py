@@ -109,13 +109,13 @@ class Connection:
             "UPDATE photo SET processed = ? WHERE id = ?", [processed, photo_id]
         )
 
-    def update_object(self, photo_id, x, y, w, h, label):
+    def update_object(self, photo_id, x, y, w, h, label, score):
         self.conn.cursor().execute(
             """
-            UPDATE object SET label = ?, score = 1.0, ground_truth = TRUE
+            UPDATE object SET label = ?, score = ?, ground_truth = TRUE
             WHERE photo_id = ? AND x = ? AND y = ? AND w = ? AND h = ?
             """,
-            [label, photo_id, x, y, w, h],
+            [label, score, photo_id, x, y, w, h],
         )
 
     def select_photo_objects(self, photo_id):

@@ -295,6 +295,7 @@ export default class BatchScreen extends React.Component {
       if (photos.length > 0) {
         this.props.navigation.navigate('PhotoScreen', {
           title: title,
+          showCrops: false,
           photos: photos.map((photo) => {
             photo.photo_path = root + '/' + photo.photo_path;
             return photo;
