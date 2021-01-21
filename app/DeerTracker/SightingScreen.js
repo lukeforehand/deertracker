@@ -127,7 +127,9 @@ export default class SightingScreen extends React.Component {
   getPhotos(day, locationId) {
     this.db.selectObjects(day, locationId).then((objects) => {
       let photos = objects[day][locationId].photos;
+      let title = Moment(new Date(day)).format('ddd, MMM Do YYYY');
       this.props.navigation.navigate('PhotoScreen', {
+        title: title,
         photos: Object.values(photos).map((photo) => {
           photo.photo_path = root + '/' + photo.photo_path;
           return photo;

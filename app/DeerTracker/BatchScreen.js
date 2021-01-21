@@ -104,7 +104,7 @@ export default class BatchScreen extends React.Component {
                 <TouchableOpacity
                   key={batch['id']}
                   style={style.locationButton}
-                  onPress={() => { this.getPhotos(batch['id']) }}>
+                  onPress={() => { this.getPhotos(batch) }}>
                   <Text style={style.h3}>
                     {Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY hh:mm A')}
                   </Text>
@@ -288,10 +288,13 @@ export default class BatchScreen extends React.Component {
     }
   }
 
-  getPhotos(batchId) {
+  getPhotos(batch) {
+    let batchId = batch['id'];
+    let title = Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY hh:mm A');
     this.db.selectBatchPhotos(batchId).then((photos) => {
       if (photos.length > 0) {
         this.props.navigation.navigate('PhotoScreen', {
+          title: title,
           photos: photos.map((photo) => {
             photo.photo_path = root + '/' + photo.photo_path;
             return photo;

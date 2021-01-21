@@ -1,5 +1,7 @@
 import React from 'react';
-import { SafeAreaView } from 'react-native';
+import { Text, SafeAreaView } from 'react-native';
+
+import style from './style';
 
 import PhotoGallery from './PhotoGallery';
 
@@ -12,7 +14,8 @@ export default class PhotoScreen extends React.Component {
   render() {
     const photos = this.props.navigation.getParam('photos');
     return (
-      <SafeAreaView style={{ marginTop: 20 }}>
+      <SafeAreaView>
+        <Text style={style.t3}>{this.props.navigation.getParam('title')}</Text>
         <PhotoGallery photos={photos} />
       </SafeAreaView >
     );
