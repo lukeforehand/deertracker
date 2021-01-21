@@ -87,6 +87,20 @@ def start_server(port):
         print(f"sending response {photo}")
         return jsonify(photo)
 
+    @app.route(
+        "/<upload_id>",
+        methods=["PUT"],
+    )
+    def put(upload_id):
+        x = int(request.form["x"])
+        y = int(request.form["y"])
+        w = int(request.form["w"])
+        h = int(request.form["h"])
+        label = request.form["label"]
+        with database.conn() as db:
+            db.update_object(upload_id, x, y, w, h, label)
+        return jsonify({"label": label, "x": x, "y": y, "w": w, "h": h})
+
     print(f"HTTP service starting on port {port}")
     app.run(host="0.0.0.0", port=port)
 

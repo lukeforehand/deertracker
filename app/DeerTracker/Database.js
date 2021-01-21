@@ -118,6 +118,14 @@ export default class Database {
         })[0][0];
     }
 
+    async updateObject(objectId, label, score) {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        return await db.executeSql(
+            'UPDATE object SET label = ?, score = ? WHERE id = ?',
+            [label, score, objectId]
+        );
+    }
+
     async processPhoto(photoId) {
         const db = await SQLite.openDatabase({ name: database, location: location });
         return await db.executeSql(
@@ -159,8 +167,8 @@ export default class Database {
         let sql = `
         SELECT * FROM (
             SELECT o.id, STRFTIME('%Y-%m-%d', o.time) AS day, l.name AS location_name,
-                l.id AS location_id, o.label,
-                p.width, p.height, p.path AS photo_path, o.x, o.y, o.w, o.h
+                l.id AS location_id, o.label, o.label_array, o.score_array, o.time,
+                p.upload_id, p.width, p.height, p.path AS photo_path, o.x, o.y, o.w, o.h
             FROM object o
             JOIN photo p ON p.id = o.photo_id
             JOIN location l ON l.id = o.location_id
@@ -175,6 +183,8 @@ export default class Database {
         })[0];
         let days = {}
         for (o of objects) {
+            o.label_array = JSON.parse(o.label_array);
+
             let day = days[o.day];
             if (!day) {
                 day = {};
@@ -200,6 +210,7 @@ export default class Database {
             let photo = location.photos[o.photo_path];
             if (!photo) {
                 photo = {
+                    time: o.time,
                     photo_path: o.photo_path,
                     width: o.width,
                     height: o.height,

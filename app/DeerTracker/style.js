@@ -197,5 +197,17 @@ export default StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  galleryMenu: {
+    height: (screenHeight / 2) - 200,
+    width: screenWidth / 2
+  },
+  picker: {
+    top: 0,
+    backgroundColor: 'black'
+  },
+  pickerItem: {
+    height: 150,
+    color: 'white'
   }
 });

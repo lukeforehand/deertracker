@@ -8,16 +8,27 @@ import {
   StyleSheet,
 } from 'react-native';
 
+import { Picker } from '@react-native-picker/picker';
+
+import style from './style';
+
+import ImageEditor from "@react-native-community/image-editor";
+
 import ImageResizer from 'react-native-image-resizer';
 
 import ImageViewer from 'react-native-image-zoom-viewer';
 
+import Database from './Database';
+
 import { thumbWidth, thumbHeight } from './style';
+
+const detectorUrl = "http://192.168.0.157:5000";
 
 export default class PhotoGallery extends React.Component {
 
   constructor(props) {
     super(props);
+    this.db = new Database();
     this.state = { modalVisible: false, photos: [] };
     this.generateThumbs(props.photos);
   }
@@ -97,6 +108,14 @@ export default class PhotoGallery extends React.Component {
               imageUrls={photos}
               index={this.state.imageIndex}
               enableSwipeDown={true}
+              enableImageZoom={false}
+              onCancel={() => { }}
+              onDoubleClick={(onCancel) => {
+
+                // todo zoom to crop, refresh menu
+                onCancel();
+              }}
+              renderFooter={this.renderMenu.bind(this)}
               swipeDownThreshold={80}
               onSwipeDown={() => { this.setState({ modalVisible: false }) }}
             />
@@ -106,4 +125,78 @@ export default class PhotoGallery extends React.Component {
     );
   }
 
+  renderMenu(index) {
+    let photos = this.state.photos;
+    let photo = photos[index];
+    for (object of photo.objects) {
+      let cropData = {
+        offset: {
+          x: object.x,
+          y: object.y
+        },
+        size: {
+          width: object.w,
+          height: object.h
+        },
+        displaySize: {
+          width: thumbWidth,
+          height: 200
+        }
+      };
+      ImageEditor.cropImage(photo.photo_path, cropData).then(url => {
+        object.path = url;
+        this.setState({
+          photos: [...photos]
+        });
+      }).catch((err) => {
+        console.log(err);
+      });
+    }
+
+    let crop = photo.objects[0];
+    let ratio = thumbWidth / crop.w;
+
+    return (
+      <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+        <View style={style.galleryMenu}>
+          <Picker
+            selectedValue={crop.label}
+            style={style.picker}
+            itemStyle={style.pickerItem}
+            onValueChange={(itemValue, itemIndex) => { this.updateObject(crop, itemIndex) }}>
+            {crop.label_array.map((label) => {
+              return (<Picker.Item key={label} label={label} value={label} />);
+            })}
+          </Picker>
+        </View>
+        <Image
+          source={{ uri: crop.path }}
+          style={{ width: crop.w * ratio, height: crop.h * ratio }} />
+      </View >
+    );
+  }
+
+  updateObject(object, labelIndex) {
+    this.db.updateObject(object.id, object.label_array[labelIndex], object.score_array[labelIndex]).then(() => {
+      const formData = new FormData();
+      formData.append('x', object.x);
+      formData.append('y', object.y);
+      formData.append('w', object.w);
+      formData.append('h', object.h);
+      formData.append('label', object.label);
+      fetch(detectorUrl + '/' + object.upload_id, { method: 'PUT', body: formData }).then((response) => {
+        console.log(response.status);
+        if (response.status == 200) {
+          response.json().then((json) => {
+            console.log(JSON.stringify(json));
+          })
+          return;
+        } else {
+          response.text().then((text) => {
+            console.log(text);
+          });
+        }
+      });
+    });
+  }
 }

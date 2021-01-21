@@ -109,6 +109,15 @@ class Connection:
             "UPDATE photo SET processed = ? WHERE id = ?", [processed, photo_id]
         )
 
+    def update_object(self, photo_id, x, y, w, h, label):
+        self.conn.cursor().execute(
+            """
+            UPDATE object SET label = ?, score = 1.0, ground_truth = TRUE
+            WHERE photo_id = ? AND x = ? AND y = ? AND w = ? AND h = ?
+            """,
+            [label, photo_id, x, y, w, h],
+        )
+
     def select_photo_objects(self, photo_id):
         return [
             self._object_from_tuple(obj)
