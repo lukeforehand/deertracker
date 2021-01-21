@@ -85,35 +85,39 @@ export default class PhotoGallery extends React.Component {
                     numColumns={2}
                     columnWrapperStyle={{ justifyContent: 'space-evenly' }}
                     data={photos}
-                    renderItem={(item) => (
-                        <TouchableOpacity
-                            key={item.item.photo_path}
-                            onPress={() => {
-                                this.setState({ modalVisible: true, imageIndex: item.index })
-                            }}>
-                            {item.item.thumb &&
-                                <View>
-                                    <Image
-                                        source={{ uri: item.item.thumb.uri }}
-                                        style={{ width: item.item.thumb.width, height: item.item.thumb.height }} />
-                                    {this.props.showCrops && item.item.objects && item.item.objects.map((o) => {
-                                        let ratio = item.item.thumb.width / (o.width);
-                                        return (
-                                            <View key={o.id} style={{
-                                                ...StyleSheet.absoluteFillObject,
-                                                left: parseInt(o.x * ratio),
-                                                top: parseInt(o.y * ratio),
-                                                width: parseInt(o.w * ratio),
-                                                height: parseInt(o.h * ratio),
-                                                borderWidth: 1,
-                                                borderColor: 'rgba(0,255,0,1.0)'
-                                            }} />
-                                        );
-                                    })}
-                                </View>
-                            }
-                        </TouchableOpacity>
-                    )}
+                    renderItem={(item) => {
+                        let photo = item.item;
+                        let thumb = photo.thumb;
+                        return (
+                            <TouchableOpacity
+                                key={photo.photo_path}
+                                onPress={() => {
+                                    this.setState({ modalVisible: true, imageIndex: item.index })
+                                }}>
+                                {thumb &&
+                                    <View>
+                                        <Image
+                                            source={{ uri: thumb.uri }}
+                                            style={{ width: thumb.width, height: thumb.height }} />
+                                        {this.props.showCrops && photo.objects && photo.objects.map((o) => {
+                                            let ratio = thumb.width / (o.width);
+                                            return (
+                                                <View key={o.id} style={{
+                                                    ...StyleSheet.absoluteFillObject,
+                                                    left: parseInt(o.x * ratio),
+                                                    top: parseInt(o.y * ratio),
+                                                    width: parseInt(o.w * ratio),
+                                                    height: parseInt(o.h * ratio),
+                                                    borderWidth: 1,
+                                                    borderColor: 'rgba(0,255,0,1.0)'
+                                                }} />
+                                            );
+                                        })}
+                                    </View>
+                                }
+                            </TouchableOpacity>
+                        )
+                    }}
                     keyExtractor={photo => photo.photo_path}
                 />
                 {this.state.modalVisible &&
