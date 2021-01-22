@@ -16,7 +16,7 @@ import ImageResizer from 'react-native-image-resizer';
 import ImageViewer from 'react-native-image-zoom-viewer';
 
 import Database from './Database';
-import style, { thumbWidth, thumbHeight } from './style';
+import style, { screenWidth, screenHeight, thumbWidth, thumbHeight } from './style';
 
 const detectorUrl = "http://192.168.0.157:5000";
 
@@ -40,6 +40,9 @@ export default class PhotoGallery extends React.Component {
     generateThumbs(photos) {
         photos.map((photo) => {
             photo.url = photo.photo_path;
+            photo.props = {
+                photo: photo
+            };
             let w = thumbWidth;
             let h = thumbHeight;
             if (photo.width && photo.height) {
@@ -127,6 +130,7 @@ export default class PhotoGallery extends React.Component {
                             index={this.state.imageIndex}
                             enableSwipeDown={true}
                             enableImageZoom={false}
+                            renderImage={this.renderImage.bind(this)}
                             onCancel={() => { }}
                             onDoubleClick={(onCancel) => {
 
@@ -143,52 +147,81 @@ export default class PhotoGallery extends React.Component {
         );
     }
 
+    renderImage(props) {
+        let photo = props.photo;
+        let ratio = screenWidth / photo.width;
+        return (
+            <View>
+                <Image {...props} />
+                {photo.objects.map((object) => {
+                    let borderColor = 'rgba(0,255,0,1.0)';
+                    if (this.state.crop && this.state.crop.id == object.id) {
+                        borderColor = 'rgba(255,0,0,1.0)'
+                    }
+                    return (
+                        <TouchableOpacity
+                            key={object.id}
+                            onPress={() => { this.generateCrop(photo, object) }}
+                            style={{
+                                ...StyleSheet.absoluteFillObject,
+                                left: parseInt(object.x * ratio),
+                                top: parseInt(object.y * ratio),
+                                width: parseInt(object.w * ratio),
+                                height: parseInt(object.h * ratio),
+                                borderWidth: 1,
+                                borderColor: borderColor,
+                            }} />
+                    );
+                })}
+            </View>
+        );
+    }
+
+    generateCrop(photo, object) {
+        let cropPath = RNFS.CachesDirectoryPath + '/crop_' + object.id + '.jpg';
+        RNFS.exists(cropPath).then((exists) => {
+            if (exists) {
+                object.path = cropPath;
+                this.setState({
+                    crop: object
+                });
+            } else {
+                let cropData = {
+                    offset: {
+                        x: object.x,
+                        y: object.y
+                    },
+                    size: {
+                        width: object.w,
+                        height: object.h
+                    },
+                    displaySize: {
+                        width: thumbWidth,
+                        height: 200
+                    }
+                };
+                ImageEditor.cropImage(photo.photo_path, cropData).then(url => {
+                    RNFS.moveFile(url, cropPath).catch((err) => {
+                        RNFS.unlink(url);
+                    }).then(() => {
+                        object.path = cropPath;
+                        this.setState({
+                            crop: object
+                        });
+                    });
+                }).catch((err) => {
+                    console.log(err);
+                });
+            }
+        });
+    }
+
     renderMenu(index) {
         if (!this.props.showCrops) {
             return;
         }
-        let photos = this.state.photos;
-        let photo = photos[index];
-        for (object of photo.objects) {
-            let cropPath = RNFS.CachesDirectoryPath + '/crop_' + object.id + '.jpg';
-            RNFS.exists(cropPath).then((exists) => {
-                if (exists) {
-                    object.path = cropPath;
-                    this.setState({
-                        photos: [...photos]
-                    });
-                } else {
-                    let cropData = {
-                        offset: {
-                            x: object.x,
-                            y: object.y
-                        },
-                        size: {
-                            width: object.w,
-                            height: object.h
-                        },
-                        displaySize: {
-                            width: thumbWidth,
-                            height: 200
-                        }
-                    };
-                    ImageEditor.cropImage(photo.photo_path, cropData).then(url => {
-                        RNFS.moveFile(url, cropPath).catch((err) => {
-                            RNFS.unlink(url);
-                        }).then(() => {
-                            object.path = cropPath;
-                            this.setState({
-                                photos: [...photos]
-                            });
-                        });
-                    }).catch((err) => {
-                        console.log(err);
-                    });
-                }
-            });
-
-            let crop = photo.objects[0];
-
+        let crop = this.state.crop;
+        if (crop) {
             return (
                 <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                     <View style={style.galleryMenu}>
@@ -204,8 +237,8 @@ export default class PhotoGallery extends React.Component {
                     </View>
                     <Image
                         source={{ uri: crop.path }}
-                        style={{ width: thumbWidth, height: 200 }} />
-                </View >
+                        style={{ width: thumbWidth, height: 200, borderWidth: 1, borderColor: 'rgba(255,0,0,1.0)' }} />
+                </View>
             );
         }
     }
@@ -213,6 +246,9 @@ export default class PhotoGallery extends React.Component {
     updateObject(object, labelIndex) {
         object.label = object.label_array[labelIndex];
         object.score = object.score_array[labelIndex];
+        this.setState({
+            crop: object
+        });
         this.db.updateObject(object.id, object.label, object.score).then(() => {
             const formData = new FormData();
             formData.append('x', object.x);
