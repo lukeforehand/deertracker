@@ -30,11 +30,11 @@ export default class SwipeRow extends Component {
         width: this.props.onArchive ? 200 : 100,
         flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
       }}>
-      {this.renderRightAction(
-        this.props.onDelete, this.props.item, 'Delete', 'darkred', 64, progress
-      )}
       {this.props.onArchive && this.renderRightAction(
-        this.props.onArchive, this.props.item, 'Archive', 'darkgreen', 64, progress
+        this.props.onArchive, this.props.item, 'Archive', '#4E603E', 64, progress
+      )}
+      {this.renderRightAction(
+        this.props.onDelete, this.props.item, 'Delete', 'rgb(255, 103, 0)', 64, progress
       )}
     </View>
   );
@@ -70,5 +70,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
+    elevation: 20,
   },
 });

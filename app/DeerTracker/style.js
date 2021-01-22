@@ -25,7 +25,11 @@ export default StyleSheet.create({
   },
   h3: {
     color: '#e3e8e8',
-    backgroundColor: 'darkred',
+    backgroundColor: '#4E603E',
+    shadowColor: '#000',
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
+    elevation: 20,
     textAlign: 'left',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
     fontSize: 18,
@@ -99,9 +103,9 @@ export default StyleSheet.create({
     margin: 20,
     shadowColor: '#000',
     shadowOpacity: 0.5,
-    shadowRadius: 1,
-    elevation: 1,
-    backgroundColor: 'darkred',
+    shadowRadius: 20,
+    elevation: 20,
+    backgroundColor: '#4E603E',
     justifyContent: 'center',
     alignItems: 'center',
     height: 60
@@ -113,8 +117,8 @@ export default StyleSheet.create({
     marginLeft: 0,
     shadowColor: '#000',
     shadowOpacity: 0.5,
-    shadowRadius: 1,
-    elevation: 1,
+    shadowRadius: 20,
+    elevation: 20,
     backgroundColor: 'lightgray',
     justifyContent: 'center',
     alignItems: 'center',
@@ -155,8 +159,8 @@ export default StyleSheet.create({
   locationButton: {
     shadowColor: '#000',
     shadowOpacity: 0.5,
-    shadowRadius: 4,
-    elevation: 4,
+    shadowRadius: 20,
+    elevation: 20,
     borderRadius: 2,
     backgroundColor: 'white',
     borderColor: 'gray',
@@ -190,14 +194,6 @@ export default StyleSheet.create({
   },
   importScreenBottom: {
     height: screenHeight - 150 - 100, // tab nav
-  },
-  progress: {
-    color: '#e3e8e8',
-    backgroundColor: 'green',
-    textAlign: 'left',
-    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
-    fontSize: 18,
-    height: 40
   },
   config: {
     flexDirection: 'row',

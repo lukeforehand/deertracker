@@ -124,8 +124,8 @@ export default class PhotoGallery extends React.Component {
                                                     top: parseInt(o.y * ratio),
                                                     width: parseInt(o.w * ratio),
                                                     height: parseInt(o.h * ratio),
-                                                    borderWidth: 1,
-                                                    borderColor: 'rgba(0,255,0,1.0)'
+                                                    borderWidth: 2,
+                                                    borderColor: 'rgb(255, 103, 0)'
                                                 }} />
                                             );
                                         })}
@@ -162,9 +162,9 @@ export default class PhotoGallery extends React.Component {
             <View>
                 <Image {...props} />
                 {this.props.showCrops && photo.objects.map((object) => {
-                    let borderColor = 'rgba(255,0,0,1.0)';
+                    let borderColor = 'green';
                     if (!this.props.showCrops || (this.state.crop && this.state.crop.id == object.id)) {
-                        borderColor = 'rgba(0,255,0,1.0)'
+                        borderColor = 'rgb(255, 103, 0)'
                     }
                     return (
                         <TouchableOpacity
@@ -176,7 +176,7 @@ export default class PhotoGallery extends React.Component {
                                 top: parseInt(object.y * ratio) - screenHeight / 6,
                                 width: parseInt(object.w * ratio),
                                 height: parseInt(object.h * ratio),
-                                borderWidth: 1,
+                                borderWidth: 2,
                                 borderColor: borderColor,
                             }} />
                     );
@@ -251,7 +251,7 @@ export default class PhotoGallery extends React.Component {
                         <View style={{ width: thumbWidth, alignItems: 'center' }}>
                             <Image
                                 source={{ uri: crop.path }}
-                                style={{ width: w, height: h, borderWidth: 1, borderColor: 'rgba(0,255,0,1.0)' }} />
+                                style={{ width: w, height: h, borderWidth: 2, borderColor: 'rgb(255, 103, 0)' }} />
                             <TouchableOpacity style={style.galleryButton}
                                 onPress={() => { this.setState({ profileVisible: true }) }}>
                                 <Text style={style.t6}>Add to Profile</Text>

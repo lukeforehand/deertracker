@@ -44,7 +44,7 @@ export default class ConfigScreen extends React.Component {
             <View style={style.config}>
               <Text style={style.h2}>Discard Empty Photos:</Text>
               <Switch
-                trackColor={{ false: '#767577', true: 'darkred' }}
+                trackColor={{ false: '#767577', true: '#4E603E' }}
                 onValueChange={(v) => this.toggle('discard_empty', v)}
                 value={config.get('discard_empty') == 'true'}
               />
@@ -55,7 +55,7 @@ export default class ConfigScreen extends React.Component {
             <View style={style.config}>
               <Text style={style.h2}>Auto Archive Photos:</Text>
               <Switch
-                trackColor={{ false: '#767577', true: 'darkred' }}
+                trackColor={{ false: '#767577', true: '#4E603E' }}
                 onValueChange={(v) => this.toggle('auto_archive', v)}
                 value={config.get('auto_archive') == 'true'}
               />

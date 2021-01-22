@@ -11,6 +11,8 @@ import {
   RefreshControl
 } from 'react-native';
 
+import Icon from 'react-native-vector-icons/FontAwesome5';
+
 import RNFS from 'react-native-fs';
 
 import Moment from 'moment';
@@ -82,11 +84,18 @@ export default class SightingScreen extends React.Component {
                           onPress={() => { this.getPhotos(day, location.location_id) }}>
                           <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                             <View style={{ flex: 1 }}>
-                              <Text style={style.h2}>{location.location_name}</Text>
+                              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                                <Image source={require('./assets/images/crosshairs.png')} style={{ marginLeft: 10, width: 30, height: 30 }} />
+                                <Text style={style.h2}>{location.location_name}</Text>
+                              </View>
                               {Object.keys(location.object_counts).sort().map((object) => {
+                                let iconName = object == 'person' ? 'user' : object == 'vehicle' ? 'car' : 'paw';
                                 return (
                                   <View key={object} style={{ paddingRight: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <Text style={style.t5}>{object}</Text>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                                      <Icon style={{ paddingLeft: 15 }} name={iconName} color='black' size={18} />
+                                      <Text style={style.t5}>{object}</Text>
+                                    </View>
                                     <Text style={style.t5}>{location.object_counts[object]}</Text>
                                   </View>
                                 );
@@ -104,8 +113,8 @@ export default class SightingScreen extends React.Component {
                                       top: parseInt(object.y * ratio),
                                       width: parseInt(object.w * ratio),
                                       height: parseInt(object.h * ratio),
-                                      borderWidth: 1,
-                                      borderColor: 'rgba(0,255,0,1.0)'
+                                      borderWidth: 2,
+                                      borderColor: 'rgb(255, 103, 0)'
                                     }} />
                                 );
                               })}

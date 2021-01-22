@@ -109,7 +109,10 @@ export default class BatchScreen extends React.Component {
                     {Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY hh:mm A')}
                   </Text>
                   <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Text style={style.h2}>{batch['location_name']}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                      <Image source={require('./assets/images/crosshairs.png')} style={{ marginLeft: 10, width: 30, height: 30 }} />
+                      <Text style={style.h2}>{batch['location_name']}</Text>
+                    </View>
                     {progress < 100 &&
                       <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end' }}>
                         <Text style={style.t4}>Processing...</Text>

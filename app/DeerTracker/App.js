@@ -11,6 +11,7 @@ import ImportScreen from './ImportScreen';
 import BatchScreen from './BatchScreen';
 import PhotoScreen from './PhotoScreen';
 import SightingScreen from './SightingScreen';
+import ProfileScreen from './ProfileScreen';
 import ConfigScreen from './ConfigScreen';
 
 const ImportScreenNavigator = createStackNavigator({
@@ -93,6 +94,19 @@ const SightingScreenNavigator = createStackNavigator({
   }
 });
 
+const ProfileScreenNavigator = createStackNavigator({
+  ProfileScreen: {
+    screen: ProfileScreen,
+    navigationOptions: {
+      title: 'Profile',
+      headerTitleStyle: {
+        fontSize: 20
+      },
+      headerTitleAlign: 'center'
+    },
+  }
+});
+
 const ConfigScreenNavigator = createStackNavigator({
   SightingScreen: {
     screen: ConfigScreen,
@@ -114,7 +128,7 @@ const TabNavigator = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: 'Load Card',
         tabBarIcon: ({ tintColor }) => (
-          <Icon name='upload' color={tintColor} size={20} />
+          <Icon name='upload' color={tintColor} size={18} />
         )
       }
     },
@@ -123,7 +137,7 @@ const TabNavigator = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: 'History',
         tabBarIcon: ({ tintColor }) => (
-          <Icon name='camera' color={tintColor} size={20} />
+          <Icon name='camera' color={tintColor} size={18} />
         )
       }
     },
@@ -132,7 +146,16 @@ const TabNavigator = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: 'Sightings',
         tabBarIcon: ({ tintColor }) => (
-          <Icon name='eye' color={tintColor} size={20} />
+          <Icon name='eye' color={tintColor} size={18} />
+        )
+      },
+    },
+    Profiles: {
+      screen: ProfileScreenNavigator,
+      navigationOptions: {
+        tabBarLabel: 'Profiles',
+        tabBarIcon: ({ tintColor }) => (
+          <Icon name='paw' color={tintColor} size={18} />
         )
       },
     },
@@ -141,7 +164,7 @@ const TabNavigator = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: 'Settings',
         tabBarIcon: ({ tintColor }) => (
-          <Icon name='cog' color={tintColor} size={20} />
+          <Icon name='cog' color={tintColor} size={18} />
         )
       },
     },
