@@ -48,7 +48,7 @@ export default class PhotoGallery extends React.Component {
             photo.props = {
                 photo: photo,
                 style: {
-                    top: -screenHeight / 6
+                    top: this.props.showCrops ? -screenHeight / 6 : 0
                 }
             };
 
@@ -105,7 +105,9 @@ export default class PhotoGallery extends React.Component {
                             <TouchableOpacity
                                 key={photo.photo_path}
                                 onPress={() => {
-                                    this.generateCrop(photos[item.index].objects[0]);
+                                    if (this.props.showCrops) {
+                                        this.generateCrop(photos[item.index].objects[0]);
+                                    }
                                     this.setState({ modalVisible: true, imageIndex: item.index });
                                 }}>
                                 {thumb &&
@@ -142,13 +144,7 @@ export default class PhotoGallery extends React.Component {
                             enableSwipeDown={true}
                             enableImageZoom={false}
                             renderImage={this.renderImage.bind(this)}
-                            onChange={(index) => { this.generateCrop(photos[index].objects[0]) }}
-                            onCancel={() => { }}
-                            onDoubleClick={(onCancel) => {
-
-                                // todo zoom to crop, refresh menu
-                                onCancel();
-                            }}
+                            onChange={(index) => { this.props.showCrops && this.generateCrop(photos[index].objects[0]) }}
                             renderFooter={this.renderMenu.bind(this)}
                             swipeDownThreshold={80}
                             onSwipeDown={() => { this.setState({ modalVisible: false }) }}
@@ -165,9 +161,9 @@ export default class PhotoGallery extends React.Component {
         return (
             <View>
                 <Image {...props} />
-                {photo.objects.map((object) => {
+                {this.props.showCrops && photo.objects.map((object) => {
                     let borderColor = 'rgba(255,0,0,1.0)';
-                    if (this.state.crop && this.state.crop.id == object.id) {
+                    if (!this.props.showCrops || (this.state.crop && this.state.crop.id == object.id)) {
                         borderColor = 'rgba(0,255,0,1.0)'
                     }
                     return (
