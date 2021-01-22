@@ -2,8 +2,11 @@ import React from 'react';
 import {
     Modal,
     View,
+    Text,
+    TextInput,
     FlatList,
     TouchableOpacity,
+    TouchableWithoutFeedback,
     Image,
     StyleSheet,
 } from 'react-native';
@@ -18,6 +21,8 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 import Database from './Database';
 import style, { screenWidth, screenHeight, thumbWidth, thumbHeight } from './style';
 
+const root = RNFS.DocumentDirectoryPath;
+
 const detectorUrl = "http://192.168.0.157:5000";
 
 export default class PhotoGallery extends React.Component {
@@ -25,7 +30,7 @@ export default class PhotoGallery extends React.Component {
     constructor(props) {
         super(props);
         this.db = new Database();
-        this.state = { modalVisible: false, photos: [] };
+        this.state = { modalVisible: false, profileVisible: false, photos: [] };
         this.generateThumbs(props.photos);
     }
 
@@ -41,14 +46,19 @@ export default class PhotoGallery extends React.Component {
         photos.map((photo) => {
             photo.url = photo.photo_path;
             photo.props = {
-                photo: photo
+                photo: photo,
+                style: {
+                    top: -screenHeight / 6
+                }
             };
+
             let w = thumbWidth;
             let h = thumbHeight;
             if (photo.width && photo.height) {
                 let scale = w / photo.width;
                 h = scale * photo.height;
             }
+
             let thumbPath = RNFS.CachesDirectoryPath + '/thumb_' + photo.photo_path.split('\\').pop().split('/').pop();
             RNFS.exists(thumbPath).then((exists) => {
                 if (exists) {
@@ -95,7 +105,8 @@ export default class PhotoGallery extends React.Component {
                             <TouchableOpacity
                                 key={photo.photo_path}
                                 onPress={() => {
-                                    this.setState({ modalVisible: true, imageIndex: item.index })
+                                    this.generateCrop(photos[item.index].objects[0]);
+                                    this.setState({ modalVisible: true, imageIndex: item.index });
                                 }}>
                                 {thumb &&
                                     <View>
@@ -131,6 +142,7 @@ export default class PhotoGallery extends React.Component {
                             enableSwipeDown={true}
                             enableImageZoom={false}
                             renderImage={this.renderImage.bind(this)}
+                            onChange={(index) => { this.generateCrop(photos[index].objects[0]) }}
                             onCancel={() => { }}
                             onDoubleClick={(onCancel) => {
 
@@ -154,18 +166,18 @@ export default class PhotoGallery extends React.Component {
             <View>
                 <Image {...props} />
                 {photo.objects.map((object) => {
-                    let borderColor = 'rgba(0,255,0,1.0)';
+                    let borderColor = 'rgba(255,0,0,1.0)';
                     if (this.state.crop && this.state.crop.id == object.id) {
-                        borderColor = 'rgba(255,0,0,1.0)'
+                        borderColor = 'rgba(0,255,0,1.0)'
                     }
                     return (
                         <TouchableOpacity
                             key={object.id}
-                            onPress={() => { this.generateCrop(photo, object) }}
+                            onPress={() => { this.generateCrop(object) }}
                             style={{
                                 ...StyleSheet.absoluteFillObject,
                                 left: parseInt(object.x * ratio),
-                                top: parseInt(object.y * ratio),
+                                top: parseInt(object.y * ratio) - screenHeight / 6,
                                 width: parseInt(object.w * ratio),
                                 height: parseInt(object.h * ratio),
                                 borderWidth: 1,
@@ -177,7 +189,7 @@ export default class PhotoGallery extends React.Component {
         );
     }
 
-    generateCrop(photo, object) {
+    generateCrop(object) {
         let cropPath = RNFS.CachesDirectoryPath + '/crop_' + object.id + '.jpg';
         RNFS.exists(cropPath).then((exists) => {
             if (exists) {
@@ -200,7 +212,7 @@ export default class PhotoGallery extends React.Component {
                         height: 200
                     }
                 };
-                ImageEditor.cropImage(photo.photo_path, cropData).then(url => {
+                ImageEditor.cropImage(root + '/' + object.photo_path, cropData).then(url => {
                     RNFS.moveFile(url, cropPath).catch((err) => {
                         RNFS.unlink(url);
                     }).then(() => {
@@ -222,23 +234,55 @@ export default class PhotoGallery extends React.Component {
         }
         let crop = this.state.crop;
         if (crop) {
+            let max = Math.max(crop.w, crop.h);
+            let w = (thumbWidth / max) * crop.w;
+            let h = (200 / max) * crop.h;
             return (
-                <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <View style={style.galleryMenu}>
-                        <Picker
-                            selectedValue={crop.label}
-                            style={style.picker}
-                            itemStyle={style.pickerItem}
-                            onValueChange={(itemValue, itemIndex) => { this.updateObject(crop, itemIndex) }}>
-                            {crop.label_array.map((label) => {
-                                return (<Picker.Item key={label} label={label} value={label} />);
-                            })}
-                        </Picker>
+                <View>
+                    <View style={{ flexDirection: 'row' }}>
+                        <View style={style.galleryMenu}>
+                            <Text style={style.t6}>Pick class</Text>
+                            <Picker
+                                selectedValue={crop.label}
+                                style={style.picker}
+                                itemStyle={style.pickerItem}
+                                onValueChange={(itemValue, itemIndex) => { this.updateObject(crop, itemIndex) }}>
+                                {crop.label_array.map((label) => {
+                                    return (<Picker.Item key={label} label={label} value={label} />);
+                                })}
+                            </Picker>
+                        </View>
+                        <View style={{ width: thumbWidth, alignItems: 'center' }}>
+                            <Image
+                                source={{ uri: crop.path }}
+                                style={{ width: w, height: h, borderWidth: 1, borderColor: 'rgba(0,255,0,1.0)' }} />
+                            <TouchableOpacity style={style.galleryButton}
+                                onPress={() => { this.setState({ profileVisible: true }) }}>
+                                <Text style={style.t6}>Add to Profile</Text>
+                            </TouchableOpacity>
+                            <Modal
+                                animationType="slide"
+                                transparent={true}
+                                onShow={() => { this.profileModal.focus(); }}
+                                visible={this.state.profileVisible}>
+                                <View style={style.modal}>
+                                    <TextInput
+                                        style={style.t2}
+                                        ref={ref => { this.profileModal = ref; }}
+                                        onChangeText={(text) => { this.setState({ profile: text }) }}
+                                        selectTextOnFocus={true}
+                                        defaultValue="Enter Profile name" />
+                                </View>
+                                <TouchableOpacity style={style.button} onPress={() => { alert('todo save') }}>
+                                    <Text style={style.h1}>Save</Text>
+                                </TouchableOpacity>
+                                <TouchableWithoutFeedback onPress={() => { this.setState({ profileVisible: false }) }}>
+                                    <View style={{ flex: 1 }} />
+                                </TouchableWithoutFeedback>
+                            </Modal>
+                        </View>
                     </View>
-                    <Image
-                        source={{ uri: crop.path }}
-                        style={{ width: thumbWidth, height: 200, borderWidth: 1, borderColor: 'rgba(255,0,0,1.0)' }} />
-                </View>
+                </View >
             );
         }
     }

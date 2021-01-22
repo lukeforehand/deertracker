@@ -67,6 +67,12 @@ export default StyleSheet.create({
     paddingBottom: 5,
     paddingLeft: 10
   },
+  t6: {
+    color: 'gray',
+    textAlign: 'center',
+    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontSize: 20
+  },
   activity: {
     paddingTop: screenHeight / 2,
     height: '100%',
@@ -199,8 +205,17 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   galleryMenu: {
-    height: (screenHeight / 2) - 200,
+    height: screenHeight / 4,
     width: screenWidth / 2
+  },
+  galleryButton: {
+    borderRadius: 2,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginTop: 20,
+    padding: 10,
+    marginBottom: screenHeight / 8
   },
   picker: {
     top: 0,
