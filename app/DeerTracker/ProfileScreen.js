@@ -11,12 +11,10 @@ import {
   RefreshControl
 } from 'react-native';
 
-import Icon from 'react-native-vector-icons/FontAwesome5';
 import RNFS from 'react-native-fs';
 
 import Moment from 'moment';
 
-import MoonPhase from './MoonPhase';
 import Database from './Database';
 
 import style from './style';
@@ -24,7 +22,7 @@ import { thumbWidth } from './style';
 
 const root = RNFS.DocumentDirectoryPath;
 
-export default class SightingScreen extends React.Component {
+export default class ProfileScreen extends React.Component {
 
   constructor(props) {
     super(props);
@@ -66,17 +64,10 @@ export default class SightingScreen extends React.Component {
             <Text style={style.t3}>No sightings, pull down to refresh</Text>
           }
           {Object.keys(objects).sort().reverse().map((day) => {
-            let date = new Date(day);
-            let phase = new MoonPhase().phase(date);
-            //TODO: fix me
-            //moon: {
-            //         phase: phase,
-            //         image: this.loadMoonImage(phase.name)
-            //      }
             return (
               <View key={day}>
                 <Text style={style.h3}>
-                  {Moment(date).format('ddd, MMM Do YYYY')}
+                  {Moment(new Date(day)).format('ddd, MMM Do YYYY')}
                 </Text>
                 <View>
                   {Object.keys(objects[day]).map((locationId) => {
@@ -91,18 +82,12 @@ export default class SightingScreen extends React.Component {
                           onPress={() => { this.getPhotos(day, location.location_id) }}>
                           <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                             <View style={{ flex: 1 }}>
-                              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                                <Image source={require('./assets/images/crosshairs.png')} style={{ marginLeft: 10, width: 30, height: 30 }} />
-                                <Text style={style.h2}>{location.location_name}</Text>
-                              </View>
-                              {Object.entries(location.object_counts).sort((a, b) => {
-                                return a[1] < b[1];
-                              }).map((object) => {
-                                let iconName = object == 'person' ? 'user' : object == 'vehicle' ? 'car' : 'paw';
+                              <Text style={style.h2}>{location.location_name}</Text>
+                              {Object.keys(location.object_counts).sort().map((object) => {
                                 return (
-                                  <View key={object[0]} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                                    <Icon style={{ paddingLeft: 15 }} name={iconName} color='black' size={18} />
-                                    <Text style={style.t5}>{object[1]} {object[0]}</Text>
+                                  <View key={object} style={{ paddingRight: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
+                                    <Text style={style.t5}>{object}</Text>
+                                    <Text style={style.t5}>{location.object_counts[object]}</Text>
                                   </View>
                                 );
                               })}
@@ -119,8 +104,8 @@ export default class SightingScreen extends React.Component {
                                       top: parseInt(object.y * ratio),
                                       width: parseInt(object.w * ratio),
                                       height: parseInt(object.h * ratio),
-                                      borderWidth: 2,
-                                      borderColor: 'rgb(255, 103, 0)'
+                                      borderWidth: 1,
+                                      borderColor: 'rgba(0,255,0,1.0)'
                                     }} />
                                 );
                               })}

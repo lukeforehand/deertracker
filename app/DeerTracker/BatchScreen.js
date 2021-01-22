@@ -13,6 +13,8 @@ import {
 
 import Upload from 'react-native-background-upload';
 
+import Icon from 'react-native-vector-icons/FontAwesome5';
+
 import RNFS from 'react-native-fs';
 
 import Moment from 'moment';
@@ -122,12 +124,24 @@ export default class BatchScreen extends React.Component {
                     }
                   </View>
                   <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Text style={style.t4}>
-                      Sightings: {batch['num_objects']}{'\n'}
-                      Photos: {batch['num_photos']}{'\n'}
-                      Uploaded: {batch['num_uploaded']}{'\n'}
-                      Processed: {batch['num_processed']}
-                    </Text>
+                    <View style={{ flex: 1 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                        <Icon style={{ paddingLeft: 15 }} name='eye' color='black' size={18} />
+                        <Text style={style.t5}>{batch['num_objects']} Sightings</Text>
+                      </View>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                        <Icon style={{ paddingLeft: 15 }} name='camera' color='black' size={18} />
+                        <Text style={style.t5}>{batch['num_photos']} Photos</Text>
+                      </View>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                        <Icon style={{ paddingLeft: 15 }} name='upload' color='black' size={18} />
+                        <Text style={style.t5}>{batch['num_uploaded']} Uploaded</Text>
+                      </View>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                        <Icon style={{ paddingLeft: 15 }} name='check' color='black' size={18} />
+                        <Text style={style.t5}>{batch['num_processed']} Processed</Text>
+                      </View>
+                    </View>
                     <View>
                       {batch['photo_path'] &&
                         <Image source={{ uri: root + '/' + batch['photo_path'] }} style={style.smallThumbnail} />

@@ -68,7 +68,8 @@ export default StyleSheet.create({
     textAlign: 'left',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
     fontSize: 18,
-    paddingBottom: 5,
+    paddingBottom: 10,
+    paddingTop: 5,
     paddingLeft: 10
   },
   t6: {
@@ -124,14 +125,6 @@ export default StyleSheet.create({
     alignItems: 'center',
     height: 50,
     width: 50
-  },
-  buttonDisabled: {
-    borderRadius: 2,
-    margin: 20,
-    backgroundColor: 'lightgrey',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 60
   },
   marker: {
     shadowColor: '#fff',

@@ -10,6 +10,8 @@ import {
   TouchableOpacity
 } from 'react-native';
 
+import DocumentPicker from 'react-native-document-picker';
+
 import Database from './Database';
 import SwipeRow from './SwipeRow';
 
@@ -61,7 +63,7 @@ export default class LocationScreen extends React.Component {
                 <TouchableOpacity
                   key={location['id']}
                   style={style.locationButton}
-                  onPress={() => { this.props.navigation.navigate('ImportScreen', { location: location }) }}>
+                  onPress={() => { this.pickFiles(location) }}>
                   <View style={{ flexDirection: 'row' }}>
                     <Image source={require('./assets/images/crosshairs.png')} style={{ margin: 10, width: 80, height: 80 }} />
                     <View>
@@ -83,6 +85,26 @@ export default class LocationScreen extends React.Component {
         </ScrollView>
       </SafeAreaView >
     );
+  }
+
+  pickFiles(location) {
+    DocumentPicker.pickMultiple({
+      type: [DocumentPicker.types.images],
+    }).then((files) => {
+      this.props.navigation.navigate('ImportScreen', {
+        location: location,
+        files: files.map((file) => {
+          file.photo_path = file.uri;
+          file.path = file.uri;
+          return file;
+        })
+      })
+    }).catch((err) => {
+      if (DocumentPicker.isCancel(err)) {
+      } else {
+        throw err;
+      }
+    });
   }
 
   deleteLocation(location, callback) {
