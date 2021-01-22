@@ -48,7 +48,7 @@ export default class PhotoGallery extends React.Component {
             photo.props = {
                 photo: photo,
                 style: {
-                    top: this.props.showCrops ? -screenHeight / 6 : 0
+                    top: this.props.showCrops ? -screenHeight / 4 : 0
                 }
             };
 
@@ -173,7 +173,7 @@ export default class PhotoGallery extends React.Component {
                             style={{
                                 ...StyleSheet.absoluteFillObject,
                                 left: parseInt(object.x * ratio),
-                                top: parseInt(object.y * ratio) - screenHeight / 6,
+                                top: parseInt(object.y * ratio) - screenHeight / 4,
                                 width: parseInt(object.w * ratio),
                                 height: parseInt(object.h * ratio),
                                 borderWidth: 2,
