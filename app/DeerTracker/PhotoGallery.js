@@ -8,6 +8,7 @@ import {
     TouchableOpacity,
     TouchableWithoutFeedback,
     Image,
+    RefreshControl,
     StyleSheet,
 } from 'react-native';
 
@@ -17,6 +18,8 @@ import RNFS from 'react-native-fs';
 import ImageEditor from "@react-native-community/image-editor";
 import ImageResizer from 'react-native-image-resizer';
 import ImageViewer from 'react-native-image-zoom-viewer';
+
+import Moment from 'moment';
 
 import Database from './Database';
 import style, { screenWidth, screenHeight, thumbWidth, thumbHeight } from './style';
@@ -46,19 +49,14 @@ export default class PhotoGallery extends React.Component {
         photos.map((photo) => {
             photo.url = photo.photo_path;
             photo.props = {
-                photo: photo,
-                style: {
-                    top: this.props.showCrops ? -screenHeight / 4 : 0
-                }
+                photo: photo
             };
-
             let w = thumbWidth;
             let h = thumbHeight;
             if (photo.width && photo.height) {
                 let scale = w / photo.width;
                 h = scale * photo.height;
             }
-
             let thumbPath = RNFS.CachesDirectoryPath + '/thumb_' + photo.photo_path.split('\\').pop().split('/').pop();
             RNFS.exists(thumbPath).then((exists) => {
                 if (exists) {
@@ -94,6 +92,9 @@ export default class PhotoGallery extends React.Component {
         return (
             <View style={this.props.style}>
                 <FlatList
+                    refreshControl={
+                        <RefreshControl tintColor='transparent' refreshing={false} onRefresh={this.props.onRefresh} />
+                    }
                     style={{ height: '100%', width: '100%' }}
                     numColumns={2}
                     columnWrapperStyle={{ justifyContent: 'space-evenly' }}
@@ -158,9 +159,22 @@ export default class PhotoGallery extends React.Component {
     renderImage(props) {
         let photo = props.photo;
         let ratio = screenWidth / photo.width;
+        let time = photo.time ? Moment(photo.time).format('ddd, MMM Do YYYY hh:mm A') : ""
+        let top = this.props.showCrops ? - screenHeight / 4 : 0;
+        props.style.top = top;
         return (
             <View>
                 <Image {...props} />
+                <View style={{ top: top }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                        <Image source={require('./assets/images/crosshairs.png')}
+                            style={{ width: 15, height: 15 }} />
+                        <Text style={style.t7}>{photo.location_name}</Text>
+                    </View>
+                    <View style={{ alignItems: 'center' }}>
+                        <Text style={style.t7}>{time}</Text>
+                    </View>
+                </View>
                 {this.props.showCrops && photo.objects.map((object) => {
                     let borderColor = 'green';
                     if (!this.props.showCrops || (this.state.crop && this.state.crop.id == object.id)) {
@@ -234,14 +248,14 @@ export default class PhotoGallery extends React.Component {
             let w = (thumbWidth / max) * crop.w;
             let h = (200 / max) * crop.h;
             return (
-                <View>
-                    <View style={{ flexDirection: 'row' }}>
+                <View style={{ height: screenHeight / 2 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <View style={style.galleryMenu}>
                             <Text style={style.t6}>Pick class</Text>
                             <Picker
                                 selectedValue={crop.label}
                                 style={style.picker}
-                                itemStyle={style.pickerItem}
+                                itemStyle={[style.pickerItem, { height: h }]}
                                 onValueChange={(itemValue, itemIndex) => { this.updateObject(crop, itemIndex) }}>
                                 {crop.label_array.map((label) => {
                                     return (<Picker.Item key={label} label={label} value={label} />);
@@ -252,16 +266,12 @@ export default class PhotoGallery extends React.Component {
                             <Image
                                 source={{ uri: crop.path }}
                                 style={{ width: w, height: h, borderWidth: 1, borderColor: 'rgb(255, 103, 0)' }} />
-                            <TouchableOpacity style={style.galleryButton}
-                                onPress={() => { this.setState({ profileVisible: true }) }}>
-                                <Text style={style.t6}>Add to Profile</Text>
-                            </TouchableOpacity>
                             <Modal
                                 animationType="slide"
                                 transparent={true}
                                 onShow={() => { this.profileModal.focus(); }}
                                 visible={this.state.profileVisible}>
-                                <View style={style.modal}>
+                                <View style={style.profileModal}>
                                     <TextInput
                                         style={style.t2}
                                         ref={ref => { this.profileModal = ref; }}
@@ -278,7 +288,11 @@ export default class PhotoGallery extends React.Component {
                             </Modal>
                         </View>
                     </View>
-                </View >
+                    <TouchableOpacity style={style.galleryButton}
+                        onPress={() => { this.setState({ profileVisible: true }) }}>
+                        <Text style={style.t6}>Add to Profile</Text>
+                    </TouchableOpacity>
+                </View>
             );
         }
     }

@@ -39,8 +39,7 @@ export default StyleSheet.create({
     color: '#e3e8e8',
     textAlign: 'left',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
-    fontSize: 18,
-    padding: 10
+    fontSize: 18
   },
   t1: {
     color: 'black',
@@ -83,7 +82,13 @@ export default StyleSheet.create({
     color: 'gray',
     textAlign: 'center',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
-    fontSize: 20
+    fontSize: 20,
+  },
+  t7: {
+    color: 'gray',
+    textAlign: 'center',
+    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontSize: 16
   },
   activity: {
     paddingTop: screenHeight / 2,
@@ -151,6 +156,16 @@ export default StyleSheet.create({
     borderColor: 'gray',
     borderWidth: 1
   },
+  profileModal: {
+    borderRadius: 2,
+    marginTop: 110,
+    marginLeft: 20,
+    marginRight: 20,
+    maxHeight: 90,
+    backgroundColor: 'white',
+    borderColor: 'gray',
+    borderWidth: 1
+  },
   input: {
     borderColor: 'gray',
     borderWidth: 1,
@@ -201,24 +216,25 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   galleryMenu: {
-    height: screenHeight / 4,
-    width: screenWidth / 2
+    width: thumbWidth - 40,
+    borderWidth: 1,
+    borderColor: 'gray',
+    paddingTop: 10,
+    marginLeft: 20,
+    marginRight: 20
   },
   galleryButton: {
     borderRadius: 2,
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
     borderColor: 'gray',
     borderWidth: 1,
-    marginTop: 20,
+    margin: 40,
     padding: 10,
-    marginBottom: screenHeight / 8
   },
   picker: {
-    top: 0,
     backgroundColor: 'black'
   },
   pickerItem: {
-    height: 150,
     color: 'white'
   }
 });

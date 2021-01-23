@@ -307,13 +307,16 @@ export default class BatchScreen extends React.Component {
   getPhotos(batch) {
     let batchId = batch['id'];
     let title = Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY hh:mm A');
+    let subTitle = batch['location_name'];
     this.db.selectBatchPhotos(batchId).then((photos) => {
       if (photos.length > 0) {
         this.props.navigation.navigate('PhotoScreen', {
           title: title,
+          subTitle: subTitle,
           showCrops: false,
           photos: photos.map((photo) => {
             photo.photo_path = root + '/' + photo.photo_path;
+            photo.location_name = batch['location_name'];
             return photo;
           })
         });

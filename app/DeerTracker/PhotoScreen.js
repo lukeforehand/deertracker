@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, SafeAreaView } from 'react-native';
+import { Image, View, Text, SafeAreaView } from 'react-native';
 
 import style, { screenHeight, thumbHeight } from './style';
 
@@ -13,12 +13,24 @@ export default class PhotoScreen extends React.Component {
 
   render() {
     const title = this.props.navigation.getParam('title');
+    const subTitle = this.props.navigation.getParam('subTitle');
     const photos = this.props.navigation.getParam('photos');
     const showCrops = this.props.navigation.getParam('showCrops');
     return (
       <SafeAreaView>
-        <Text style={style.t3}>{title}</Text>
-        <PhotoGallery style={{ height: screenHeight - (thumbHeight * 2) }} photos={photos} showCrops={showCrops} />
+        <View style={{ alignItems: 'center', marginLeft: 10 }}>
+          <Text style={style.t4}>{title}</Text>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+          <Image source={require('./assets/images/crosshairs.png')} style={{ marginLeft: 20, width: 30, height: 30 }} />
+          <Text style={style.t4}>{subTitle}</Text>
+        </View>
+        <PhotoGallery style={{ height: screenHeight - (thumbHeight * 2) - 60 }}
+          photos={photos}
+          showCrops={showCrops}
+          onRefresh={() => {
+            this.props.navigation.goBack();
+          }} />
       </SafeAreaView >
     );
   }

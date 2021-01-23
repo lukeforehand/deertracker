@@ -73,11 +73,11 @@ export default class SightingScreen extends React.Component {
             let moonImage = moon.image(phase);
             return (
               <View key={day}>
-                <View style={[style.h3, { flexDirection: 'row', justifyContent: 'space-between' }]}>
+                <View style={[style.h3, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
                   <Text style={style.h4}>
                     {Moment(date).format('ddd, MMM Do YYYY')}
                   </Text>
-                  <Image style={{ width: 40, height: 40 }} source={moonImage} />
+                  <Image style={{ width: 35, height: 35 }} source={moonImage} />
                 </View>
                 <View>
                   {Object.keys(objects[day]).map((locationId) => {
@@ -99,7 +99,7 @@ export default class SightingScreen extends React.Component {
                               {Object.entries(location.object_counts).sort((a, b) => {
                                 return a[1] < b[1];
                               }).map((object) => {
-                                let iconName = object == 'person' ? 'user' : object == 'vehicle' ? 'car' : 'paw';
+                                let iconName = object[0] == 'person' ? 'user' : object[0] == 'vehicle' ? 'car' : 'paw';
                                 return (
                                   <View key={object[0]} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
                                     <Icon style={{ paddingLeft: 15 }} name={iconName} color='black' size={18} />
@@ -144,11 +144,14 @@ export default class SightingScreen extends React.Component {
     this.db.selectObjects(day, locationId).then((objects) => {
       let photos = objects[day][locationId].photos;
       let title = Moment(new Date(day)).format('ddd, MMM Do YYYY');
+      let subTitle = objects[day][locationId].location_name;
       this.props.navigation.navigate('PhotoScreen', {
         title: title,
+        subTitle: subTitle,
         showCrops: true,
         photos: Object.values(photos).map((photo) => {
           photo.photo_path = root + '/' + photo.photo_path;
+          photo.location_name = objects[day][locationId].location_name;
           return photo;
         })
       });

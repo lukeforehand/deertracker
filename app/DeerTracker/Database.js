@@ -15,6 +15,7 @@ export default class Database {
                 tx.executeSql(CREATE_TABLE_LOCATION);
                 tx.executeSql(CREATE_TABLE_BATCH);
                 tx.executeSql(CREATE_TABLE_PHOTO);
+                tx.executeSql(CREATE_TABLE_PROFILE);
                 tx.executeSql(CREATE_TABLE_OBJECT);
                 tx.executeSql(CREATE_TABLE_CONFIG);
                 tx.executeSql(`INSERT INTO config (key, value) SELECT 'discard_empty', 'true' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'discard_empty')`);
@@ -136,7 +137,7 @@ export default class Database {
     async selectBatchPhotos(batchId) {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql(`
-            SELECT p.batch_id, p.path as photo_path, p.width, p.height, o.*
+            SELECT p.batch_id, p.path as photo_path, p.width, p.height, p.time, o.*
             FROM photo p LEFT OUTER JOIN object o ON o.photo_id = p.id
             WHERE p.batch_id = ?
         `, [batchId]);
@@ -151,6 +152,7 @@ export default class Database {
                     batch_id: o.batch_id,
                     photo_id: o.photo_id,
                     photo_path: o.photo_path,
+                    time: o.time,
                     width: o.width,
                     height: o.height,
                     objects: []
@@ -263,8 +265,8 @@ export default class Database {
         obj['time'] = Moment(obj['time']).format('YYYY-MM-DD HH:mm:ss');
         const db = await SQLite.openDatabase({ name: database, location: location });
         return await db.executeSql(
-            `INSERT INTO object(id, x, y, w, h, lat, lon, time, label, label_array, score, score_array, photo_id, location_id)
-            VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO object(id, x, y, w, h, lat, lon, time, label, label_array, score, score_array, reviewed, photo_id, location_id)
+            VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, FALSE, ?, ?)`,
             [
                 obj['x'],
                 obj['y'],
@@ -352,10 +354,20 @@ CREATE TABLE IF NOT EXISTS object (
     label_array VARCHAR(255) NOT NULL,
     score FLOAT NOT NULL,
     score_array VARCHAR(255) NOT NULL,
+    reviewed BOOLEAN NOT NULL,
     photo_id CHARACTER(32) NOT NULL,
     location_id INTEGER NOT NULL,
+    profile_id INTEGER NULL,
     FOREIGN KEY(photo_id) REFERENCES photo(id),
-    FOREIGN KEY(location_id) REFERENCES location(id)
+    FOREIGN KEY(location_id) REFERENCES location(id),
+    FOREIGN KEY(profile_id) REFERENCES profile(id)
+)
+`
+
+CREATE_TABLE_PROFILE = `
+CREATE TABLE IF NOT EXISTS profile (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(255) NOT NULL UNIQUE
 )
 `
 

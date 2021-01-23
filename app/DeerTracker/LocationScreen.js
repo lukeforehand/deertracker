@@ -97,6 +97,7 @@ export default class LocationScreen extends React.Component {
         files: files.map((file) => {
           file.photo_path = file.uri;
           file.path = file.uri;
+          file.location_name = location.name;
           return file;
         })
       })
