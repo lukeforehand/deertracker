@@ -35,6 +35,13 @@ export default StyleSheet.create({
     fontSize: 18,
     padding: 10
   },
+  h4: {
+    color: '#e3e8e8',
+    textAlign: 'left',
+    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontSize: 18,
+    padding: 10
+  },
   t1: {
     color: 'black',
     textAlign: 'center',
@@ -186,7 +193,7 @@ export default StyleSheet.create({
     height: 150,
   },
   importScreenBottom: {
-    height: screenHeight - 150 - 100, // tab nav
+    height: screenHeight - 150 - (thumbHeight * 2)
   },
   config: {
     flexDirection: 'row',

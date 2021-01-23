@@ -117,7 +117,6 @@ export default class BatchScreen extends React.Component {
                     </View>
                     {progress < 100 &&
                       <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end' }}>
-                        <Text style={style.t4}>Processing...</Text>
                         <ActivityIndicator size='small' />
                         <Text style={style.t4}>{progress}%</Text>
                       </View>

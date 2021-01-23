@@ -145,4 +145,19 @@ export default class MoonPhase {
 
     }
 
+    image(phase) {
+        let name = phase.name;
+        switch (name) {
+            case 'Waxing Gibbous': return require('./assets/images/moons/moon_waxg.png');
+            case 'Waxing Crescent': return require('./assets/images/moons/moon_waxc.png');
+            case 'Waning Gibbous': return require('./assets/images/moons/moon_wang.png');
+            case 'Waning Crescent': return require('./assets/images/moons/moon_wanc.png');
+            case 'New Moon': return require('./assets/images/moons/moon_new.png');
+            case 'Last Quarter': return require('./assets/images/moons/moon_lq.png');
+            case 'Full Moon': return require('./assets/images/moons/moon_full.png');
+            case 'First Quarter': return require('./assets/images/moons/moon_fq.png');
+            default: throw new Error('Could not load moon image ' + name);
+        }
+    }
+
 }

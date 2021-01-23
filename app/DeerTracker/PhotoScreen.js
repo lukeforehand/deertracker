@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, SafeAreaView } from 'react-native';
 
-import style from './style';
+import style, { screenHeight, thumbHeight } from './style';
 
 import PhotoGallery from './PhotoGallery';
 
@@ -18,7 +18,7 @@ export default class PhotoScreen extends React.Component {
     return (
       <SafeAreaView>
         <Text style={style.t3}>{title}</Text>
-        <PhotoGallery photos={photos} showCrops={showCrops} />
+        <PhotoGallery style={{ height: screenHeight - (thumbHeight * 2) }} photos={photos} showCrops={showCrops} />
       </SafeAreaView >
     );
   }

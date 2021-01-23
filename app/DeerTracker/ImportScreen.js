@@ -40,9 +40,7 @@ export default class ImportScreen extends React.Component {
             <Text style={style.h1}>Import {files.length} Photos</Text>
           </TouchableOpacity>
         </View>
-        <View style={style.importScreenBottom}>
-          <PhotoGallery photos={files} showCrops={false} />
-        </View>
+        <PhotoGallery style={style.importScreenBottom} photos={files} showCrops={false} />
       </SafeAreaView >
     );
   }
@@ -65,7 +63,7 @@ export default class ImportScreen extends React.Component {
                 return RNFS.hash(file.path, 'md5').then((hash) => {
                   let relativeDestFile = relativePath + '/' + hash + '.jpg';
                   this.db.insertPhoto(hash, relativeDestFile, location['lat'], location['lon'], batchId).then(() => {
-                    RNFS.moveFile(file.path, root + '/' + relativeDestFile);
+                    RNFS.copyFile(file.path, root + '/' + relativeDestFile);
                   }).catch((error) => {
                     console.log(error);
                     console.log("deleting " + file.path);
@@ -73,7 +71,6 @@ export default class ImportScreen extends React.Component {
                   });
                 });
               })).then(() => {
-                this.removeEmptyFolders();
                 this.db.selectBatches().then((batches) => {
                   this.props.navigation.popToTop('LocationScreen');
                   this.props.navigation.navigate('BatchScreen', {

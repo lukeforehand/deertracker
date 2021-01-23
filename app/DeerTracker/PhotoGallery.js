@@ -92,7 +92,7 @@ export default class PhotoGallery extends React.Component {
     render() {
         const photos = this.state.photos;
         return (
-            <View>
+            <View style={this.props.style}>
                 <FlatList
                     style={{ height: '100%', width: '100%' }}
                     numColumns={2}
@@ -124,7 +124,7 @@ export default class PhotoGallery extends React.Component {
                                                     top: parseInt(o.y * ratio),
                                                     width: parseInt(o.w * ratio),
                                                     height: parseInt(o.h * ratio),
-                                                    borderWidth: 2,
+                                                    borderWidth: 1,
                                                     borderColor: 'rgb(255, 103, 0)'
                                                 }} />
                                             );
@@ -176,7 +176,7 @@ export default class PhotoGallery extends React.Component {
                                 top: parseInt(object.y * ratio) - screenHeight / 4,
                                 width: parseInt(object.w * ratio),
                                 height: parseInt(object.h * ratio),
-                                borderWidth: 2,
+                                borderWidth: 1,
                                 borderColor: borderColor,
                             }} />
                     );
@@ -251,7 +251,7 @@ export default class PhotoGallery extends React.Component {
                         <View style={{ width: thumbWidth, alignItems: 'center' }}>
                             <Image
                                 source={{ uri: crop.path }}
-                                style={{ width: w, height: h, borderWidth: 2, borderColor: 'rgb(255, 103, 0)' }} />
+                                style={{ width: w, height: h, borderWidth: 1, borderColor: 'rgb(255, 103, 0)' }} />
                             <TouchableOpacity style={style.galleryButton}
                                 onPress={() => { this.setState({ profileVisible: true }) }}>
                                 <Text style={style.t6}>Add to Profile</Text>

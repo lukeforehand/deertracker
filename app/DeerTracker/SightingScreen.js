@@ -24,6 +24,8 @@ import { thumbWidth } from './style';
 
 const root = RNFS.DocumentDirectoryPath;
 
+const moon = new MoonPhase();
+
 export default class SightingScreen extends React.Component {
 
   constructor(props) {
@@ -67,17 +69,16 @@ export default class SightingScreen extends React.Component {
           }
           {Object.keys(objects).sort().reverse().map((day) => {
             let date = new Date(day);
-            let phase = new MoonPhase().phase(date);
-            //TODO: fix me
-            //moon: {
-            //         phase: phase,
-            //         image: this.loadMoonImage(phase.name)
-            //      }
+            let phase = moon.phase(date);
+            let moonImage = moon.image(phase);
             return (
               <View key={day}>
-                <Text style={style.h3}>
-                  {Moment(date).format('ddd, MMM Do YYYY')}
-                </Text>
+                <View style={[style.h3, { flexDirection: 'row', justifyContent: 'space-between' }]}>
+                  <Text style={style.h4}>
+                    {Moment(date).format('ddd, MMM Do YYYY')}
+                  </Text>
+                  <Image style={{ width: 40, height: 40 }} source={moonImage} />
+                </View>
                 <View>
                   {Object.keys(objects[day]).map((locationId) => {
                     let location = objects[day][locationId];
@@ -119,7 +120,7 @@ export default class SightingScreen extends React.Component {
                                       top: parseInt(object.y * ratio),
                                       width: parseInt(object.w * ratio),
                                       height: parseInt(object.h * ratio),
-                                      borderWidth: 2,
+                                      borderWidth: 1,
                                       borderColor: 'rgb(255, 103, 0)'
                                     }} />
                                 );
@@ -135,7 +136,7 @@ export default class SightingScreen extends React.Component {
             );
           })}
         </ScrollView>
-      </SafeAreaView>
+      </SafeAreaView >
     );
   }
 

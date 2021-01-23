@@ -38,7 +38,7 @@ const ImportScreenNavigator = createStackNavigator({
   ImportScreen: {
     screen: ImportScreen,
     navigationOptions: {
-      title: 'Photos',
+      title: 'Import',
       headerTitleStyle: {
         fontSize: 20
       },
