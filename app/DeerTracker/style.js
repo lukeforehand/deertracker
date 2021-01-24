@@ -28,8 +28,8 @@ export default StyleSheet.create({
     backgroundColor: '#4E603E',
     shadowColor: '#000',
     shadowOpacity: 0.5,
-    shadowRadius: 20,
-    elevation: 20,
+    shadowRadius: 10,
+    elevation: 10,
     textAlign: 'left',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
     fontSize: 18,
@@ -112,12 +112,12 @@ export default StyleSheet.create({
     top: '50%'
   },
   button: {
-    borderRadius: 2,
+    borderRadius: 10,
     margin: 20,
     shadowColor: '#000',
     shadowOpacity: 0.5,
-    shadowRadius: 20,
-    elevation: 20,
+    shadowRadius: 10,
+    elevation: 10,
     backgroundColor: '#4E603E',
     justifyContent: 'center',
     alignItems: 'center',
@@ -125,13 +125,13 @@ export default StyleSheet.create({
   },
   locationArrow: {
     color: 'blue',
-    borderRadius: 2,
+    borderRadius: 10,
     margin: 25,
     marginLeft: 0,
     shadowColor: '#000',
     shadowOpacity: 0.5,
-    shadowRadius: 20,
-    elevation: 20,
+    shadowRadius: 10,
+    elevation: 10,
     backgroundColor: 'lightgray',
     justifyContent: 'center',
     alignItems: 'center',
@@ -147,21 +147,28 @@ export default StyleSheet.create({
     height: 30
   },
   modal: {
-    borderRadius: 2,
+    borderRadius: 10,
     marginTop: 110,
     marginLeft: 20,
     marginRight: 20,
-    maxHeight: 90,
     backgroundColor: 'white',
     borderColor: 'gray',
     borderWidth: 1
   },
   profileModal: {
-    borderRadius: 2,
-    marginTop: 110,
+    borderRadius: 10,
+    marginTop: 80,
     marginLeft: 20,
     marginRight: 20,
-    maxHeight: 90,
+    backgroundColor: 'white',
+    borderColor: 'gray',
+    borderWidth: 1
+  },
+  saveProfileModal: {
+    borderRadius: 10,
+    marginTop: 80 + 280,
+    marginLeft: 20,
+    marginRight: 20,
     backgroundColor: 'white',
     borderColor: 'gray',
     borderWidth: 1
@@ -174,9 +181,9 @@ export default StyleSheet.create({
   locationButton: {
     shadowColor: '#000',
     shadowOpacity: 0.5,
-    shadowRadius: 20,
-    elevation: 20,
-    borderRadius: 2,
+    shadowRadius: 10,
+    elevation: 10,
+    borderRadius: 10,
     backgroundColor: 'white',
     borderColor: 'gray',
     borderWidth: 1,
@@ -208,7 +215,7 @@ export default StyleSheet.create({
     height: 150,
   },
   importScreenBottom: {
-    height: screenHeight - 150 - (thumbHeight * 2)
+    height: screenHeight - (thumbHeight * 3)
   },
   config: {
     flexDirection: 'row',
@@ -217,19 +224,25 @@ export default StyleSheet.create({
   },
   galleryMenu: {
     width: thumbWidth - 40,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: 'gray',
     paddingTop: 10,
     marginLeft: 20,
-    marginRight: 20
+    marginRight: 20,
+    paddingBottom: 5
   },
   galleryButton: {
-    borderRadius: 2,
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    borderColor: 'gray',
-    borderWidth: 1,
+    borderRadius: 10,
     margin: 40,
-    padding: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 10,
+    backgroundColor: '#4E603E',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 60
   },
   picker: {
     backgroundColor: 'black'

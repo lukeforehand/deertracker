@@ -70,7 +70,7 @@ export default class AddLocationScreen extends React.Component {
           }
           {this.state.region &&
             <Modal
-              animationType="slide"
+              animationType='slide'
               transparent={true}
               onShow={() => { this.location.focus(); }}
               visible={this.state.modalVisible}>
@@ -80,14 +80,14 @@ export default class AddLocationScreen extends React.Component {
                   ref={ref => { this.location = ref; }}
                   onChangeText={(text) => { this.setState({ location: text }) }}
                   selectTextOnFocus={true}
-                  defaultValue="Enter location name" />
+                  defaultValue='Enter location name' />
                 <Text style={style.t1}>
                   {this.state.region.latitude.toFixed(5)}, {this.state.region.longitude.toFixed(5)}
                 </Text>
+                <TouchableOpacity style={style.button} onPress={this.saveLocation.bind(this)}>
+                  <Text style={style.h1}>Save</Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity style={style.button} onPress={this.saveLocation.bind(this)}>
-                <Text style={style.h1}>Save</Text>
-              </TouchableOpacity>
               <TouchableWithoutFeedback onPress={() => { this.setState({ modalVisible: false }) }}>
                 <View style={{ flex: 1 }} />
               </TouchableWithoutFeedback>
@@ -99,10 +99,10 @@ export default class AddLocationScreen extends React.Component {
   }
 
   saveLocation() {
-    location = this.state.location;
-    lat = this.state.region.latitude;
-    lon = this.state.region.longitude;
-    if (location && location.length > 0 && location != "Enter location name") {
+    let location = this.state.location;
+    let lat = this.state.region.latitude;
+    let lon = this.state.region.longitude;
+    if (location && location.length > 0 && location != 'Enter location name') {
       this.db.insertLocation(location, lat, lon).then((rs) => {
         this.db.selectLocations().then((locations) => {
           this.setState({ modalVisible: false });
@@ -112,11 +112,11 @@ export default class AddLocationScreen extends React.Component {
         });
       }).catch((error) => {
         if (error.code && error.code == 6) {
-          Alert.alert("That name already exists");
+          Alert.alert('That name already exists');
         }
       });
     } else {
-      Alert.alert("Enter location name");
+      Alert.alert('Enter location name');
     }
   }
 

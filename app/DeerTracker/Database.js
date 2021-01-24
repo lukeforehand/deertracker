@@ -119,6 +119,14 @@ export default class Database {
         })[0][0];
     }
 
+    async updateObjectProfile(objectId, profileId) {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        return await db.executeSql(
+            'UPDATE object set profile_id = ? WHERE id = ?',
+            [profileId, objectId]
+        );
+    }
+
     async updateObject(objectId, label, score) {
         const db = await SQLite.openDatabase({ name: database, location: location });
         return await db.executeSql(
@@ -170,10 +178,12 @@ export default class Database {
         SELECT * FROM (
             SELECT o.id, STRFTIME('%Y-%m-%d', o.time) AS day, l.name AS location_name,
                 l.id AS location_id, o.label, o.label_array, o.score_array, o.time,
-                p.upload_id, p.width, p.height, p.path AS photo_path, o.x, o.y, o.w, o.h
+                p.upload_id, p.width, p.height, p.path AS photo_path, o.x, o.y, o.w, o.h,
+                i.name AS profile_name, i.id AS profile_id
             FROM object o
             JOIN photo p ON p.id = o.photo_id
             JOIN location l ON l.id = o.location_id
+            LEFT JOIN profile i ON i.id = o.profile_id
             ORDER BY day DESC
         )`;
         if (day && locationId) {
@@ -248,11 +258,26 @@ export default class Database {
         })[0];
     }
 
+    async selectProfiles() {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        rs = await db.executeSql('SELECT * FROM profile ORDER BY name ASC')
+        return rs.map((r) => {
+            return r.rows.raw();
+        })[0];
+    }
+
     async insertLocation(name, lat, lon) {
         const db = await SQLite.openDatabase({ name: database, location: location });
         return await db.executeSql(
             'INSERT INTO location(id, name, lat, lon) VALUES(NULL, ?, ?, ?)',
             [name, lat, lon]);
+    }
+
+    async insertProfile(objectId, name) {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        return await db.executeSql(
+            'INSERT INTO profile(id, name) VALUES(NULL, ?)',
+            [name]);
     }
 
     async deleteLocation(id) {

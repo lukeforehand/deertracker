@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+    Alert,
     Modal,
     View,
     Text,
@@ -33,8 +34,12 @@ export default class PhotoGallery extends React.Component {
     constructor(props) {
         super(props);
         this.db = new Database();
-        this.state = { modalVisible: false, profileVisible: false, photos: [] };
+        this.state = { modalVisible: false, profileVisible: false, saveProfileVisible: false, photos: [] };
         this.generateThumbs(props.photos);
+    }
+
+    componentDidMount() {
+        this.fetchData();
     }
 
     componentDidUpdate() {
@@ -247,6 +252,8 @@ export default class PhotoGallery extends React.Component {
             let max = Math.max(crop.w, crop.h);
             let w = (thumbWidth / max) * crop.w;
             let h = (200 / max) * crop.h;
+            let profiles = this.state.profiles;
+            let selectedProfile = this.state.selectedProfile;
             return (
                 <View style={{ height: screenHeight / 2 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -266,34 +273,96 @@ export default class PhotoGallery extends React.Component {
                             <Image
                                 source={{ uri: crop.path }}
                                 style={{ width: w, height: h, borderWidth: 1, borderColor: 'rgb(255, 103, 0)' }} />
+                            <Text style={style.h1}>{crop.profile_name}</Text>
+                        </View>
+                        <Modal
+                            animationType='slide'
+                            transparent={true}
+                            visible={this.state.profileVisible}>
+                            <View style={style.profileModal}>
+                                <Text style={style.h3}>Select Profile</Text>
+                                <Picker selectedValue={selectedProfile}
+                                    onValueChange={(itemValue, itemIndex) => {
+                                        if (itemIndex > 0) {
+                                            this.updateProfile(crop, profiles[itemIndex - 1])
+                                        }
+                                    }}>
+                                    <Picker.Item key='-1' label='' value='-1' />
+                                    {profiles.map((p) => {
+                                        return (<Picker.Item key={p.id} label={p.name} value={p.id} />);
+                                    })}
+                                    <Picker.Item key='' label='Add Profile' value='' />
+                                </Picker>
+                            </View>
+                            <TouchableWithoutFeedback onPress={() => { this.setState({ profileVisible: false }) }}>
+                                <View style={{ flex: 1 }} />
+                            </TouchableWithoutFeedback>
                             <Modal
-                                animationType="slide"
+                                animationType='slide'
                                 transparent={true}
                                 onShow={() => { this.profileModal.focus(); }}
-                                visible={this.state.profileVisible}>
-                                <View style={style.profileModal}>
+                                visible={this.state.saveProfileVisible}>
+                                <View style={style.saveProfileModal}>
                                     <TextInput
                                         style={style.t2}
                                         ref={ref => { this.profileModal = ref; }}
                                         onChangeText={(text) => { this.setState({ profile: text }) }}
                                         selectTextOnFocus={true}
-                                        defaultValue="Enter Profile name" />
+                                        defaultValue='Enter profile name' />
+                                    <TouchableOpacity style={style.button} onPress={this.saveProfile.bind(this)}>
+                                        <Text style={style.h1}>Save</Text>
+                                    </TouchableOpacity>
                                 </View>
-                                <TouchableOpacity style={style.button} onPress={() => { alert('todo save') }}>
-                                    <Text style={style.h1}>Save</Text>
-                                </TouchableOpacity>
-                                <TouchableWithoutFeedback onPress={() => { this.setState({ profileVisible: false }) }}>
+                                <TouchableWithoutFeedback onPress={() => { this.setState({ saveProfileVisible: false }) }}>
                                     <View style={{ flex: 1 }} />
                                 </TouchableWithoutFeedback>
                             </Modal>
-                        </View>
+                        </Modal>
                     </View>
                     <TouchableOpacity style={style.galleryButton}
-                        onPress={() => { this.setState({ profileVisible: true }) }}>
-                        <Text style={style.t6}>Add to Profile</Text>
+                        onPress={() => { this.setState({ selectedProfile: crop.profile_id, profileVisible: true }) }}>
+                        <Text style={style.h1}>Profile</Text>
                     </TouchableOpacity>
-                </View>
+                </View >
             );
+        }
+    }
+
+    updateProfile(crop, profile) {
+        if (profile) {
+            this.db.updateObjectProfile(crop.id, profile.id).then((rs) => {
+                crop.profile_name = profile.name;
+                crop.profile_id = profile.id;
+                this.setState({
+                    profileVisible: false,
+                    crop: Object.assign({}, crop)
+                });
+            }).catch((error) => {
+                console.log(error);
+            });
+        } else {
+            this.setState({
+                selectedProfile: '',
+                saveProfileVisible: true
+            });
+        }
+    }
+
+    saveProfile() {
+        let crop = this.state.crop;
+        let profile = this.state.profile;
+        if (profile && profile.length > 0 && profile != 'Enter profile name') {
+            this.db.insertProfile(crop.id, profile).then((rs) => {
+                let profileId = rs[0]['insertId'];
+                this.updateProfile(crop, { id: profileId, name: profile });
+            }).catch((error) => {
+                console.log(error);
+                if (error.code && error.code == 6) {
+                    Alert.alert('That name already exists');
+                }
+            });
+        } else {
+            Alert.alert('Enter profile name');
         }
     }
 
@@ -323,6 +392,17 @@ export default class PhotoGallery extends React.Component {
                     });
                 }
             });
+        });
+    }
+
+    fetchData() {
+        this.db.selectProfiles().then((profiles) => {
+            this.setState({
+                isLoading: false,
+                profiles: profiles
+            });
+        }).catch((error) => {
+            console.log(error);
         });
     }
 }
