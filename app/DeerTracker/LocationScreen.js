@@ -90,7 +90,7 @@ export default class LocationScreen extends React.Component {
   pickFiles(location) {
     DocumentPicker.pickMultiple({
       type: [DocumentPicker.types.images],
-      mode: 'open'
+      mode: 'import',
     }).then((files) => {
       this.props.navigation.navigate('ImportScreen', {
         location: location,

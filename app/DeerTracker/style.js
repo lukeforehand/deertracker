@@ -215,7 +215,7 @@ export default StyleSheet.create({
     height: 150,
   },
   importScreenBottom: {
-    height: screenHeight - (thumbHeight * 3)
+    height: screenHeight - thumbHeight - 100 // header and footer
   },
   config: {
     flexDirection: 'row',

@@ -25,7 +25,7 @@ export default class PhotoScreen extends React.Component {
           <Image source={require('./assets/images/crosshairs.png')} style={{ marginLeft: 20, width: 30, height: 30 }} />
           <Text style={style.t4}>{subTitle}</Text>
         </View>
-        <PhotoGallery style={{ height: screenHeight - (thumbHeight * 2) - 60 }}
+        <PhotoGallery style={{ height: screenHeight - thumbHeight - 100 }}
           photos={photos}
           showCrops={showCrops}
           onRefresh={() => {

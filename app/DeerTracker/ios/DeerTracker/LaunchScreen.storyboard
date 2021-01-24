@@ -17,7 +17,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" fixedFrame="YES" image="crosshairs" translatesAutoresizingMaskIntoConstraints="NO" id="R2t-FF-E90">
-                                <rect key="frame" x="56" y="168" width="321" height="171"/>
+                                <rect key="frame" x="27" y="160" width="321" height="171"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="DeerTracker" textAlignment="center" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" minimumFontSize="18" translatesAutoresizingMaskIntoConstraints="NO" id="GJd-Yh-RWb">
@@ -32,6 +32,10 @@
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" fixedFrame="YES" image="camo" translatesAutoresizingMaskIntoConstraints="NO" id="aTs-Z7-3m4">
+                                <rect key="frame" x="-225" y="-216" width="687" height="1079"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Bcu-3y-fUS"/>
                         <color key="backgroundColor" red="0.30599999999999999" green="0.376" blue="0.24299999999999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -51,6 +55,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="camo" width="600" height="600"/>
         <image name="crosshairs" width="512" height="512"/>
     </resources>
 </document>
