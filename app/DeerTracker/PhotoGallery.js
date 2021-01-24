@@ -154,6 +154,10 @@ export default class PhotoGallery extends React.Component {
                             renderFooter={this.renderMenu.bind(this)}
                             swipeDownThreshold={80}
                             onSwipeDown={() => { this.setState({ modalVisible: false }) }}
+                        //menus={(cancel, saveToLocal) => {
+                        //TODO save to album 
+                        //return;
+                        //}}
                         />
                     </Modal>
                 }
@@ -313,7 +317,7 @@ export default class PhotoGallery extends React.Component {
                                         <Text style={style.h1}>Save</Text>
                                     </TouchableOpacity>
                                 </View>
-                                <TouchableWithoutFeedback onPress={() => { this.setState({ saveProfileVisible: false }) }}>
+                                <TouchableWithoutFeedback onPress={() => { this.setState({ saveProfileVisible: false, profileVisible: false }) }}>
                                     <View style={{ flex: 1 }} />
                                 </TouchableWithoutFeedback>
                             </Modal>
