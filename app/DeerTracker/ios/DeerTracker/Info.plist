@@ -41,6 +41,8 @@
 	<string>To associate photos with a location.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>To save photos to camera roll.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>To save photos to camera roll.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>

@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 
 import { Picker } from '@react-native-picker/picker';
+import CameraRoll from "@react-native-community/cameraroll";
 
 import RNFS from 'react-native-fs';
 import ImageEditor from "@react-native-community/image-editor";
@@ -34,7 +35,13 @@ export default class PhotoGallery extends React.Component {
     constructor(props) {
         super(props);
         this.db = new Database();
-        this.state = { modalVisible: false, profileVisible: false, saveProfileVisible: false, photos: [] };
+        this.state = {
+            modalVisible: false,
+            profileVisible: false,
+            saveProfileVisible: false,
+            saveToCameraVisible: false,
+            photos: []
+        };
         this.generateThumbs(props.photos);
     }
 
@@ -150,14 +157,36 @@ export default class PhotoGallery extends React.Component {
                             enableSwipeDown={true}
                             enableImageZoom={false}
                             renderImage={this.renderImage.bind(this)}
-                            onChange={(index) => { this.props.showCrops && this.generateCrop(photos[index].objects[0]) }}
+                            onChange={(index) => {
+                                if (this.props.showCrops) {
+                                    let photo = photos[index];
+                                    this.setState({ imageIndex: index });
+                                    this.generateCrop(photo.objects[0]);
+                                }
+                            }}
                             renderFooter={this.renderMenu.bind(this)}
                             swipeDownThreshold={80}
                             onSwipeDown={() => { this.setState({ modalVisible: false }) }}
-                        //menus={(cancel, saveToLocal) => {
-                        //TODO save to album 
-                        //return;
-                        //}}
+                            menus={({ cancel, saveToLocal }) => {
+                                return (
+                                    <View style={{ height: screenHeight }}>
+                                        <Modal
+                                            animationType='slide'
+                                            transparent={true}>
+                                            <View style={style.saveProfileModal}>
+                                                <TouchableOpacity style={style.button} onPress={() => {
+                                                    CameraRoll.save(photos[this.state.imageIndex].photo_path).then(() => cancel());
+                                                }}>
+                                                    <Text style={style.h1}>Save to Camera Roll</Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                            <TouchableWithoutFeedback onPress={() => { cancel() }}>
+                                                <View style={{ flex: 1 }} />
+                                            </TouchableWithoutFeedback>
+                                        </Modal>
+                                    </View>
+                                );
+                            }}
                         />
                     </Modal>
                 }
@@ -169,10 +198,10 @@ export default class PhotoGallery extends React.Component {
         let photo = props.photo;
         let ratio = screenWidth / photo.width;
         let time = photo.time ? Moment(photo.time).format('ddd, MMM Do YYYY hh:mm A') : ""
-        let top = this.props.showCrops ? - screenHeight / 4 : 0;
-        props.style.top = top;
+        let top = this.props.showCrops ? - photo.height * ratio : 0;
+        props.style.top = 100;
         return (
-            <View>
+            <View style={{ height: screenHeight / 2, top: top }}>
                 <Image {...props} />
                 <View style={{ top: top }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
@@ -196,7 +225,7 @@ export default class PhotoGallery extends React.Component {
                             style={{
                                 ...StyleSheet.absoluteFillObject,
                                 left: parseInt(object.x * ratio),
-                                top: parseInt(object.y * ratio) - screenHeight / 4,
+                                top: parseInt(object.y * ratio) + 100,
                                 width: parseInt(object.w * ratio),
                                 height: parseInt(object.h * ratio),
                                 borderWidth: 1,

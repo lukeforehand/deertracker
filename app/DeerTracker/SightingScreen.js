@@ -11,6 +11,8 @@ import {
   RefreshControl
 } from 'react-native';
 
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import RNFS from 'react-native-fs';
 
