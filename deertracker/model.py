@@ -63,7 +63,7 @@ class Detector:
             label_array = np.array([label])
             if label == "animal":
                 score_array = self.classifier.predict(crop)
-                top_idx = np.argsort(-score_array)[:4]
+                top_idx = np.argsort(-score_array)[:5]
                 score_array = score_array[[top_idx]]
                 label_array = np.array(self.classifier.classes)[top_idx]
                 high_score_idx = np.argmax(score_array)

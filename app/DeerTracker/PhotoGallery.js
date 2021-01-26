@@ -15,6 +15,7 @@ import {
 
 import { Picker } from '@react-native-picker/picker';
 import CameraRoll from "@react-native-community/cameraroll";
+import Swiper from 'react-native-swiper'
 
 import RNFS from 'react-native-fs';
 import ImageEditor from "@react-native-community/image-editor";
@@ -202,8 +203,7 @@ export default class PhotoGallery extends React.Component {
         props.style.top = 100;
         return (
             <View style={{ height: screenHeight / 2, top: top }}>
-                <Image {...props} />
-                <View style={{ top: top }}>
+                <View style={{ top: props.style.top, height: 40 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                         <Image source={require('./assets/images/crosshairs.png')}
                             style={{ width: 15, height: 15 }} />
@@ -213,6 +213,7 @@ export default class PhotoGallery extends React.Component {
                         <Text style={style.t7}>{time}</Text>
                     </View>
                 </View>
+                <Image {...props} />
                 {this.props.showCrops && photo.objects.map((object) => {
                     let borderColor = 'green';
                     if (!this.props.showCrops || (this.state.crop && this.state.crop.id == object.id)) {
@@ -225,7 +226,7 @@ export default class PhotoGallery extends React.Component {
                             style={{
                                 ...StyleSheet.absoluteFillObject,
                                 left: parseInt(object.x * ratio),
-                                top: parseInt(object.y * ratio) + 100,
+                                top: parseInt(object.y * ratio) + 100 + 40,
                                 width: parseInt(object.w * ratio),
                                 height: parseInt(object.h * ratio),
                                 borderWidth: 1,
@@ -280,84 +281,100 @@ export default class PhotoGallery extends React.Component {
         if (!this.props.showCrops) {
             return;
         }
-        let crop = this.state.crop;
-        if (crop) {
-            let max = Math.max(crop.w, crop.h);
-            let w = (thumbWidth / max) * crop.w;
-            let h = (200 / max) * crop.h;
-            let profiles = this.state.profiles;
-            let selectedProfile = this.state.selectedProfile;
+        let crops = this.state.photos[index].objects;
+        if (crops.length > 0) {
             return (
                 <View style={{ height: screenHeight / 2 }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <View style={style.galleryMenu}>
-                            <Text style={style.t6}>Pick class</Text>
-                            <Picker
-                                selectedValue={crop.label}
-                                style={style.picker}
-                                itemStyle={[style.pickerItem, { height: h }]}
-                                onValueChange={(itemValue, itemIndex) => { this.updateObject(crop, itemIndex) }}>
-                                {crop.label_array.map((label) => {
-                                    return (<Picker.Item key={label} label={label} value={label} />);
-                                })}
-                            </Picker>
-                        </View>
-                        <View style={{ width: thumbWidth, alignItems: 'center' }}>
-                            <Image
-                                source={{ uri: crop.path }}
-                                style={{ width: w, height: h, borderWidth: 1, borderColor: 'rgb(255, 103, 0)' }} />
-                            <Text style={style.h1}>{crop.profile_name}</Text>
-                        </View>
-                        <Modal
-                            animationType='slide'
-                            transparent={true}
-                            visible={this.state.profileVisible}>
-                            <View style={style.profileModal}>
-                                <Text style={style.h3}>Select Profile</Text>
-                                <Picker selectedValue={selectedProfile}
-                                    onValueChange={(itemValue, itemIndex) => {
-                                        if (itemIndex > 0) {
-                                            this.updateProfile(crop, profiles[itemIndex - 1])
-                                        }
-                                    }}>
-                                    <Picker.Item key='-1' label='' value='-1' />
-                                    {profiles.map((p) => {
-                                        return (<Picker.Item key={p.id} label={p.name} value={p.id} />);
-                                    })}
-                                    <Picker.Item key='' label='Add Profile' value='' />
-                                </Picker>
-                            </View>
-                            <TouchableWithoutFeedback onPress={() => { this.setState({ profileVisible: false }) }}>
-                                <View style={{ flex: 1 }} />
-                            </TouchableWithoutFeedback>
-                            <Modal
-                                animationType='slide'
-                                transparent={true}
-                                onShow={() => { this.profileModal.focus(); }}
-                                visible={this.state.saveProfileVisible}>
-                                <View style={style.saveProfileModal}>
-                                    <TextInput
-                                        style={style.t2}
-                                        ref={ref => { this.profileModal = ref; }}
-                                        onChangeText={(text) => { this.setState({ profile: text }) }}
-                                        selectTextOnFocus={true}
-                                        defaultValue='Enter profile name' />
-                                    <TouchableOpacity style={style.button} onPress={this.saveProfile.bind(this)}>
-                                        <Text style={style.h1}>Save</Text>
+                    <Swiper loop={false} activeDotColor='#4E603E' dotColor='rgb(255, 103, 0)'
+                        onIndexChanged={(nextIndex) => { this.generateCrop(crops[nextIndex]) }}>
+                        {crops.map((crop) => {
+                            let max = Math.max(crop.w, crop.h);
+                            let w = (thumbWidth / max) * crop.w;
+                            let h = (200 / max) * crop.h;
+                            let profiles = this.state.profiles;
+                            let selectedProfile = this.state.selectedProfile;
+                            return (
+                                <View key={crop.id}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <View style={style.galleryMenu}>
+                                            <Text style={style.t6}>Pick class</Text>
+                                            <Picker
+                                                selectedValue={crop.label}
+                                                style={style.picker}
+                                                itemStyle={[style.h1, { height: h }]}
+                                                onValueChange={(itemValue, itemIndex) => { this.updateObject(crop, itemIndex) }}>
+                                                {crop.label_array.map((label) => {
+                                                    return (<Picker.Item key={label} label={label} value={label} />);
+                                                })}
+                                            </Picker>
+                                        </View>
+                                        <View style={{ width: thumbWidth, alignItems: 'center' }}>
+                                            <TouchableOpacity style={style.galleryButton}
+                                                onPress={() => { this.setState({ selectedProfile: crop.profile_id, profileVisible: true }) }}>
+                                                <Image
+                                                    source={{ uri: crop.path }}
+                                                    style={{ width: w, height: h, borderWidth: 1, borderColor: 'rgb(255, 103, 0)' }} />
+                                                {crop.profile_name &&
+                                                    <Text style={[style.h4, { paddingTop: 10 }]}>{crop.profile_name}</Text>
+                                                }
+                                            </TouchableOpacity>
+                                        </View>
+                                        <Modal
+                                            animationType='slide'
+                                            transparent={true}
+                                            visible={this.state.profileVisible}>
+                                            <View style={style.profileModal}>
+                                                <Text style={style.h5}>Select Profile</Text>
+                                                <Picker selectedValue={selectedProfile}
+                                                    style={{ height: 200 }}
+                                                    itemStyle={style.t2}
+                                                    onValueChange={(itemValue, itemIndex) => {
+                                                        if (itemIndex > 0) {
+                                                            this.updateProfile(crop, profiles[itemIndex - 1])
+                                                        }
+                                                    }}>
+                                                    <Picker.Item key='-1' label='Select Profile' value='-1' />
+                                                    {profiles.map((p) => {
+                                                        return (<Picker.Item key={p.id} label={p.name} value={p.id} />);
+                                                    })}
+                                                    <Picker.Item key='' label='Add Profile' value='' />
+                                                </Picker>
+                                            </View>
+                                            <TouchableWithoutFeedback onPress={() => { this.setState({ profileVisible: false }) }}>
+                                                <View style={{ flex: 1 }} />
+                                            </TouchableWithoutFeedback>
+                                            <Modal
+                                                animationType='slide'
+                                                transparent={true}
+                                                onShow={() => { this.profileModal.focus(); }}
+                                                visible={this.state.saveProfileVisible}>
+                                                <View style={style.saveProfileModal}>
+                                                    <TextInput
+                                                        style={style.t2}
+                                                        ref={ref => { this.profileModal = ref; }}
+                                                        onChangeText={(text) => { this.setState({ profile: text }) }}
+                                                        selectTextOnFocus={true}
+                                                        defaultValue='Enter profile name' />
+                                                    <TouchableOpacity style={style.button} onPress={this.saveProfile.bind(this)}>
+                                                        <Text style={style.h1}>Save</Text>
+                                                    </TouchableOpacity>
+                                                </View>
+                                                <TouchableWithoutFeedback onPress={() => { this.setState({ saveProfileVisible: false, profileVisible: false }) }}>
+                                                    <View style={{ flex: 1 }} />
+                                                </TouchableWithoutFeedback>
+                                            </Modal>
+                                        </Modal>
+                                    </View>
+                                    <TouchableOpacity style={style.galleryButton}
+                                        onPress={() => { this.setState({ selectedProfile: crop.profile_id, profileVisible: true }) }}>
+                                        <Text style={style.h1}>Profile</Text>
                                     </TouchableOpacity>
                                 </View>
-                                <TouchableWithoutFeedback onPress={() => { this.setState({ saveProfileVisible: false, profileVisible: false }) }}>
-                                    <View style={{ flex: 1 }} />
-                                </TouchableWithoutFeedback>
-                            </Modal>
-                        </Modal>
-                    </View>
-                    <TouchableOpacity style={style.galleryButton}
-                        onPress={() => { this.setState({ selectedProfile: crop.profile_id, profileVisible: true }) }}>
-                        <Text style={style.h1}>Profile</Text>
-                    </TouchableOpacity>
+                            )
+                        })}
+                    </Swiper>
                 </View >
-            );
+            )
         }
     }
 

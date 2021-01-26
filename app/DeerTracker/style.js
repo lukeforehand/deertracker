@@ -41,6 +41,18 @@ export default StyleSheet.create({
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
     fontSize: 18
   },
+  h5: {
+    color: '#e3e8e8',
+    backgroundColor: '#4E603E',
+    shadowColor: '#000',
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 10,
+    textAlign: 'center',
+    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontSize: 18,
+    padding: 10
+  },
   t1: {
     color: 'black',
     textAlign: 'center',
@@ -230,7 +242,7 @@ export default StyleSheet.create({
     paddingTop: 10,
     marginLeft: 20,
     marginRight: 20,
-    paddingBottom: 5
+    paddingBottom: 5,
   },
   galleryButton: {
     borderRadius: 10,
@@ -245,9 +257,7 @@ export default StyleSheet.create({
     height: 60
   },
   picker: {
-    backgroundColor: 'black'
-  },
-  pickerItem: {
-    color: 'white'
+    backgroundColor: 'black',
+    height: 200
   }
 });
