@@ -13,6 +13,7 @@ import {
     StyleSheet,
 } from 'react-native';
 
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Picker } from '@react-native-picker/picker';
 import CameraRoll from "@react-native-community/cameraroll";
 import Swiper from 'react-native-swiper'
@@ -233,8 +234,9 @@ export default class PhotoGallery extends React.Component {
                                 borderColor: borderColor,
                             }} />
                     );
-                })}
-            </View>
+                })
+                }
+            </View >
         );
     }
 
@@ -309,15 +311,12 @@ export default class PhotoGallery extends React.Component {
                                             </Picker>
                                         </View>
                                         <View style={{ width: thumbWidth, alignItems: 'center' }}>
-                                            <TouchableOpacity style={style.galleryButton}
-                                                onPress={() => { this.setState({ selectedProfile: crop.profile_id, profileVisible: true }) }}>
-                                                <Image
-                                                    source={{ uri: crop.path }}
-                                                    style={{ width: w, height: h, borderWidth: 1, borderColor: 'rgb(255, 103, 0)' }} />
-                                                {crop.profile_name &&
-                                                    <Text style={[style.h4, { paddingTop: 10 }]}>{crop.profile_name}</Text>
-                                                }
-                                            </TouchableOpacity>
+                                            <Image
+                                                source={{ uri: crop.path }}
+                                                style={{ width: w, height: h, borderWidth: 1, borderColor: 'rgb(255, 103, 0)' }} />
+                                            {crop.profile_name &&
+                                                <Text style={[style.h4, { paddingTop: 10 }]}>{crop.profile_name}</Text>
+                                            }
                                         </View>
                                         <Modal
                                             animationType='slide'
