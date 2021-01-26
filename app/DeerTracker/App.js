@@ -82,6 +82,16 @@ const SightingScreenNavigator = createStackNavigator({
       headerTitleAlign: 'center'
     },
   },
+  ReviewScreen: {
+    screen: PhotoScreen,
+    navigationOptions: {
+      title: 'New Sightings',
+      headerTitleStyle: {
+        fontSize: 20
+      },
+      headerTitleAlign: 'center'
+    },
+  },
   PhotoScreen: {
     screen: PhotoScreen,
     navigationOptions: {
@@ -108,7 +118,7 @@ const ProfileScreenNavigator = createStackNavigator({
 });
 
 const ConfigScreenNavigator = createStackNavigator({
-  SightingScreen: {
+  ConfigScreen: {
     screen: ConfigScreen,
     navigationOptions: {
       title: 'Settings',

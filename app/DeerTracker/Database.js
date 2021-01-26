@@ -127,10 +127,15 @@ export default class Database {
         );
     }
 
+    async updateObjectReview(objectId) {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        return await db.executeSql('UPDATE object SET reviewed = TRUE WHERE id = ?', [objectId]);
+    }
+
     async updateObject(objectId, label, score) {
         const db = await SQLite.openDatabase({ name: database, location: location });
         return await db.executeSql(
-            'UPDATE object SET label = ?, score = ? WHERE id = ?',
+            'UPDATE object SET label = ?, score = ?, reviewed = TRUE WHERE id = ?',
             [label, score, objectId]
         );
     }
@@ -170,6 +175,20 @@ export default class Database {
             photo.objects.push(o);
         }
         return Object.values(photos);
+    }
+
+    async selectPhotosToReview() {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        rs = await db.executeSql(`
+        SELECT o.*, p.path AS photo_path, l.name AS location_name, STRFTIME('%Y-%m-%d', o.time) AS day
+        FROM object o
+        JOIN photo p ON p.id = o.photo_id
+        JOIN location l ON l.id = o.location_id
+        WHERE o.reviewed IS FALSE ORDER BY p.time ASC, o.id ASC
+        `);
+        return rs.map((r) => {
+            return r.rows.raw();
+        })[0];
     }
 
     async selectObjects(day = null, locationId = null) {

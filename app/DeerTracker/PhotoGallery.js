@@ -5,22 +5,18 @@ import {
     View,
     Text,
     TextInput,
-    FlatList,
     TouchableOpacity,
     TouchableWithoutFeedback,
     Image,
-    RefreshControl,
     StyleSheet,
 } from 'react-native';
 
-import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Picker } from '@react-native-picker/picker';
 import CameraRoll from "@react-native-community/cameraroll";
 import Swiper from 'react-native-swiper'
 
 import RNFS from 'react-native-fs';
 import ImageEditor from "@react-native-community/image-editor";
-import ImageResizer from 'react-native-image-resizer';
 import ImageViewer from 'react-native-image-zoom-viewer';
 
 import Moment from 'moment';
@@ -38,161 +34,62 @@ export default class PhotoGallery extends React.Component {
         super(props);
         this.db = new Database();
         this.state = {
-            modalVisible: false,
+            imageIndex: props.imageIndex,
+            photos: props.photos,
             profileVisible: false,
             saveProfileVisible: false,
-            saveToCameraVisible: false,
-            photos: []
+            saveToCameraVisible: false
         };
-        this.generateThumbs(props.photos);
     }
 
     componentDidMount() {
         this.fetchData();
-    }
-
-    componentDidUpdate() {
-        // compare new image urls to previous
-        let newPhotos = this.props.photos.filter((photo) => {
-            return this.state.photos.indexOf(photo) == -1;
-        });
-        this.generateThumbs(newPhotos);
-    }
-
-    generateThumbs(photos) {
-        photos.map((photo) => {
-            photo.url = photo.photo_path;
-            photo.props = {
-                photo: photo
-            };
-            let w = thumbWidth;
-            let h = thumbHeight;
-            if (photo.width && photo.height) {
-                let scale = w / photo.width;
-                h = scale * photo.height;
-            }
-            let thumbPath = RNFS.CachesDirectoryPath + '/thumb_' + photo.photo_path.split('\\').pop().split('/').pop();
-            RNFS.exists(thumbPath).then((exists) => {
-                if (exists) {
-                    photo.thumb = {
-                        uri: thumbPath,
-                        width: w,
-                        height: h
-                    };
-                    this.setState({
-                        photos: [...photos]
-                    });
-                } else {
-                    ImageResizer.createResizedImage(photo.photo_path, w, h, 'JPEG', 50, 0, thumbPath, false, { mode: 'cover' }).then((thumb) => {
-                        RNFS.moveFile(thumb.uri, thumbPath).catch((err) => {
-                            RNFS.unlink(thumb.uri);
-                        }).then(() => {
-                            thumb.uri = thumbPath;
-                            photo.thumb = thumb;
-                            this.setState({
-                                photos: [...photos]
-                            });
-                        });
-                    }).catch((err) => {
-                        console.log(err);
-                    })
-                }
-            });
-        });
+        if (this.props.showCrops) {
+            this.generateCrop(this.props.photos[this.props.imageIndex].objects[0]);
+        }
     }
 
     render() {
         const photos = this.state.photos;
+        const imageIndex = this.state.imageIndex;
         return (
-            <View style={this.props.style}>
-                <FlatList
-                    refreshControl={
-                        <RefreshControl tintColor='transparent' refreshing={false} onRefresh={this.props.onRefresh} />
+            <ImageViewer
+                imageUrls={photos}
+                index={imageIndex}
+                enableSwipeDown={true}
+                enableImageZoom={false}
+                renderImage={this.renderImage.bind(this)}
+                onChange={(index) => {
+                    if (this.props.showCrops) {
+                        let photo = photos[index];
+                        this.setState({ imageIndex: index });
+                        this.generateCrop(photo.objects[0]);
                     }
-                    style={{ height: '100%', width: '100%' }}
-                    numColumns={2}
-                    columnWrapperStyle={{ justifyContent: 'space-evenly' }}
-                    data={photos}
-                    renderItem={(item) => {
-                        let photo = item.item;
-                        let thumb = photo.thumb;
-                        return (
-                            <TouchableOpacity
-                                key={photo.photo_path}
-                                onPress={() => {
-                                    if (this.props.showCrops) {
-                                        this.generateCrop(photos[item.index].objects[0]);
-                                    }
-                                    this.setState({ modalVisible: true, imageIndex: item.index });
-                                }}>
-                                {thumb &&
-                                    <View>
-                                        <Image
-                                            source={{ uri: thumb.uri }}
-                                            style={{ width: thumb.width, height: thumb.height }} />
-                                        {this.props.showCrops && photo.objects && photo.objects.map((o) => {
-                                            let ratio = thumb.width / (o.width);
-                                            return (
-                                                <View key={o.id} style={{
-                                                    ...StyleSheet.absoluteFillObject,
-                                                    left: parseInt(o.x * ratio),
-                                                    top: parseInt(o.y * ratio),
-                                                    width: parseInt(o.w * ratio),
-                                                    height: parseInt(o.h * ratio),
-                                                    borderWidth: 1,
-                                                    borderColor: 'rgb(255, 103, 0)'
-                                                }} />
-                                            );
-                                        })}
-                                    </View>
-                                }
-                            </TouchableOpacity>
-                        )
-                    }}
-                    keyExtractor={photo => photo.photo_path}
-                />
-                {this.state.modalVisible &&
-                    <Modal transparent={true} onRequestClose={() => this.setState({ modalVisible: false })}>
-                        <ImageViewer
-                            imageUrls={photos}
-                            index={this.state.imageIndex}
-                            enableSwipeDown={true}
-                            enableImageZoom={false}
-                            renderImage={this.renderImage.bind(this)}
-                            onChange={(index) => {
-                                if (this.props.showCrops) {
-                                    let photo = photos[index];
-                                    this.setState({ imageIndex: index });
-                                    this.generateCrop(photo.objects[0]);
-                                }
-                            }}
-                            renderFooter={this.renderMenu.bind(this)}
-                            swipeDownThreshold={80}
-                            onSwipeDown={() => { this.setState({ modalVisible: false }) }}
-                            menus={({ cancel, saveToLocal }) => {
-                                return (
-                                    <View style={{ height: screenHeight }}>
-                                        <Modal
-                                            animationType='slide'
-                                            transparent={true}>
-                                            <View style={style.saveProfileModal}>
-                                                <TouchableOpacity style={style.button} onPress={() => {
-                                                    CameraRoll.save(photos[this.state.imageIndex].photo_path).then(() => cancel());
-                                                }}>
-                                                    <Text style={style.h1}>Save to Camera Roll</Text>
-                                                </TouchableOpacity>
-                                            </View>
-                                            <TouchableWithoutFeedback onPress={() => { cancel() }}>
-                                                <View style={{ flex: 1 }} />
-                                            </TouchableWithoutFeedback>
-                                        </Modal>
-                                    </View>
-                                );
-                            }}
-                        />
-                    </Modal>
-                }
-            </View >
+                }}
+                renderFooter={this.renderMenu.bind(this)}
+                swipeDownThreshold={80}
+                onSwipeDown={this.props.onSwipeDown}
+                menus={({ cancel, saveToLocal }) => {
+                    return (
+                        <View style={{ height: screenHeight }}>
+                            <Modal
+                                animationType='slide'
+                                transparent={true}>
+                                <View style={style.saveProfileModal}>
+                                    <TouchableOpacity style={style.button} onPress={() => {
+                                        CameraRoll.save(photos[imageIndex].photo_path).then(() => cancel());
+                                    }}>
+                                        <Text style={style.h1}>Save to Camera Roll</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                <TouchableWithoutFeedback onPress={() => { cancel() }}>
+                                    <View style={{ flex: 1 }} />
+                                </TouchableWithoutFeedback>
+                            </Modal>
+                        </View>
+                    );
+                }}
+            />
         );
     }
 
@@ -201,7 +98,7 @@ export default class PhotoGallery extends React.Component {
         let ratio = screenWidth / photo.width;
         let time = photo.time ? Moment(photo.time).format('ddd, MMM Do YYYY hh:mm A') : ""
         let top = this.props.showCrops ? - photo.height * ratio : 0;
-        props.style.top = 100;
+        props.style.top = this.props.showCrops ? 100 : 0;
         return (
             <View style={{ height: screenHeight / 2, top: top }}>
                 <View style={{ top: props.style.top, height: 40 }}>
@@ -280,7 +177,7 @@ export default class PhotoGallery extends React.Component {
     }
 
     renderMenu(index) {
-        if (!this.props.showCrops) {
+        if (!this.props.showCrops || !this.state.profiles) {
             return;
         }
         let crops = this.state.photos[index].objects;
@@ -379,7 +276,7 @@ export default class PhotoGallery extends React.Component {
 
     updateProfile(crop, profile) {
         if (profile) {
-            this.db.updateObjectProfile(crop.id, profile.id).then((rs) => {
+            this.db.updateObjectProfile(crop.id, profile.id).then(() => {
                 crop.profile_name = profile.name;
                 crop.profile_id = profile.id;
                 this.setState({

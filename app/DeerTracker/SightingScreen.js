@@ -20,7 +20,7 @@ import MoonPhase from './MoonPhase';
 import Database from './Database';
 
 import style from './style';
-import { thumbWidth } from './style';
+import { screenHeight, thumbWidth } from './style';
 
 const root = RNFS.DocumentDirectoryPath;
 
@@ -57,7 +57,7 @@ export default class SightingScreen extends React.Component {
     }
     return (
       <SafeAreaView>
-        <ScrollView style={{ height: '100%' }} refreshControl={
+        <ScrollView style={{ height: screenHeight - 270 }} refreshControl={
           <RefreshControl
             title='Refresh'
             titleColor='black'
@@ -136,8 +136,18 @@ export default class SightingScreen extends React.Component {
             );
           })}
         </ScrollView>
-      </SafeAreaView >
+        <TouchableOpacity style={style.button} onPress={() => { this.getPhotosToReview() }}>
+          <Text style={style.h1}>Review New Sightings</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
     );
+  }
+
+  getPhotosToReview() {
+    alert("TODO");
+    this.db.selectPhotosToReview().then((objects) => {
+      //TOOD:
+    });
   }
 
   getPhotos(day, locationId) {
