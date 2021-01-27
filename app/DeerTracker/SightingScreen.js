@@ -55,9 +55,12 @@ export default class SightingScreen extends React.Component {
         </SafeAreaView>
       )
     }
+
+    let scrollViewHeight = this.state.newSightings > 0 ? screenHeight - 230 : screenHeight;
+
     return (
       <SafeAreaView>
-        <ScrollView style={{ height: screenHeight - thumbHeight }} refreshControl={
+        <ScrollView style={{ height: scrollViewHeight }} refreshControl={
           <RefreshControl
             title='Refresh'
             titleColor='black'
@@ -138,7 +141,7 @@ export default class SightingScreen extends React.Component {
         </ScrollView>
         {this.state.newSightings > 0 &&
           <TouchableOpacity style={style.highlightButton} onPress={() => { this.getPhotosToReview() }}>
-            <Text style={style.h1}>Review {this.state.newSightings} New Sightings</Text>
+            <Text style={style.highlightButtonText}>Review {this.state.newSightings} New Sightings</Text>
           </TouchableOpacity>
         }
       </SafeAreaView >

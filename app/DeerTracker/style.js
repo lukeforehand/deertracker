@@ -135,22 +135,6 @@ export default StyleSheet.create({
     alignItems: 'center',
     height: 60
   },
-  highlightButton: {
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    elevation: 10,
-    backgroundColor: 'rgb(255, 103, 0)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 60,
-    position: 'absolute',
-    left: 20,
-    width: screenWidth - 40,
-    bottom: 80
-
-  },
   locationArrow: {
     color: 'blue',
     borderRadius: 10,
@@ -216,6 +200,23 @@ export default StyleSheet.create({
     borderColor: 'gray',
     borderWidth: 1,
     padding: 5
+  },
+  highlightButton: {
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 10,
+    backgroundColor: 'rgb(255, 103, 0)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 60,
+  },
+  highlightButtonText: {
+    color: '#e3e8e8',
+    textAlign: 'center',
+    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontSize: 18,
   },
   thumbnail: {
     borderWidth: 1,

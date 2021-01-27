@@ -24,8 +24,6 @@ import Moment from 'moment';
 import Database from './Database';
 import style, { screenWidth, screenHeight, thumbWidth, thumbHeight } from './style';
 
-const root = RNFS.DocumentDirectoryPath;
-
 const detectorUrl = "http://192.168.0.157:5000";
 
 export default class PhotoGallery extends React.Component {
@@ -35,7 +33,6 @@ export default class PhotoGallery extends React.Component {
         this.db = new Database();
         this.state = {
             imageIndex: props.imageIndex ? props.imageIndex : 0,
-            photos: props.photos,
             profileVisible: false,
             saveProfileVisible: false,
             saveToCameraVisible: false
@@ -45,12 +42,12 @@ export default class PhotoGallery extends React.Component {
     componentDidMount() {
         this.fetchData();
         if (this.props.showCrops) {
-            this.generateCrop(this.state.photos[this.state.imageIndex].objects[0]);
+            this.generateCrop(this.props.photos[this.state.imageIndex].objects[0]);
         }
     }
 
     render() {
-        const photos = this.state.photos;
+        const photos = this.props.photos;
         const imageIndex = this.state.imageIndex;
         return (
             <Modal visible={true} transparent={true}>
@@ -121,7 +118,7 @@ export default class PhotoGallery extends React.Component {
                 </View>
                 <Image {...props} />
                 {this.props.showCrops && photo.objects.map((object) => {
-                    let borderColor = 'green';
+                    let borderColor = photo.objects.length > 1 ? 'green' : 'rgb(255, 103, 0)';
                     if (this.state.crop && this.state.crop.id == object.id) {
                         borderColor = 'rgb(255, 103, 0)'
                     }
@@ -150,7 +147,7 @@ export default class PhotoGallery extends React.Component {
         if (!this.props.showCrops || !this.state.profiles) {
             return;
         }
-        let crops = this.state.photos[index].objects;
+        let crops = this.props.photos[index].objects;
         if (crops.length > 0) {
             return (
                 <View style={{ height: screenHeight / 2 }}>
@@ -267,7 +264,7 @@ export default class PhotoGallery extends React.Component {
                         height: 200
                     }
                 };
-                ImageEditor.cropImage(root + '/' + object.photo_path, cropData).then(url => {
+                ImageEditor.cropImage(object.photo_path, cropData).then(url => {
                     RNFS.moveFile(url, cropPath).catch((err) => {
                         RNFS.unlink(url);
                     }).then(() => {

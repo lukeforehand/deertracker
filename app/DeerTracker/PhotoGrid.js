@@ -23,22 +23,13 @@ export default class PhotoGrid extends React.Component {
     super(props);
     this.state = {
       modalVisible: false,
-      photos: []
+      photos: this.props.photos
     };
-    this.generateThumbs(this.props.photos);
-  }
-
-  componentDidUpdate() {
-    // compare new image urls to previous
-    let photos = this.props.photos;
-    let newPhotos = photos.filter((photo) => {
-      return this.state.photos.indexOf(photo) == -1;
-    });
-    this.generateThumbs(newPhotos);
+    this.generateThumbs(this.state.photos);
   }
 
   render() {
-    const photos = this.props.photos;
+    const photos = this.state.photos;
     const showCrops = this.props.showCrops;
     return (
       <View>
