@@ -10,7 +10,7 @@ import {
 import RNFS from 'react-native-fs';
 import Database from './Database';
 
-import PhotoGallery from './PhotoGallery';
+import PhotoGrid from './PhotoGrid';
 
 import style from './style';
 
@@ -40,7 +40,12 @@ export default class ImportScreen extends React.Component {
             <Text style={style.h1}>Import {files.length} Photos</Text>
           </TouchableOpacity>
         </View>
-        <PhotoGallery style={style.importScreenBottom} photos={files} showCrops={false} />
+        <View style={style.importScreenBottom}>
+          <PhotoGrid
+            photos={files}
+            showCrops={false}
+            onRefresh={() => { this.props.navigation.goBack() }} />
+        </View>
       </SafeAreaView >
     );
   }

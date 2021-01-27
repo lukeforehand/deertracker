@@ -65,7 +65,9 @@ export default class PhotoGallery extends React.Component {
                             let photo = photos[index];
                             this.setState({ imageIndex: index });
                             this.generateCrop(photo.objects[0]);
-                            this.props.onChange(photo.objects[0].id);
+                            if (this.props.onChange) {
+                                this.props.onChange(photo.objects[0].id);
+                            }
                         }
                     }}
                     renderFooter={this.renderMenu.bind(this)}
@@ -98,10 +100,13 @@ export default class PhotoGallery extends React.Component {
 
     renderImage(props) {
         let photo = props.photo;
-        let ratio = screenWidth / photo.width;
         let time = photo.time ? Moment(photo.time).format('ddd, MMM Do YYYY hh:mm A') : ""
-        let top = this.props.showCrops ? - photo.height * ratio : 0;
-        props.style.top = this.props.showCrops ? 100 : 0;
+        let top = 0;
+        props.style.top = 0;
+        if (this.props.showCrops) {
+            top = - photo.height * (screenWidth / photo.width);
+            props.style.top = 100;
+        }
         return (
             <View style={{ height: screenHeight / 2, top: top }}>
                 <View style={{ top: props.style.top, height: 40 }}>
@@ -117,9 +122,10 @@ export default class PhotoGallery extends React.Component {
                 <Image {...props} />
                 {this.props.showCrops && photo.objects.map((object) => {
                     let borderColor = 'green';
-                    if (!this.props.showCrops || (this.state.crop && this.state.crop.id == object.id)) {
+                    if (this.state.crop && this.state.crop.id == object.id) {
                         borderColor = 'rgb(255, 103, 0)'
                     }
+                    let ratio = screenWidth / photo.width;
                     return (
                         <TouchableOpacity
                             key={object.id}

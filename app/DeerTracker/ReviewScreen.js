@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  Text, SafeAreaView,
-} from 'react-native';
-
-import style, { screenWidth, screenHeight, thumbWidth, thumbHeight } from './style';
+import { SafeAreaView } from 'react-native';
 
 import Database from './Database';
 
@@ -21,11 +17,11 @@ export default class ReviewScreen extends React.Component {
     this.db.updateObjectReview(photos[0].objects[0].id);
     return (
       <SafeAreaView>
-        <PhotoGallery style={{ height: screenHeight - thumbHeight - 100 }}
+        <PhotoGallery
           photos={photos}
+          showCrops={true}
           onSwipeDown={() => { this.props.navigation.goBack() }}
-          onChange={(objectId) => { this.db.updateObjectReview(objectId) }}
-          showCrops={true} />
+          onChange={(objectId) => { this.db.updateObjectReview(objectId) }} />
       </SafeAreaView >
     );
   }

@@ -148,7 +148,7 @@ export default StyleSheet.create({
     position: 'absolute',
     left: 20,
     width: screenWidth - 40,
-    top: screenHeight - 250
+    bottom: 80
 
   },
   locationArrow: {
