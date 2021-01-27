@@ -73,11 +73,11 @@ export default class SightingScreen extends React.Component {
             let moonImage = moon.image(phase);
             return (
               <View key={day}>
-                <View style={[style.h3, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
+                <View style={[style.locationButton, style.h3, { paddingTop: 0, paddingBottom: 0, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
                   <Text style={style.h4}>
                     {Moment(date).format('ddd, MMM Do YYYY')}
                   </Text>
-                  <Image style={{ width: 35, height: 35 }} source={moonImage} />
+                  <Image style={{ width: 45, height: 45 }} source={moonImage} />
                 </View>
                 <View>
                   {Object.keys(objects[day]).map((locationId) => {
