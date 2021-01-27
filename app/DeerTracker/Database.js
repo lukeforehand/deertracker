@@ -177,6 +177,12 @@ export default class Database {
         return Object.values(photos);
     }
 
+    async selectPhotosToReviewCount() {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        return Object.values(
+            (await db.executeSql('SELECT COUNT(*) FROM object WHERE reviewed IS FALSE'))[0].rows.raw()[0])[0];
+    }
+
     async selectPhotosToReview() {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql(`

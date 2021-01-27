@@ -20,7 +20,7 @@ import MoonPhase from './MoonPhase';
 import Database from './Database';
 
 import style from './style';
-import { screenHeight, thumbWidth } from './style';
+import { screenHeight, thumbWidth, thumbHeight } from './style';
 
 const root = RNFS.DocumentDirectoryPath;
 
@@ -31,7 +31,7 @@ export default class SightingScreen extends React.Component {
   constructor(props) {
     super(props);
     this.db = new Database();
-    this.state = { isLoading: true }
+    this.state = { isLoading: true, newSightings: 0 }
   }
 
   componentDidMount() {
@@ -57,7 +57,7 @@ export default class SightingScreen extends React.Component {
     }
     return (
       <SafeAreaView>
-        <ScrollView style={{ height: screenHeight - 270 }} refreshControl={
+        <ScrollView style={{ height: screenHeight - thumbHeight }} refreshControl={
           <RefreshControl
             title='Refresh'
             titleColor='black'
@@ -136,10 +136,12 @@ export default class SightingScreen extends React.Component {
             );
           })}
         </ScrollView>
-        <TouchableOpacity style={style.highlightButton} onPress={() => { this.getPhotosToReview() }}>
-          <Text style={style.h1}>Review New Sightings</Text>
-        </TouchableOpacity>
-      </SafeAreaView>
+        {this.state.newSightings > 0 &&
+          <TouchableOpacity style={style.highlightButton} onPress={() => { this.getPhotosToReview() }}>
+            <Text style={style.h1}>Review {this.state.newSightings} New Sightings</Text>
+          </TouchableOpacity>
+        }
+      </SafeAreaView >
     );
   }
 
@@ -187,9 +189,12 @@ export default class SightingScreen extends React.Component {
       isLoading: true
     });
     this.db.selectObjects().then((objects) => {
-      this.setState({
-        isLoading: false,
-        objects: objects
+      this.db.selectPhotosToReviewCount().then((count) => {
+        this.setState({
+          isLoading: false,
+          objects: objects,
+          newSightings: count
+        });
       });
     }).catch((error) => {
       console.log(error);

@@ -137,7 +137,6 @@ export default StyleSheet.create({
   },
   highlightButton: {
     borderRadius: 10,
-    margin: 20,
     shadowColor: '#000',
     shadowOpacity: 0.5,
     shadowRadius: 10,
@@ -145,7 +144,12 @@ export default StyleSheet.create({
     backgroundColor: 'rgb(255, 103, 0)',
     justifyContent: 'center',
     alignItems: 'center',
-    height: 60
+    height: 60,
+    position: 'absolute',
+    left: 20,
+    width: screenWidth - 40,
+    top: screenHeight - 250
+
   },
   locationArrow: {
     color: 'blue',

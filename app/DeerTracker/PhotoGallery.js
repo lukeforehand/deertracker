@@ -65,6 +65,7 @@ export default class PhotoGallery extends React.Component {
                             let photo = photos[index];
                             this.setState({ imageIndex: index });
                             this.generateCrop(photo.objects[0]);
+                            this.props.onChange(photo.objects[0].id);
                         }
                     }}
                     renderFooter={this.renderMenu.bind(this)}
