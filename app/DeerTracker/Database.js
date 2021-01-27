@@ -180,15 +180,25 @@ export default class Database {
     async selectPhotosToReview() {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql(`
-        SELECT o.*, p.path AS photo_path, l.name AS location_name, STRFTIME('%Y-%m-%d', o.time) AS day
+        SELECT STRFTIME('%Y-%m-%d', o.time) AS day, o.*,
+            p.path AS photo_path, p.width, p.height, p.upload_id,
+            i.name AS profile_name, i.id AS profile_id,
+            l.name AS location_name, l.id AS location_id
         FROM object o
         JOIN photo p ON p.id = o.photo_id
         JOIN location l ON l.id = o.location_id
+        LEFT JOIN profile i ON i.id = o.profile_id
         WHERE o.reviewed IS FALSE ORDER BY p.time ASC, o.id ASC
         `);
-        return rs.map((r) => {
+        let objects = rs.map((r) => {
             return r.rows.raw();
         })[0];
+        for (o of objects) {
+            o.label_array = JSON.parse(o.label_array);
+            o.score_array = JSON.parse(o.score_array);
+            o.objects = [o];
+        }
+        return objects;
     }
 
     async selectObjects(day = null, locationId = null) {

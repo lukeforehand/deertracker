@@ -11,6 +11,7 @@ import ImportScreen from './ImportScreen';
 import BatchScreen from './BatchScreen';
 import PhotoScreen from './PhotoScreen';
 import SightingScreen from './SightingScreen';
+import ReviewScreen from './ReviewScreen';
 import ProfileScreen from './ProfileScreen';
 import ConfigScreen from './ConfigScreen';
 
@@ -83,7 +84,7 @@ const SightingScreenNavigator = createStackNavigator({
     },
   },
   ReviewScreen: {
-    screen: PhotoScreen,
+    screen: ReviewScreen,
     navigationOptions: {
       title: 'New Sightings',
       headerTitleStyle: {

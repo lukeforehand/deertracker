@@ -114,10 +114,6 @@ export default class PhotoScreen extends React.Component {
 
   generateThumbs(photos) {
     photos.map((photo) => {
-      photo.url = photo.photo_path;
-      photo.props = {
-        photo: photo
-      };
       let w = thumbWidth;
       let h = thumbHeight;
       if (photo.width && photo.height) {

@@ -136,7 +136,7 @@ export default class SightingScreen extends React.Component {
             );
           })}
         </ScrollView>
-        <TouchableOpacity style={style.button} onPress={() => { this.getPhotosToReview() }}>
+        <TouchableOpacity style={style.highlightButton} onPress={() => { this.getPhotosToReview() }}>
           <Text style={style.h1}>Review New Sightings</Text>
         </TouchableOpacity>
       </SafeAreaView>
@@ -144,9 +144,17 @@ export default class SightingScreen extends React.Component {
   }
 
   getPhotosToReview() {
-    alert("TODO");
-    this.db.selectPhotosToReview().then((objects) => {
-      //TOOD:
+    this.db.selectPhotosToReview().then((photos) => {
+      this.props.navigation.navigate('ReviewScreen', {
+        photos: photos.map((photo) => {
+          photo.photo_path = root + '/' + photo.photo_path;
+          photo.url = photo.photo_path;
+          photo.props = {
+            photo: photo
+          };
+          return photo;
+        })
+      });
     });
   }
 
@@ -162,6 +170,10 @@ export default class SightingScreen extends React.Component {
         photos: Object.values(photos).map((photo) => {
           photo.photo_path = root + '/' + photo.photo_path;
           photo.location_name = objects[day][locationId].location_name;
+          photo.url = photo.photo_path;
+          photo.props = {
+            photo: photo
+          };
           return photo;
         })
       });

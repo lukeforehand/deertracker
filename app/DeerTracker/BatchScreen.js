@@ -317,6 +317,10 @@ export default class BatchScreen extends React.Component {
           photos: photos.map((photo) => {
             photo.photo_path = root + '/' + photo.photo_path;
             photo.location_name = batch['location_name'];
+            photo.url = photo.photo_path;
+            photo.props = {
+              photo: photo
+            };
             return photo;
           })
         });

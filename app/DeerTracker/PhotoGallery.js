@@ -34,7 +34,7 @@ export default class PhotoGallery extends React.Component {
         super(props);
         this.db = new Database();
         this.state = {
-            imageIndex: props.imageIndex,
+            imageIndex: props.imageIndex ? props.imageIndex : 0,
             photos: props.photos,
             profileVisible: false,
             saveProfileVisible: false,
@@ -45,7 +45,7 @@ export default class PhotoGallery extends React.Component {
     componentDidMount() {
         this.fetchData();
         if (this.props.showCrops) {
-            this.generateCrop(this.props.photos[this.props.imageIndex].objects[0]);
+            this.generateCrop(this.state.photos[this.state.imageIndex].objects[0]);
         }
     }
 
@@ -53,43 +53,45 @@ export default class PhotoGallery extends React.Component {
         const photos = this.state.photos;
         const imageIndex = this.state.imageIndex;
         return (
-            <ImageViewer
-                imageUrls={photos}
-                index={imageIndex}
-                enableSwipeDown={true}
-                enableImageZoom={false}
-                renderImage={this.renderImage.bind(this)}
-                onChange={(index) => {
-                    if (this.props.showCrops) {
-                        let photo = photos[index];
-                        this.setState({ imageIndex: index });
-                        this.generateCrop(photo.objects[0]);
-                    }
-                }}
-                renderFooter={this.renderMenu.bind(this)}
-                swipeDownThreshold={80}
-                onSwipeDown={this.props.onSwipeDown}
-                menus={({ cancel, saveToLocal }) => {
-                    return (
-                        <View style={{ height: screenHeight }}>
-                            <Modal
-                                animationType='slide'
-                                transparent={true}>
-                                <View style={style.saveProfileModal}>
-                                    <TouchableOpacity style={style.button} onPress={() => {
-                                        CameraRoll.save(photos[imageIndex].photo_path).then(() => cancel());
-                                    }}>
-                                        <Text style={style.h1}>Save to Camera Roll</Text>
-                                    </TouchableOpacity>
-                                </View>
-                                <TouchableWithoutFeedback onPress={() => { cancel() }}>
-                                    <View style={{ flex: 1 }} />
-                                </TouchableWithoutFeedback>
-                            </Modal>
-                        </View>
-                    );
-                }}
-            />
+            <Modal visible={true} transparent={true}>
+                <ImageViewer
+                    imageUrls={photos}
+                    index={imageIndex}
+                    enableSwipeDown={true}
+                    enableImageZoom={false}
+                    renderImage={this.renderImage.bind(this)}
+                    onChange={(index) => {
+                        if (this.props.showCrops) {
+                            let photo = photos[index];
+                            this.setState({ imageIndex: index });
+                            this.generateCrop(photo.objects[0]);
+                        }
+                    }}
+                    renderFooter={this.renderMenu.bind(this)}
+                    swipeDownThreshold={80}
+                    onSwipeDown={this.props.onSwipeDown}
+                    menus={({ cancel, saveToLocal }) => {
+                        return (
+                            <View style={{ height: screenHeight }}>
+                                <Modal
+                                    animationType='slide'
+                                    transparent={true}>
+                                    <View style={style.saveProfileModal}>
+                                        <TouchableOpacity style={style.button} onPress={() => {
+                                            CameraRoll.save(photos[imageIndex].photo_path).then(() => cancel());
+                                        }}>
+                                            <Text style={style.h1}>Save to Camera Roll</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                    <TouchableWithoutFeedback onPress={() => { cancel() }}>
+                                        <View style={{ flex: 1 }} />
+                                    </TouchableWithoutFeedback>
+                                </Modal>
+                            </View>
+                        );
+                    }}
+                />
+            </Modal>
         );
     }
 
@@ -135,45 +137,6 @@ export default class PhotoGallery extends React.Component {
                 }
             </View >
         );
-    }
-
-    generateCrop(object) {
-        let cropPath = RNFS.CachesDirectoryPath + '/crop_' + object.id + '.jpg';
-        RNFS.exists(cropPath).then((exists) => {
-            if (exists) {
-                object.path = cropPath;
-                this.setState({
-                    crop: object
-                });
-            } else {
-                let cropData = {
-                    offset: {
-                        x: object.x,
-                        y: object.y
-                    },
-                    size: {
-                        width: object.w,
-                        height: object.h
-                    },
-                    displaySize: {
-                        width: thumbWidth,
-                        height: 200
-                    }
-                };
-                ImageEditor.cropImage(root + '/' + object.photo_path, cropData).then(url => {
-                    RNFS.moveFile(url, cropPath).catch((err) => {
-                        RNFS.unlink(url);
-                    }).then(() => {
-                        object.path = cropPath;
-                        this.setState({
-                            crop: object
-                        });
-                    });
-                }).catch((err) => {
-                    console.log(err);
-                });
-            }
-        });
     }
 
     renderMenu(index) {
@@ -272,6 +235,45 @@ export default class PhotoGallery extends React.Component {
                 </View >
             )
         }
+    }
+
+    generateCrop(object) {
+        let cropPath = RNFS.CachesDirectoryPath + '/crop_' + object.id + '.jpg';
+        RNFS.exists(cropPath).then((exists) => {
+            if (exists) {
+                object.path = cropPath;
+                this.setState({
+                    crop: object
+                });
+            } else {
+                let cropData = {
+                    offset: {
+                        x: object.x,
+                        y: object.y
+                    },
+                    size: {
+                        width: object.w,
+                        height: object.h
+                    },
+                    displaySize: {
+                        width: thumbWidth,
+                        height: 200
+                    }
+                };
+                ImageEditor.cropImage(root + '/' + object.photo_path, cropData).then(url => {
+                    RNFS.moveFile(url, cropPath).catch((err) => {
+                        RNFS.unlink(url);
+                    }).then(() => {
+                        object.path = cropPath;
+                        this.setState({
+                            crop: object
+                        });
+                    });
+                }).catch((err) => {
+                    console.log(err);
+                });
+            }
+        });
     }
 
     updateProfile(crop, profile) {
