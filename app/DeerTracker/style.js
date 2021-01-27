@@ -210,7 +210,7 @@ export default StyleSheet.create({
     backgroundColor: 'rgb(255, 103, 0)',
     justifyContent: 'center',
     alignItems: 'center',
-    height: 60,
+    height: 50,
   },
   highlightButtonText: {
     color: '#e3e8e8',
@@ -244,7 +244,7 @@ export default StyleSheet.create({
     height: 150,
   },
   importScreenBottom: {
-    height: screenHeight - thumbHeight - 100 // header and footer
+    height: screenHeight - thumbHeight * 2 - 100 // header and footer
   },
   config: {
     flexDirection: 'row',

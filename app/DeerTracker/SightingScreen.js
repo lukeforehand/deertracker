@@ -56,7 +56,7 @@ export default class SightingScreen extends React.Component {
       )
     }
 
-    let scrollViewHeight = this.state.newSightings > 0 ? screenHeight - 230 : screenHeight;
+    let scrollViewHeight = this.state.newSightings > 0 ? screenHeight - 220 : screenHeight - thumbHeight;
 
     return (
       <SafeAreaView>

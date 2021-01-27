@@ -194,7 +194,7 @@ export default class Database {
         JOIN photo p ON p.id = o.photo_id
         JOIN location l ON l.id = o.location_id
         LEFT JOIN profile i ON i.id = o.profile_id
-        WHERE o.reviewed IS FALSE ORDER BY p.time ASC, o.x ASC
+        WHERE o.reviewed IS FALSE ORDER BY p.time ASC
         `);
         let objects = rs.map((r) => {
             return r.rows.raw();

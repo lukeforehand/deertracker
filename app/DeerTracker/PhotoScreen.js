@@ -6,7 +6,7 @@ import {
   SafeAreaView
 } from 'react-native';
 
-import style from './style';
+import style, { screenHeight, thumbHeight } from './style';
 
 import PhotoGrid from './PhotoGrid';
 
@@ -30,7 +30,7 @@ export default class PhotoScreen extends React.Component {
           <Image source={require('./assets/images/crosshairs.png')} style={{ marginLeft: 20, width: 30, height: 30 }} />
           <Text style={style.t4}>{subTitle}</Text>
         </View>
-        <View>
+        <View style={{ height: screenHeight - thumbHeight * 2 }}>
           <PhotoGrid photos={photos} showCrops={showCrops} onRefresh={() => { this.props.navigation.goBack() }} />
         </View>
       </SafeAreaView>
