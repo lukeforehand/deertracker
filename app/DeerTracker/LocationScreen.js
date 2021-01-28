@@ -65,8 +65,8 @@ export default class LocationScreen extends React.Component {
                   style={style.locationButton}
                   onPress={() => { this.pickFiles(location) }}>
                   <View style={{ flexDirection: 'row' }}>
-                    <Image source={require('./assets/images/crosshairs.png')} style={{ margin: 10, width: 80, height: 80 }} />
-                    <View>
+                    <Image source={require('./assets/images/crosshairs.png')} style={{ margin: 10, width: 60, height: 60 }} />
+                    <View style={{ justifyContent: 'center' }}>
                       <Text style={style.h2}>{location['name']}</Text>
                       <Text style={style.h2}>({location['lat'].toFixed(5)}, {location['lon'].toFixed(5)})</Text>
                     </View>
@@ -75,6 +75,7 @@ export default class LocationScreen extends React.Component {
               </SwipeRow>
             );
           })}
+          <View style={{ height: 20 }} />
           <TouchableOpacity style={style.button} onPress={() => {
             this.props.navigation.navigate('AddLocationScreen', {
               locations: this.state.locations

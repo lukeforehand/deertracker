@@ -59,8 +59,8 @@ export default class AddLocationScreen extends React.Component {
             <Image source={require('./assets/images/crosshairs.png')} style={{ width: 80, height: 80 }} />
           </View>
           {!this.state.modalVisible &&
-            <View style={{ flexDirection: 'row' }}>
-              <TouchableOpacity style={[style.button, { flex: 1 }]} onPress={() => { this.setState({ modalVisible: true }) }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <TouchableOpacity style={style.mapButton} onPress={() => { this.setState({ modalVisible: true }) }}>
                 <Text style={style.h1}>Save Location</Text>
               </TouchableOpacity>
               <TouchableOpacity style={style.locationArrow} onPress={() => { this.getCurrentPosition() }}>

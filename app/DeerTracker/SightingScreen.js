@@ -19,8 +19,7 @@ import Moment from 'moment';
 import MoonPhase from './MoonPhase';
 import Database from './Database';
 
-import style from './style';
-import { screenHeight, thumbWidth, thumbHeight } from './style';
+import style, { screenHeight, thumbWidth, headerHeight, footerHeight } from './style';
 
 const root = RNFS.DocumentDirectoryPath;
 
@@ -55,12 +54,9 @@ export default class SightingScreen extends React.Component {
         </SafeAreaView>
       )
     }
-
-    let scrollViewHeight = this.state.newSightings > 0 ? screenHeight - 220 : screenHeight - thumbHeight;
-
     return (
       <SafeAreaView>
-        <ScrollView style={{ height: scrollViewHeight }} refreshControl={
+        <ScrollView style={{ height: screenHeight - headerHeight - footerHeight }} refreshControl={
           <RefreshControl
             title='Refresh'
             titleColor='black'
@@ -76,8 +72,8 @@ export default class SightingScreen extends React.Component {
             let moonImage = moon.image(phase);
             return (
               <View key={day}>
-                <View style={[style.locationButton, style.h3, { paddingTop: 0, paddingBottom: 0, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
-                  <Text style={style.h4}>
+                <View style={style.sightingButton}>
+                  <Text style={style.h6}>
                     {Moment(date).format('ddd, MMM Do YYYY')}
                   </Text>
                   <Image style={{ width: 45, height: 45 }} source={moonImage} />
@@ -174,6 +170,10 @@ export default class SightingScreen extends React.Component {
         showCrops: true,
         photos: Object.values(photos).map((photo) => {
           photo.photo_path = root + '/' + photo.photo_path;
+          photo.objects = photo.objects.map((object) => {
+            object.photo_path = root + '/' + object.photo_path;
+            return object;
+          });
           photo.location_name = objects[day][locationId].location_name;
           photo.url = photo.photo_path;
           photo.props = {

@@ -5,6 +5,7 @@ import {
   Text,
   View,
   TouchableOpacity,
+  Image
 } from 'react-native';
 
 import RNFS from 'react-native-fs';
@@ -34,7 +35,11 @@ export default class ImportScreen extends React.Component {
     return (
       <SafeAreaView>
         <View style={style.importScreenTop}>
-          <Text style={style.t2}>{location['name']}</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+            <Image source={require('./assets/images/crosshairs.png')}
+              style={{ width: 25, height: 25 }} />
+            <Text style={style.t2}>{location['name']}</Text>
+          </View>
           <TouchableOpacity
             style={style.button} onPress={this.importPhotos.bind(this)}>
             <Text style={style.h1}>Import {files.length} Photos</Text>

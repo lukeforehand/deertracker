@@ -25,7 +25,7 @@ import Database from './Database';
 import style from './style';
 
 const root = RNFS.DocumentDirectoryPath;
-const detectorUrl = "http://192.168.0.157:5000";
+const detectorUrl = "http://192.168.1.3:5000";
 
 export default class BatchScreen extends React.Component {
 
@@ -111,8 +111,8 @@ export default class BatchScreen extends React.Component {
                     {Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY hh:mm A')}
                   </Text>
                   <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                      <Image source={require('./assets/images/crosshairs.png')} style={{ marginLeft: 10, width: 30, height: 30 }} />
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', margin: 10 }}>
+                      <Image source={require('./assets/images/crosshairs.png')} style={{ width: 25, height: 25 }} />
                       <Text style={style.h2}>{batch['location_name']}</Text>
                     </View>
                     {progress < 100 &&

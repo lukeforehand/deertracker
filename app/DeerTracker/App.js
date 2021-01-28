@@ -15,14 +15,15 @@ import ReviewScreen from './ReviewScreen';
 import ProfileScreen from './ProfileScreen';
 import ConfigScreen from './ConfigScreen';
 
+import style, { headerHeight, footerHeight } from './style';
+
 const ImportScreenNavigator = createStackNavigator({
   LocationScreen: {
     screen: LocationScreen,
     navigationOptions: {
       title: 'Load Card',
-      headerTitleStyle: {
-        fontSize: 20
-      },
+      headerStyle: { height: headerHeight },
+      headerTitleStyle: style.header,
       headerTitleAlign: 'center'
     },
   },
@@ -30,9 +31,8 @@ const ImportScreenNavigator = createStackNavigator({
     screen: AddLocationScreen,
     navigationOptions: {
       title: 'Add Location',
-      headerTitleStyle: {
-        fontSize: 20
-      },
+      headerStyle: { height: headerHeight },
+      headerTitleStyle: style.header,
       headerTitleAlign: 'center'
     },
   },
@@ -40,9 +40,8 @@ const ImportScreenNavigator = createStackNavigator({
     screen: ImportScreen,
     navigationOptions: {
       title: 'Import',
-      headerTitleStyle: {
-        fontSize: 20
-      },
+      headerStyle: { height: headerHeight },
+      headerTitleStyle: style.header,
       headerTitleAlign: 'center'
     },
   }
@@ -54,9 +53,8 @@ const BatchScreenNavigator = createStackNavigator({
     screen: BatchScreen,
     navigationOptions: {
       title: 'Card History',
-      headerTitleStyle: {
-        fontSize: 20
-      },
+      headerStyle: { height: headerHeight },
+      headerTitleStyle: style.header,
       headerTitleAlign: 'center'
     },
   },
@@ -64,9 +62,8 @@ const BatchScreenNavigator = createStackNavigator({
     screen: PhotoScreen,
     navigationOptions: {
       title: 'Gallery',
-      headerTitleStyle: {
-        fontSize: 20
-      },
+      headerStyle: { height: headerHeight },
+      headerTitleStyle: style.header,
       headerTitleAlign: 'center'
     },
   }
@@ -77,9 +74,8 @@ const SightingScreenNavigator = createStackNavigator({
     screen: SightingScreen,
     navigationOptions: {
       title: 'Sightings',
-      headerTitleStyle: {
-        fontSize: 20
-      },
+      headerStyle: { height: headerHeight },
+      headerTitleStyle: style.header,
       headerTitleAlign: 'center'
     },
   },
@@ -87,9 +83,8 @@ const SightingScreenNavigator = createStackNavigator({
     screen: ReviewScreen,
     navigationOptions: {
       title: 'New Sightings',
-      headerTitleStyle: {
-        fontSize: 20
-      },
+      headerStyle: { height: headerHeight },
+      headerTitleStyle: style.header,
       headerTitleAlign: 'center'
     },
   },
@@ -97,9 +92,8 @@ const SightingScreenNavigator = createStackNavigator({
     screen: PhotoScreen,
     navigationOptions: {
       title: 'Gallery',
-      headerTitleStyle: {
-        fontSize: 20
-      },
+      headerStyle: { height: headerHeight },
+      headerTitleStyle: style.header,
       headerTitleAlign: 'center'
     },
   }
@@ -110,9 +104,8 @@ const ProfileScreenNavigator = createStackNavigator({
     screen: ProfileScreen,
     navigationOptions: {
       title: 'Profile',
-      headerTitleStyle: {
-        fontSize: 20
-      },
+      headerStyle: { height: headerHeight },
+      headerTitleStyle: style.header,
       headerTitleAlign: 'center'
     },
   }
@@ -123,9 +116,8 @@ const ConfigScreenNavigator = createStackNavigator({
     screen: ConfigScreen,
     navigationOptions: {
       title: 'Settings',
-      headerTitleStyle: {
-        fontSize: 20
-      },
+      headerStyle: { height: headerHeight },
+      headerTitleStyle: style.header,
       headerTitleAlign: 'center'
     },
   }
@@ -182,8 +174,9 @@ const TabNavigator = createBottomTabNavigator(
   },
   {
     tabBarOptions: {
+      style: { height: footerHeight },
       labelStyle: {
-        fontSize: 14,
+        fontSize: 12,
         //fontFamily: Platform.OS === 'ios' ? 'Metamorphous' : 'metamorphous_regular'
       }
     }

@@ -22,15 +22,16 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 import Moment from 'moment';
 
 import Database from './Database';
-import style, { screenWidth, screenHeight, thumbWidth, thumbHeight } from './style';
+import style, { screenWidth, screenHeight, thumbWidth, thumbHeight, headerHeight } from './style';
 
-const detectorUrl = "http://192.168.0.157:5000";
+const detectorUrl = "http://192.168.1.3:5000";
 
 export default class PhotoGallery extends React.Component {
 
     constructor(props) {
         super(props);
         this.db = new Database();
+        this.swiper = React.createRef();
         this.state = {
             imageIndex: props.imageIndex ? props.imageIndex : 0,
             profileVisible: false,
@@ -76,13 +77,13 @@ export default class PhotoGallery extends React.Component {
                                 <Modal
                                     animationType='slide'
                                     transparent={true}>
-                                    <View style={style.saveProfileModal}>
-                                        <TouchableOpacity style={style.button} onPress={() => {
-                                            CameraRoll.save(photos[imageIndex].photo_path).then(() => cancel());
-                                        }}>
-                                            <Text style={style.h1}>Save to Camera Roll</Text>
-                                        </TouchableOpacity>
-                                    </View>
+
+                                    <TouchableOpacity style={style.saveToCameraButton} onPress={() => {
+                                        CameraRoll.save(photos[imageIndex].photo_path).then(() => cancel());
+                                    }}>
+                                        <Text style={style.h1}>Save to Camera Roll</Text>
+                                    </TouchableOpacity>
+
                                     <TouchableWithoutFeedback onPress={() => { cancel() }}>
                                         <View style={{ flex: 1 }} />
                                     </TouchableWithoutFeedback>
@@ -99,14 +100,14 @@ export default class PhotoGallery extends React.Component {
         let photo = props.photo;
         let time = photo.time ? Moment(photo.time).format('ddd, MMM Do YYYY hh:mm A') : ""
         let top = 0;
-        props.style.top = 0;
+        let titleHeight = 40;
+        props.style.top = -titleHeight;
         if (this.props.showCrops) {
-            top = - photo.height * (screenWidth / photo.width);
-            props.style.top = 100;
+            top = -photo.height * (screenWidth / photo.width) / 2 + titleHeight;
         }
         return (
-            <View style={{ height: screenHeight / 2, top: top }}>
-                <View style={{ top: props.style.top, height: 40 }}>
+            <View style={{ top: top }}>
+                <View style={{ top: props.style.top }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                         <Image source={require('./assets/images/crosshairs.png')}
                             style={{ width: 15, height: 15 }} />
@@ -126,19 +127,18 @@ export default class PhotoGallery extends React.Component {
                     return (
                         <TouchableOpacity
                             key={object.id}
-                            onPress={() => { this.generateCrop(object) }}
+                            onPress={() => { this.swiper.current.scrollTo(photo.objects.indexOf(object) - this.swiper.current.state.index) }}
                             style={{
                                 ...StyleSheet.absoluteFillObject,
                                 left: parseInt(object.x * ratio),
-                                top: parseInt(object.y * ratio) + 100 + 40,
+                                top: parseInt(object.y * ratio),
                                 width: parseInt(object.w * ratio),
                                 height: parseInt(object.h * ratio),
                                 borderWidth: 1,
                                 borderColor: borderColor,
                             }} />
                     );
-                })
-                }
+                })}
             </View >
         );
     }
@@ -147,16 +147,18 @@ export default class PhotoGallery extends React.Component {
         if (!this.props.showCrops || !this.state.profiles) {
             return;
         }
-        let crops = this.props.photos[index].objects;
+        let photo = this.props.photos[index];
+        let crops = photo.objects;
         if (crops.length > 0) {
             return (
-                <View style={{ height: screenHeight / 2 }}>
-                    <Swiper loop={false} activeDotColor='#4E603E' dotColor='rgb(255, 103, 0)'
+                <View style={{ height: 280 }}>
+                    <Swiper loop={false} dot={<View />} activeDot={<View />}
+                        ref={this.swiper}
                         onIndexChanged={(nextIndex) => { this.generateCrop(crops[nextIndex]) }}>
                         {crops.map((crop) => {
                             let max = Math.max(crop.w, crop.h);
                             let w = (thumbWidth / max) * crop.w;
-                            let h = (200 / max) * crop.h;
+                            let h = (180 / max) * crop.h;
                             let profiles = this.state.profiles;
                             let selectedProfile = this.state.selectedProfile;
                             return (
@@ -228,6 +230,7 @@ export default class PhotoGallery extends React.Component {
                                             </Modal>
                                         </Modal>
                                     </View>
+                                    <View style={{ height: 15 }} />
                                     <TouchableOpacity style={style.galleryButton}
                                         onPress={() => { this.setState({ selectedProfile: crop.profile_id, profileVisible: true }) }}>
                                         <Text style={style.h1}>Profile</Text>
@@ -287,7 +290,8 @@ export default class PhotoGallery extends React.Component {
                 crop.profile_id = profile.id;
                 this.setState({
                     profileVisible: false,
-                    crop: Object.assign({}, crop)
+                    saveProfileVisible: false,
+                    crop: crop
                 });
             }).catch((error) => {
                 console.log(error);
@@ -307,6 +311,7 @@ export default class PhotoGallery extends React.Component {
             this.db.insertProfile(crop.id, profile).then((rs) => {
                 let profileId = rs[0]['insertId'];
                 this.updateProfile(crop, { id: profileId, name: profile });
+                this.fetchData();
             }).catch((error) => {
                 console.log(error);
                 if (error.code && error.code == 6) {

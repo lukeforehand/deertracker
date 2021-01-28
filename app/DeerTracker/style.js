@@ -4,42 +4,45 @@ import { StyleSheet, Dimensions } from 'react-native';
 export const screenWidth = Dimensions.get('window').width;
 export const screenHeight = Dimensions.get('window').height;
 export const thumbWidth = screenWidth / 2;
-export const thumbHeight = thumbWidth * (9 / 16);
+export const thumbHeight = thumbWidth * (3 / 4);
 export const photoWidth = screenWidth;
-export const photoHeight = photoWidth * (9 / 16);
+export const photoHeight = photoWidth * (4 / 4);
+
+export const footerHeight = 50;
+export const headerHeight = 65;
 
 export default StyleSheet.create({
+  header: {
+    fontSize: 18
+  },
   h1: {
     color: '#e3e8e8',
     textAlign: 'center',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
-    fontSize: 20,
+    fontSize: 16,
     margin: 10
   },
   h2: {
     color: 'black',
     textAlign: 'left',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
-    fontSize: 20,
-    margin: 10
+    fontSize: 18,
+    marginLeft: 10,
+    marginRight: 10
   },
   h3: {
     color: '#e3e8e8',
     backgroundColor: '#4E603E',
-    shadowColor: '#000',
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    elevation: 10,
     textAlign: 'left',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
-    fontSize: 18,
+    fontSize: 16,
     padding: 10
   },
   h4: {
     color: '#e3e8e8',
     textAlign: 'left',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
-    fontSize: 18
+    fontSize: 16
   },
   h5: {
     color: '#e3e8e8',
@@ -50,7 +53,14 @@ export default StyleSheet.create({
     elevation: 10,
     textAlign: 'center',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
-    fontSize: 18,
+    fontSize: 16,
+    padding: 10
+  },
+  h6: {
+    color: '#e3e8e8',
+    textAlign: 'left',
+    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontSize: 16,
     padding: 10
   },
   t1: {
@@ -64,28 +74,28 @@ export default StyleSheet.create({
     color: 'black',
     textAlign: 'center',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
-    fontSize: 20,
-    margin: 10
+    fontSize: 16,
+    margin: 15
   },
   t3: {
     color: 'black',
     textAlign: 'center',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
-    fontSize: 18,
-    margin: 20
+    fontSize: 16,
+    margin: 15
   },
   t4: {
     color: 'black',
     textAlign: 'left',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
-    fontSize: 18,
+    fontSize: 16,
     margin: 10
   },
   t5: {
     color: 'black',
     textAlign: 'left',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
-    fontSize: 18,
+    fontSize: 16,
     paddingBottom: 10,
     paddingTop: 5,
     paddingLeft: 10
@@ -94,7 +104,7 @@ export default StyleSheet.create({
     color: 'gray',
     textAlign: 'center',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
-    fontSize: 20,
+    fontSize: 16,
   },
   t7: {
     color: 'gray',
@@ -125,7 +135,8 @@ export default StyleSheet.create({
   },
   button: {
     borderRadius: 10,
-    margin: 20,
+    marginLeft: 60,
+    marginRight: 60,
     shadowColor: '#000',
     shadowOpacity: 0.5,
     shadowRadius: 10,
@@ -133,12 +144,25 @@ export default StyleSheet.create({
     backgroundColor: '#4E603E',
     justifyContent: 'center',
     alignItems: 'center',
-    height: 60
+    height: 40
+  },
+  mapButton: {
+    width: screenWidth - 40 - 40 - 40,
+    marginLeft: 40,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 10,
+    backgroundColor: '#4E603E',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 40
   },
   locationArrow: {
     color: 'blue',
     borderRadius: 10,
-    margin: 25,
+    margin: 15,
     marginLeft: 0,
     shadowColor: '#000',
     shadowOpacity: 0.5,
@@ -147,8 +171,8 @@ export default StyleSheet.create({
     backgroundColor: 'lightgray',
     justifyContent: 'center',
     alignItems: 'center',
-    height: 50,
-    width: 50
+    height: 40,
+    width: 40
   },
   marker: {
     shadowColor: '#fff',
@@ -169,7 +193,7 @@ export default StyleSheet.create({
   },
   profileModal: {
     borderRadius: 10,
-    marginTop: 80,
+    marginTop: 60,
     marginLeft: 20,
     marginRight: 20,
     backgroundColor: 'white',
@@ -177,13 +201,30 @@ export default StyleSheet.create({
     borderWidth: 1
   },
   saveProfileModal: {
+    height: 100,
     borderRadius: 10,
-    marginTop: 80 + 280,
+    marginTop: 20 + 280,
     marginLeft: 20,
     marginRight: 20,
     backgroundColor: 'white',
     borderColor: 'gray',
     borderWidth: 1
+  },
+  saveToCameraButton: {
+    borderRadius: 10,
+    marginTop: 280,
+    marginLeft: 60,
+    marginRight: 60,
+    shadowColor: '#000',
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 10,
+    backgroundColor: '#4E603E',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
   },
   input: {
     borderColor: 'gray',
@@ -198,11 +239,22 @@ export default StyleSheet.create({
     borderRadius: 10,
     backgroundColor: 'white',
     borderColor: 'gray',
-    borderWidth: 1,
-    padding: 5
+    borderWidth: 1
+  },
+  sightingButton: {
+    shadowColor: '#000',
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 10,
+    backgroundColor: '#4E603E',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   highlightButton: {
     borderRadius: 10,
+    marginLeft: 60,
+    marginRight: 60,
     shadowColor: '#000',
     shadowOpacity: 0.5,
     shadowRadius: 10,
@@ -210,24 +262,25 @@ export default StyleSheet.create({
     backgroundColor: 'rgb(255, 103, 0)',
     justifyContent: 'center',
     alignItems: 'center',
-    height: 50,
+    height: 40,
+    position: 'absolute',
+    bottom: 15,
+    width: screenWidth - 120,
   },
   highlightButtonText: {
     color: '#e3e8e8',
     textAlign: 'center',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
-    fontSize: 18,
+    fontSize: 16,
   },
   thumbnail: {
     borderWidth: 1,
     borderColor: 'grey'
   },
   smallThumbnail: {
-    width: thumbWidth / 1.25,
-    height: thumbHeight / 1.25,
-    borderWidth: 1,
-    borderColor: 'grey',
-    margin: 10
+    width: thumbWidth,
+    height: thumbHeight,
+    marginBottom: 10
   },
   photoContainer: {
     flexDirection: 'column',
@@ -241,10 +294,10 @@ export default StyleSheet.create({
     height: photoHeight
   },
   importScreenTop: {
-    height: 150,
+    height: 100,
   },
   importScreenBottom: {
-    height: screenHeight - thumbHeight * 2 - 100 // header and footer
+    height: screenHeight - 100 - headerHeight - footerHeight
   },
   config: {
     flexDirection: 'row',
@@ -252,7 +305,7 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   galleryMenu: {
-    width: thumbWidth - 40,
+    width: screenWidth / 2 - 40,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: 'gray',
@@ -263,7 +316,8 @@ export default StyleSheet.create({
   },
   galleryButton: {
     borderRadius: 10,
-    margin: 40,
+    marginLeft: 60,
+    marginRight: 60,
     shadowColor: '#000',
     shadowOpacity: 0.5,
     shadowRadius: 10,
@@ -271,10 +325,10 @@ export default StyleSheet.create({
     backgroundColor: '#4E603E',
     justifyContent: 'center',
     alignItems: 'center',
-    height: 60
+    height: 40
   },
   picker: {
     backgroundColor: 'black',
-    height: 200
+    height: 180
   }
 });
