@@ -2,90 +2,107 @@ import React from 'react';
 import {
   Alert,
   SafeAreaView,
+  ActivityIndicator,
+  ScrollView,
   Text,
   View,
+  Image,
   TouchableOpacity,
 } from 'react-native';
 
 import RNFS from 'react-native-fs';
+
+import SwipeRow from './SwipeRow';
+
+import MoonPhase from './MoonPhase';
 import Database from './Database';
 
-import PhotoGallery from './PhotoGallery';
-
 import style from './style';
-
-const root = RNFS.DocumentDirectoryPath;
-
-RNFS.mkdir(root + '/.data', { NSURLIsExcludedFromBackupKey: true });
 
 export default class ProfileScreen extends React.Component {
 
   constructor(props) {
     super(props);
     this.db = new Database();
-    this.state = {};
+    this.state = { isLoading: true }
+  }
+
+  componentDidMount() {
+    this.fetchData();
+  }
+
+  componentDidUpdate() {
+    this.fetchData();
+  }
+
+  refreshing() {
+    return this.state.isLoading;
   }
 
   render() {
 
-    const location = this.props.navigation.getParam('location');
-    const files = this.props.navigation.getParam('files');
+    if (this.refreshing()) {
+      return (
+        <SafeAreaView>
+          <View style={style.activity}>
+            <ActivityIndicator size='large' />
+          </View>
+        </SafeAreaView>
+      )
+    }
+
+    const profiles = this.state.profiles;
 
     return (
       <SafeAreaView>
-        <View style={style.importScreenTop}>
-          <Text style={style.t2}>{location['name']}</Text>
-          <TouchableOpacity
-            style={style.button} onPress={this.importPhotos.bind(this)}>
-            <Text style={style.h1}>Import {files.length} Photos</Text>
-          </TouchableOpacity>
-        </View>
-        <PhotoGallery
-          style={style.importScreenBottom}
-          photos={files}
-          onSwipeDown={() => { this.props.navigation.goBack() }}
-          showCrops={false} />
+        <ScrollView style={{ height: '100%' }}>
+          {profiles.length <= 0 &&
+            <Text style={style.t3}>Review sightings to add a profile</Text>
+          }
+          {profiles.map((profile) => {
+            return (
+              <SwipeRow key={profile.id} item={profile} onDelete={this.deleteProfile.bind(this)}>
+                <TouchableOpacity
+                  style={style.locationButton}
+                  onPress={() => { this.getProfile(profile) }}>
+                  <View style={{ flexDirection: 'row' }}>
+                    <Image source={require('./assets/images/crosshairs.png')} style={{ margin: 10, width: 60, height: 60 }} />
+                    <View style={{ justifyContent: 'center' }}>
+                      <Text style={style.h2}>{profile.name}</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </SwipeRow>
+            );
+          })}
+        </ScrollView>
       </SafeAreaView >
     );
   }
 
-  importPhotos() {
-    const location = this.props.navigation.getParam('location');
-    const files = this.props.navigation.getParam('files');
+  deleteProfile(profile, callback) {
     Alert.alert(
-      'Import ' + files.length + ' photos from location ' + location['name'] + '?', '', [
+      'Delete Profile ' + profile.name + '?', '', [
       {
         text: 'Yes',
         onPress: () => {
-          this.setState({ isLoading: true });
-          this.db.insertBatch(location['id']).then((rs) => {
-            let batchId = rs[0]['insertId'];
-            let relativePath = '.data/batch/' + batchId;
-            let destPath = root + '/' + relativePath;
-            RNFS.mkdir(destPath, { NSURLIsExcludedFromBackupKey: true }).then(() => {
-              Promise.all(files.map(async (file) => {
-                return RNFS.hash(file.path, 'md5').then((hash) => {
-                  let relativeDestFile = relativePath + '/' + hash + '.jpg';
-                  this.db.insertPhoto(hash, relativeDestFile, location['lat'], location['lon'], batchId).then(() => {
-                    RNFS.copyFile(file.path, root + '/' + relativeDestFile);
-                  }).catch((error) => {
-                    console.log(error);
-                    console.log("deleting " + file.path);
-                    RNFS.unlink(file.path);
-                  });
-                });
-              })).then(() => {
-                this.db.selectBatches().then((batches) => {
-                  this.props.navigation.popToTop('LocationScreen');
-                  this.props.navigation.navigate('BatchScreen', {
-                    batches: batches
-                  });
-                });
-              });
-            });
+          this.db.deleteProfile(profile.id).then(() => {
+            this.fetchData();
           });
+          callback();
         }
-      }, { text: 'No' }], { cancelable: false });
+      },
+      { text: 'No', onPress: callback }], { cancelable: false });
   }
 
+  fetchData() {
+    this.db.selectProfiles().then((profiles) => {
+      this.setState({
+        isLoading: false,
+        profiles: profiles
+      });
+    }).catch((error) => {
+      console.log(error);
+    });
+  }
 }

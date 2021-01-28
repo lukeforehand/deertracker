@@ -84,7 +84,7 @@ export default class LocationScreen extends React.Component {
             <Text style={style.h1}>New Location</Text>
           </TouchableOpacity>
         </ScrollView>
-      </SafeAreaView >
+      </SafeAreaView>
     );
   }
 

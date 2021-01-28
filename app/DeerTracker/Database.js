@@ -321,6 +321,12 @@ export default class Database {
             'DELETE FROM location WHERE id = ?', [id]);
     }
 
+    async deleteProfile(id) {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        await db.executeSql('DELETE FROM profile WHERE id = ?', [id]);
+        return await db.executeSql('UPDATE object SET profile_id = NULL WHERE profile_id = ?', [id]);
+    }
+
     async insertObject(obj) {
         obj['time'] = Moment(obj['time']).format('YYYY-MM-DD HH:mm:ss');
         const db = await SQLite.openDatabase({ name: database, location: location });
