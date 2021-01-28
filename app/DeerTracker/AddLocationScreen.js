@@ -87,6 +87,7 @@ export default class AddLocationScreen extends React.Component {
                 <TouchableOpacity style={style.button} onPress={this.saveLocation.bind(this)}>
                   <Text style={style.h1}>Save</Text>
                 </TouchableOpacity>
+                <View style={{ height: 15 }} />
               </View>
               <TouchableWithoutFeedback onPress={() => { this.setState({ modalVisible: false }) }}>
                 <View style={{ flex: 1 }} />
