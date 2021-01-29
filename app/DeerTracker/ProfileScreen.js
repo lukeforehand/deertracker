@@ -4,20 +4,23 @@ import {
   SafeAreaView,
   ActivityIndicator,
   ScrollView,
+  RefreshControl,
   Text,
   View,
   Image,
   TouchableOpacity,
 } from 'react-native';
 
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import RNFS from 'react-native-fs';
+import Moment from 'moment';
 
 import SwipeRow from './SwipeRow';
-
-import MoonPhase from './MoonPhase';
 import Database from './Database';
 
-import style from './style';
+import style, { screenWidth, screenHeight, thumbWidth, thumbHeight, headerHeight } from './style';
+
+const root = RNFS.DocumentDirectoryPath;
 
 export default class ProfileScreen extends React.Component {
 
@@ -28,10 +31,6 @@ export default class ProfileScreen extends React.Component {
   }
 
   componentDidMount() {
-    this.fetchData();
-  }
-
-  componentDidUpdate() {
     this.fetchData();
   }
 
@@ -55,20 +54,44 @@ export default class ProfileScreen extends React.Component {
 
     return (
       <SafeAreaView>
-        <ScrollView style={{ height: '100%' }}>
+        <ScrollView style={{ height: '100%' }} refreshControl={
+          <RefreshControl
+            title='Refresh'
+            titleColor='black'
+            tintColor='black'
+            refreshing={this.refreshing()} onRefresh={this.fetchData.bind(this)} />
+        }>
           {profiles.length <= 0 &&
             <Text style={style.t3}>Review sightings to add a profile</Text>
           }
+          {profiles.length > 0 &&
+            <Text style={style.t3}>Select a profile</Text>
+          }
           {profiles.map((profile) => {
+            let crop = profile.objects[0];
+            crop.path = RNFS.CachesDirectoryPath + '/crop_' + crop.id + '.jpg';
+            let max = Math.max(crop.w, crop.h);
+            let w = (thumbWidth / max) * crop.w;
+            let h = (140 / max) * crop.h;
             return (
-              <SwipeRow key={profile.id} item={profile} onDelete={this.deleteProfile.bind(this)}>
+              <SwipeRow key={crop.profile_name} item={crop} onDelete={this.deleteProfile.bind(this)}>
                 <TouchableOpacity
                   style={style.locationButton}
                   onPress={() => { this.getProfile(profile) }}>
-                  <View style={{ flexDirection: 'row' }}>
-                    <Image source={require('./assets/images/crosshairs.png')} style={{ margin: 10, width: 60, height: 60 }} />
-                    <View style={{ justifyContent: 'center' }}>
-                      <Text style={style.h2}>{profile.name}</Text>
+                  <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <View>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', margin: 10 }}>
+                        <Image source={require('./assets/images/crosshairs.png')} style={{ width: 25, height: 25 }} />
+                        <Text style={style.h2}>{crop.profile_name}</Text>
+                      </View>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                        <Icon style={{ paddingLeft: 15 }} name='eye' color='black' size={18} />
+                        <Text style={style.t5}>{profile.objects.length} Sightings</Text>
+                      </View>
+                      <Text style={style.t5}>Last seen {Moment(new Date() - Moment(crop.photo_time)).format('DD')} days ago</Text>
+                    </View>
+                    <View style={{ width: thumbWidth, alignItems: 'center', justifyContent: 'center' }}>
+                      <Image source={{ uri: crop.path }} style={{ width: w, height: h }} />
                     </View>
                   </View>
                 </TouchableOpacity>
@@ -81,12 +104,13 @@ export default class ProfileScreen extends React.Component {
   }
 
   deleteProfile(profile, callback) {
+    console.log(profile);
     Alert.alert(
-      'Delete Profile ' + profile.name + '?', '', [
+      'Delete Profile ' + profile.profile_name + '?', '', [
       {
         text: 'Yes',
         onPress: () => {
-          this.db.deleteProfile(profile.id).then(() => {
+          this.db.deleteProfile(profile.profile_id).then(() => {
             this.fetchData();
           });
           callback();

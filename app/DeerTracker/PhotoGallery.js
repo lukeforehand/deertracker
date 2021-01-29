@@ -127,7 +127,9 @@ export default class PhotoGallery extends React.Component {
                     return (
                         <TouchableOpacity
                             key={object.id}
-                            onPress={() => { this.swiper.current.scrollTo(photo.objects.indexOf(object) - this.swiper.current.state.index) }}
+                            onPress={() => {
+                                this.swiper.current.scrollTo(photo.objects.indexOf(object));
+                            }}
                             style={{
                                 ...StyleSheet.absoluteFillObject,
                                 left: parseInt(object.x * ratio),
@@ -194,9 +196,14 @@ export default class PhotoGallery extends React.Component {
                                                     style={{ height: 200 }}
                                                     itemStyle={style.t2}
                                                     onValueChange={(itemValue, itemIndex) => {
-                                                        if (itemIndex > 0) {
-                                                            this.updateProfile(crop, profiles[itemIndex - 1])
+                                                        let profile = profiles[itemIndex - 1];
+                                                        if (!profile && itemIndex === 0) {
+                                                            profile = {
+                                                                name: null,
+                                                                id: null
+                                                            };
                                                         }
+                                                        this.updateProfile(crop, profile);
                                                     }}>
                                                     <Picker.Item key='-1' label='Select Profile' value='-1' />
                                                     {profiles.map((p) => {
@@ -253,6 +260,9 @@ export default class PhotoGallery extends React.Component {
                     crop: object
                 });
             } else {
+                let max = Math.max(object.w, object.h);
+                let w = (thumbWidth / max) * object.w;
+                let h = (180 / max) * object.h;
                 let cropData = {
                     offset: {
                         x: object.x,
@@ -263,8 +273,8 @@ export default class PhotoGallery extends React.Component {
                         height: object.h
                     },
                     displaySize: {
-                        width: thumbWidth,
-                        height: 200
+                        width: w,
+                        height: h
                     }
                 };
                 ImageEditor.cropImage(object.photo_path, cropData).then(url => {
@@ -353,7 +363,7 @@ export default class PhotoGallery extends React.Component {
     }
 
     fetchData() {
-        this.db.selectProfiles().then((profiles) => {
+        this.db.selectProfileList().then((profiles) => {
             this.setState({
                 isLoading: false,
                 profiles: profiles

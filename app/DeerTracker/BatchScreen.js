@@ -60,7 +60,6 @@ export default class BatchScreen extends React.Component {
     this.focusListener.remove();
   }
 
-
   componentWillUnmount() {
     clearInterval(this.checkUploads);
     clearInterval(this.checkProcess);

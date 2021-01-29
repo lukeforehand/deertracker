@@ -103,7 +103,7 @@ const ProfileScreenNavigator = createStackNavigator({
   ProfileScreen: {
     screen: ProfileScreen,
     navigationOptions: {
-      title: 'Select Profile',
+      title: 'Profiles',
       headerStyle: { height: headerHeight },
       headerTitleStyle: style.header,
       headerTitleAlign: 'center'

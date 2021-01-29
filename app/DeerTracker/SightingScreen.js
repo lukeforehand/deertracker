@@ -91,13 +91,11 @@ export default class SightingScreen extends React.Component {
                           onPress={() => { this.getPhotos(day, location.location_id) }}>
                           <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                             <View style={{ flex: 1 }}>
-                              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                                <Image source={require('./assets/images/crosshairs.png')} style={{ marginLeft: 10, width: 30, height: 30 }} />
+                              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', margin: 10 }}>
+                                <Image source={require('./assets/images/crosshairs.png')} style={{ width: 25, height: 25 }} />
                                 <Text style={style.h2}>{location.location_name}</Text>
                               </View>
-                              {Object.entries(location.object_counts).sort((a, b) => {
-                                return a[1] < b[1];
-                              }).map((object) => {
+                              {Object.entries(location.object_counts).sort((a, b) => b[1] - a[1]).map((object) => {
                                 let iconName = object[0] == 'person' ? 'user' : object[0] == 'vehicle' ? 'car' : 'paw';
                                 return (
                                   <View key={object[0]} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>

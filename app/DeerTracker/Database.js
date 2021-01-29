@@ -293,12 +293,40 @@ export default class Database {
         })[0];
     }
 
-    async selectProfiles() {
+    async selectProfileList() {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql('SELECT * FROM profile ORDER BY name ASC')
         return rs.map((r) => {
             return r.rows.raw();
         })[0];
+    }
+
+    async selectProfiles() {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        rs = await db.executeSql(`
+            SELECT i.name AS profile_name, i.id AS profile_id,
+            p.path AS photo_path, p.time AS photo_time, p.width, p.height,
+            o.id, o.x, o.y, o.w, o.h, l.name AS location_name
+            FROM profile i
+            JOIN object o ON o.profile_id = i.id
+            JOIN photo p ON p.id = o.photo_id
+            JOIN location l ON l.id = o.location_id
+            ORDER BY o.time DESC`)
+        let objects = await rs.map((r) => {
+            return r.rows.raw();
+        })[0];
+        let profiles = {};
+        for (o of objects) {
+            let profile = profiles[o.profile_name];
+            if (!profile) {
+                profile = {
+                    objects: []
+                };
+                profiles[o.profile_name] = profile;
+            }
+            profile.objects.push(o);
+        }
+        return Object.values(profiles).sort((a, b) => b.objects[0].photo_time - a.objects[0].photo_time);
     }
 
     async insertLocation(name, lat, lon) {
@@ -323,8 +351,8 @@ export default class Database {
 
     async deleteProfile(id) {
         const db = await SQLite.openDatabase({ name: database, location: location });
-        await db.executeSql('DELETE FROM profile WHERE id = ?', [id]);
-        return await db.executeSql('UPDATE object SET profile_id = NULL WHERE profile_id = ?', [id]);
+        await db.executeSql('UPDATE object SET profile_id = NULL WHERE profile_id = ?', [id]);
+        return await db.executeSql('DELETE FROM profile WHERE id = ?', [id]);
     }
 
     async insertObject(obj) {
