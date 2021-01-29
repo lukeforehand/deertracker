@@ -12,6 +12,7 @@ import BatchScreen from './BatchScreen';
 import PhotoScreen from './PhotoScreen';
 import SightingScreen from './SightingScreen';
 import ReviewScreen from './ReviewScreen';
+import ProfileListScreen from './ProfileListScreen';
 import ProfileScreen from './ProfileScreen';
 import ConfigScreen from './ConfigScreen';
 
@@ -100,10 +101,28 @@ const SightingScreenNavigator = createStackNavigator({
 });
 
 const ProfileScreenNavigator = createStackNavigator({
+  ProfileListScreen: {
+    screen: ProfileListScreen,
+    navigationOptions: {
+      title: 'Profiles',
+      headerStyle: { height: headerHeight },
+      headerTitleStyle: style.header,
+      headerTitleAlign: 'center'
+    },
+  },
   ProfileScreen: {
     screen: ProfileScreen,
     navigationOptions: {
-      title: 'Profiles',
+      title: 'Profile',
+      headerStyle: { height: headerHeight },
+      headerTitleStyle: style.header,
+      headerTitleAlign: 'center'
+    },
+  },
+  PhotoScreen: {
+    screen: PhotoScreen,
+    navigationOptions: {
+      title: 'Gallery',
       headerStyle: { height: headerHeight },
       headerTitleStyle: style.header,
       headerTitleAlign: 'center'

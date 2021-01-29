@@ -305,8 +305,9 @@ export default class Database {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql(`
             SELECT i.name AS profile_name, i.id AS profile_id,
-            p.path AS photo_path, p.time AS photo_time, p.width, p.height,
-            o.id, o.x, o.y, o.w, o.h, l.name AS location_name
+            p.path AS photo_path, p.time, p.width, p.height,
+            o.id, o.x, o.y, o.w, o.h, o.score_array, o.label_array, o.score, o.label,
+            l.name AS location_name
             FROM profile i
             JOIN object o ON o.profile_id = i.id
             JOIN photo p ON p.id = o.photo_id
@@ -317,6 +318,8 @@ export default class Database {
         })[0];
         let profiles = {};
         for (o of objects) {
+            o.label_array = JSON.parse(o.label_array);
+            o.score_array = JSON.parse(o.score_array);
             let profile = profiles[o.profile_name];
             if (!profile) {
                 profile = {
@@ -326,7 +329,7 @@ export default class Database {
             }
             profile.objects.push(o);
         }
-        return Object.values(profiles).sort((a, b) => b.objects[0].photo_time - a.objects[0].photo_time);
+        return Object.values(profiles).sort((a, b) => b.objects[0].time - a.objects[0].time);
     }
 
     async insertLocation(name, lat, lon) {
