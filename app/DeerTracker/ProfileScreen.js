@@ -173,7 +173,7 @@ export default class ProfileScreen extends React.Component {
                   accessor={'count'}
                   center={[30, 0]}
                   style={{
-                    marginRight: 40
+                    marginRight: 40,
                   }}
                 />
               </View>
@@ -213,9 +213,14 @@ export default class ProfileScreen extends React.Component {
                   mapType="satellite"
                   initialRegion={this.state.region}
                   onMapReady={() => {
-                    this.map.fitToCoordinates(
-                      profile.stats.location.map(location => ({ latitude: location.lat, longitude: location.lon })),
-                      { edgePadding: { top: 100, right: 120, bottom: 100, left: 120 }, animated: true })
+                    if (profile.stats.location.length > 1) {
+                      this.map.fitToCoordinates(
+                        profile.stats.location.map(location => ({ latitude: location.lat, longitude: location.lon })),
+                        { edgePadding: { top: 100, right: 120, bottom: 100, left: 120 }, animated: true })
+                    } else {
+                      let location = profile.stats.location[0];
+                      this.map.animateCamera({ center: { latitude: location.lat, longitude: location.lon } });
+                    }
                   }}>
                   {profile.stats.location.map((location) => {
                     let red = Math.max(100, 255 * (location.cnt / 6));
@@ -224,7 +229,7 @@ export default class ProfileScreen extends React.Component {
                       <View>
                         <View style={[style.sightingMarker, {
                           borderColor: `rgb(${red}, 103, 0)`,
-                          backgroundColor: `rgba(${red}, 103, 0, 0.4)`,
+                          backgroundColor: `rgba(${red}, 103, 0, 0.6)`,
                         }]} />
                         <View style={style.markerContainer}>
                           <View style={{ flexDirection: 'row' }}>
