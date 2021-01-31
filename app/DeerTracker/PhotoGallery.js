@@ -154,7 +154,7 @@ export default class PhotoGallery extends React.Component {
         if (crops.length > 0) {
             return (
                 <View style={{ height: 280 }}>
-                    <Swiper loop={false} ref={this.swiper}
+                    <Swiper loop={true} dot={(<View />)} activeDot={(<View />)} ref={this.swiper}
                         onIndexChanged={(nextIndex) => { this.generateCrop(crops[nextIndex]) }}>
                         {crops.map((crop) => {
                             let max = Math.max(crop.w, crop.h);

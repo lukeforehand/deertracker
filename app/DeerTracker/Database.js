@@ -312,6 +312,7 @@ export default class Database {
             JOIN object o ON o.profile_id = i.id
             JOIN photo p ON p.id = o.photo_id
             JOIN location l ON l.id = o.location_id
+            GROUP BY o.photo_id
             ORDER BY o.time DESC`)
         let objects = await rs.map((r) => {
             return r.rows.raw();
@@ -330,6 +331,55 @@ export default class Database {
             profile.objects.push(o);
         }
         return Object.values(profiles).sort((a, b) => b.objects[0].time - a.objects[0].time);
+    }
+
+    async selectProfileStats(profileId) {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        weekday = (await db.executeSql(sighting_sql + `
+            SELECT weekday, COUNT(*) AS cnt, COUNT(*) * 1.0 / (SELECT COUNT(*) FROM sighting) AS prob
+            FROM sighting GROUP BY weekday ORDER BY prob DESC`, [profileId])).map((r) => {
+            return r.rows.raw();
+        })[0];
+        weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((w) => {
+            let x = weekday.find(x => x.weekday == w);
+            return {
+                weekday: x ? x.weekday.slice(0, 3) : w.slice(0, 3),
+                cnt: x ? x.cnt : 0,
+                prob: x ? x.prob : 0.0
+            }
+        });
+        location = (await db.executeSql(sighting_sql + `
+            SELECT location, COUNT(*) AS cnt, COUNT(*) * 1.0 / (SELECT COUNT(*) FROM sighting) AS prob
+            FROM sighting GROUP BY location ORDER BY prob DESC`, [profileId])).map((r) => {
+            return r.rows.raw();
+        })[0];
+        ampm = (await db.executeSql(sighting_sql + `
+            SELECT ampm, COUNT(*) AS cnt, COUNT(*) * 1.0 / (SELECT COUNT(*) FROM sighting) AS prob
+            FROM sighting GROUP BY ampm ORDER BY prob DESC`, [profileId])).map((r) => {
+            return r.rows.raw();
+        })[0];
+        days = (await db.executeSql(sighting_sql + `
+        SELECT day, COUNT(*) AS cnt FROM sighting GROUP BY day ORDER BY day ASC`, [profileId])).map((r) => {
+            return r.rows.raw();
+        })[0].map((day) => {
+            return {
+                date: day.day,
+                count: day.cnt
+            }
+        });
+        all = (await db.executeSql(sighting_sql + `
+            SELECT weekday, location, ampm, COUNT(*) AS cnt, COUNT(*) * 1.0 / (SELECT COUNT(*) FROM sighting) AS prob
+            FROM sighting GROUP BY weekday, location, ampm ORDER BY prob DESC`, [profileId])).map((r) => {
+            return r.rows.raw();
+        })[0];
+        r = {
+            weekday: weekday,
+            location: location,
+            ampm: ampm,
+            days, days,
+            all: all
+        }
+        return r;
     }
 
     async insertLocation(name, lat, lon) {
@@ -402,6 +452,26 @@ export default class Database {
     }
 
 }
+
+sighting_sql = `WITH sighting AS(
+    SELECT i.name AS profile_name, l.name AS location, STRFTIME('%Y-%m-%d', o.time) AS day,
+        CASE CAST(STRFTIME('%w', o.time) AS INTEGER)
+            WHEN 0 THEN 'Sunday'
+            WHEN 1 THEN 'Monday'
+            WHEN 2 THEN 'Tuesday'
+            WHEN 3 THEN 'Wednesday'
+            WHEN 4 THEN 'Thursday'
+            WHEN 5 THEN 'Friday'
+            ELSE 'Saturday' END AS weekday,
+        CASE
+            WHEN CAST(STRFTIME('%H', o.time) AS INTEGER) < 12
+            THEN 'Before Noon'
+            ELSE 'After Noon'
+            END AS ampm
+    FROM profile i
+        JOIN object o ON o.profile_id = i.id
+        JOIN location l ON l.id = o.location_id
+    WHERE o.profile_id = ?)`
 
 CREATE_TABLE_LOCATION = `
 CREATE TABLE IF NOT EXISTS location (

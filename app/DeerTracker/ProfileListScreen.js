@@ -18,9 +18,7 @@ import Moment from 'moment';
 import SwipeRow from './SwipeRow';
 import Database from './Database';
 
-import style, { thumbWidth } from './style';
-
-const root = RNFS.DocumentDirectoryPath;
+import style, { thumbWidth, thumbHeight } from './style';
 
 export default class ProfileListScreen extends React.Component {
 
@@ -70,9 +68,8 @@ export default class ProfileListScreen extends React.Component {
           {profiles.map((profile) => {
             let crop = profile.objects[0];
             crop.path = RNFS.CachesDirectoryPath + '/crop_' + crop.id + '.jpg';
-            let max = Math.max(crop.w, crop.h);
-            let w = (thumbWidth / max) * crop.w;
-            let h = (140 / max) * crop.h;
+            let w = thumbWidth;
+            let h = (thumbWidth / crop.w) * crop.h;
             return (
               <SwipeRow key={crop.profile_name} item={crop} onDelete={this.deleteProfile.bind(this)}>
                 <TouchableOpacity
@@ -88,10 +85,10 @@ export default class ProfileListScreen extends React.Component {
                         <Icon style={{ paddingLeft: 15 }} name='eye' color='black' size={18} />
                         <Text style={style.t5}>{profile.objects.length} Sightings</Text>
                       </View>
-                      <Text style={style.t5}>Last seen {Moment(new Date() - Moment(crop.time)).format('DD')} days ago</Text>
+                      <Text style={style.t5}>Last seen {Moment(new Date() - Moment(crop.time)).format('D')} days ago</Text>
                     </View>
-                    <View style={{ width: thumbWidth, alignItems: 'center', justifyContent: 'center' }}>
-                      <Image source={{ uri: crop.path }} style={{ width: w, height: h }} />
+                    <View style={{ width: thumbWidth, height: thumbHeight, alignItems: 'center', justifyContent: 'center' }}>
+                      <Image source={{ uri: crop.path }} style={{ width: w, height: Math.min(w, h) }} />
                     </View>
                   </View>
                 </TouchableOpacity>
