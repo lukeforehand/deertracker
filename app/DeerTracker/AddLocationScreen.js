@@ -38,23 +38,29 @@ export default class AddLocationScreen extends React.Component {
     return (
       <SafeAreaView>
         <View style={style.container}>
-          <MapView
-            ref={ref => { this.map = ref; }}
-            style={{ ...StyleSheet.absoluteFillObject }}
-            showsUserLocation={true}
-            mapType="satellite"
-            region={this.state.region}
-            onDoublePress={(ev) => { this.map.animateCamera({ center: ev.nativeEvent.coordinate }) }}
-            onRegionChangeComplete={(region) => { this.setState({ region: region }) }}>
-            {locations.map((location) => {
-              return (
-                <Marker key={location['id']}
-                  coordinate={{ latitude: location['lat'], longitude: location['lon'] }}
-                  title={location['name']}>
-                </Marker>
-              );
-            })}
-          </MapView>
+          {this.state.region &&
+            <MapView
+              ref={ref => { this.map = ref; }}
+              style={{ ...StyleSheet.absoluteFillObject }}
+              showsUserLocation={true}
+              mapType="satellite"
+              initialRegion={this.state.region}
+              onMapReady={() => {
+                this.map.fitToCoordinates(
+                  locations.map(location => ({ latitude: location.lat, longitude: location.lon })),
+                  { edgePadding: { top: 50, right: 50, bottom: 50, left: 50 }, animated: true })
+              }}
+              onDoublePress={(ev) => { this.map.animateCamera({ center: ev.nativeEvent.coordinate }) }}>
+              {locations.map((location) => {
+                return (
+                  <Marker key={location['id']}
+                    coordinate={{ latitude: location['lat'], longitude: location['lon'] }}
+                    title={location['name']}>
+                  </Marker>
+                );
+              })}
+            </MapView>
+          }
           <View style={style.markerFixed}>
             <Image source={require('./assets/images/crosshairs.png')} style={{ width: 80, height: 80 }} />
           </View>
@@ -63,9 +69,18 @@ export default class AddLocationScreen extends React.Component {
               <TouchableOpacity style={style.mapButton} onPress={() => { this.setState({ modalVisible: true }) }}>
                 <Text style={style.h1}>Save Location</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={style.locationArrow} onPress={() => { this.getCurrentPosition() }}>
-                <Icon name='location-arrow' color={style.locationArrow.color} size={20} />
-              </TouchableOpacity>
+              <View style={{ flexDirection: 'row' }}>
+                <TouchableOpacity style={style.locationArrow} onPress={() => { this.getCurrentPosition() }}>
+                  <Icon name='location-arrow' color={style.locationArrow.color} size={15} />
+                </TouchableOpacity>
+                <TouchableOpacity style={style.locationArrow} onPress={() => {
+                  this.map.fitToCoordinates(
+                    locations.map(location => ({ latitude: location.lat, longitude: location.lon })),
+                    { edgePadding: { top: 50, right: 50, bottom: 50, left: 50 }, animated: true })
+                }}>
+                  <Icon name='eye' color={style.locationArrow.color} size={15} />
+                </TouchableOpacity>
+              </View>
             </View>
           }
           {this.state.region &&
@@ -132,6 +147,7 @@ export default class AddLocationScreen extends React.Component {
             longitudeDelta: 0.001
           }
         });
+        this.map.animateCamera({ center: position.coords });
       },
       (error) => {
         console.log(error.code, error.message);

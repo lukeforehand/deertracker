@@ -307,7 +307,7 @@ export default class Database {
             SELECT i.name AS profile_name, i.id AS profile_id,
             p.path AS photo_path, p.time, p.width, p.height,
             o.id, o.x, o.y, o.w, o.h, o.score_array, o.label_array, o.score, o.label,
-            l.name AS location_name
+            l.name AS location_name, l.lat, l.lon
             FROM profile i
             JOIN object o ON o.profile_id = i.id
             JOIN photo p ON p.id = o.photo_id
@@ -349,8 +349,8 @@ export default class Database {
             }
         });
         location = (await db.executeSql(sighting_sql + `
-            SELECT location, COUNT(*) AS cnt, COUNT(*) * 1.0 / (SELECT COUNT(*) FROM sighting) AS prob
-            FROM sighting GROUP BY location ORDER BY prob DESC`, [profileId])).map((r) => {
+            SELECT location, lat, lon, COUNT(*) AS cnt, COUNT(*) * 1.0 / (SELECT COUNT(*) FROM sighting) AS prob
+            FROM sighting GROUP BY location, lat, lon ORDER BY prob DESC`, [profileId])).map((r) => {
             return r.rows.raw();
         })[0];
         ampm = (await db.executeSql(sighting_sql + `
@@ -454,7 +454,8 @@ export default class Database {
 }
 
 sighting_sql = `WITH sighting AS(
-    SELECT i.name AS profile_name, l.name AS location, STRFTIME('%Y-%m-%d', o.time) AS day,
+    SELECT i.name AS profile_name, l.name AS location, l.lat, l.lon,
+        STRFTIME('%Y-%m-%d', o.time) AS day,
         CASE CAST(STRFTIME('%w', o.time) AS INTEGER)
             WHEN 0 THEN 'Sunday'
             WHEN 1 THEN 'Monday'

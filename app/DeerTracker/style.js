@@ -147,20 +147,20 @@ export default StyleSheet.create({
     height: 40
   },
   mapButton: {
-    width: screenWidth - 40 - 40 - 40,
-    marginLeft: 40,
+    width: screenWidth - 40 - 40 - 40 - 40,
+    marginLeft: 20,
     borderRadius: 10,
     shadowColor: '#000',
     shadowOpacity: 0.5,
     shadowRadius: 10,
     elevation: 10,
-    backgroundColor: '#4E603E',
+    backgroundColor: 'rgb(255, 103, 0)',
     justifyContent: 'center',
     alignItems: 'center',
     height: 40
   },
   locationArrow: {
-    color: 'blue',
+    color: '#e3e8e8',
     borderRadius: 10,
     margin: 15,
     marginLeft: 0,
@@ -168,7 +168,7 @@ export default StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 10,
     elevation: 10,
-    backgroundColor: 'lightgray',
+    backgroundColor: 'rgb(255, 103, 0)',
     justifyContent: 'center',
     alignItems: 'center',
     height: 40,

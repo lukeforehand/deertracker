@@ -4,11 +4,14 @@ import {
   ActivityIndicator,
   SafeAreaView,
   Text,
+  StyleSheet,
   RefreshControl,
   View,
   ScrollView,
   Image
 } from 'react-native';
+
+import MapView, { Marker } from 'react-native-maps';
 
 import RNFS from 'react-native-fs';
 import ImageEditor from "@react-native-community/image-editor";
@@ -28,6 +31,8 @@ const root = RNFS.DocumentDirectoryPath;
 
 // TODO: use this
 //const moon = new MoonPhase();
+
+const markers = [];
 
 export default class ProfileScreen extends React.Component {
 
@@ -61,8 +66,8 @@ export default class ProfileScreen extends React.Component {
     }
 
     const profile = this.state.profile;
-    let crop = profile.crop;
 
+    let crop = profile.crop;
     let photos = profile.objects.map((photo) => {
       photo.photo_path = root + '/' + photo.photo_path;
       photo.url = photo.photo_path;
@@ -197,9 +202,31 @@ export default class ProfileScreen extends React.Component {
               </View>
             </ScrollView>
             <View>
-              <View>
-                <PhotoGrid photos={photos} showCrops={true} onRefresh={() => { this.props.navigation.goBack() }} />
-              </View>
+              <PhotoGrid photos={photos} showCrops={true} onRefresh={() => { this.props.navigation.goBack() }} />
+            </View>
+            <View style={style.container}>
+              {this.state.region &&
+                <MapView
+                  ref={ref => { this.map = ref; }}
+                  style={{ ...StyleSheet.absoluteFillObject }}
+                  showsUserLocation={false}
+                  scrollEnabled={false}
+                  zoomEnabled={false}
+                  mapType="satellite"
+                  initialRegion={this.state.region}
+                  onMapReady={() => {
+                    this.map.fitToCoordinates(
+                      profile.stats.location.map(location => ({ latitude: location.lat, longitude: location.lon })),
+                      { edgePadding: { top: 50, right: 50, bottom: 50, left: 50 }, animated: true })
+                  }}>
+                  {profile.stats.location.map((location) => {
+                    return (<Marker key={location.location}
+                      coordinate={{ latitude: location.lat, longitude: location.lon }}
+                      title={location.location}>
+                    </Marker>);
+                  })}
+                </MapView>
+              }
             </View>
           </Swiper>
         </View>
@@ -208,12 +235,22 @@ export default class ProfileScreen extends React.Component {
   }
 
   fetchData() {
-    let profile = this.state.profile;
     this.setState({
       isLoading: true
     });
+    let profile = this.state.profile;
     this.db.selectProfileStats(profile.objects[0].profile_id).then((stats) => {
       profile.stats = stats;
+      let location = profile.stats.location[0];
+      this.setState({
+        region: {
+          latitude: parseFloat(location.lat),
+          longitude: parseFloat(location.lon),
+          latitudeDelta: 0.001,
+          longitudeDelta: 0.001
+        }
+      });
+
       profile.crop = profile.objects[0];
       let crop = profile.crop;
       let w = screenWidth;
