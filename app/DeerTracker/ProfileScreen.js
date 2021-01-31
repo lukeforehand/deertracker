@@ -215,25 +215,24 @@ export default class ProfileScreen extends React.Component {
                   onMapReady={() => {
                     this.map.fitToCoordinates(
                       profile.stats.location.map(location => ({ latitude: location.lat, longitude: location.lon })),
-                      { edgePadding: { top: 100, right: 100, bottom: 100, left: 100 }, animated: true })
+                      { edgePadding: { top: 100, right: 120, bottom: 100, left: 120 }, animated: true })
                   }}>
                   {profile.stats.location.map((location) => {
-                    let dim = location.cnt * location.cnt * 10;
+                    let red = Math.max(100, 255 * (location.cnt / 6));
                     return (<Marker key={location.location}
-                      coordinate={{ latitude: location.lat, longitude: location.lon }}
-                      title={location.location}
-                      description={location.cnt + ' sightings'}>
-                      <View style={{
-                        backgroundColor: 'rgba(255, 103, 0, 0.50)',
-                        borderWidth: 1,
-                        borderColor: 'rgb(255, 103, 0)',
-                        width: dim,
-                        height: dim,
-                        borderRadius: dim / 2,
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                      }}>
-                        <Text style={style.markerLabel}>{location.cnt + ' sightings'}</Text>
+                      coordinate={{ latitude: location.lat, longitude: location.lon }}>
+                      <View>
+                        <View style={[style.sightingMarker, {
+                          borderColor: `rgb(${red}, 103, 0)`,
+                          backgroundColor: `rgba(${red}, 103, 0, 0.4)`,
+                        }]} />
+                        <View style={style.markerContainer}>
+                          <View style={{ flexDirection: 'row' }}>
+                            <Image source={require('./assets/images/crosshairs.png')} style={{ width: 25, height: 25 }} />
+                            <Text style={style.markerLabel}>{location.location}</Text>
+                          </View>
+                          <Text style={[style.markerLabel, { left: 7 }]}>{location.cnt}</Text>
+                        </View>
                       </View>
                     </Marker>);
                   })}

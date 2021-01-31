@@ -48,14 +48,26 @@ export default class AddLocationScreen extends React.Component {
               onMapReady={() => {
                 this.map.fitToCoordinates(
                   locations.map(location => ({ latitude: location.lat, longitude: location.lon })),
-                  { edgePadding: { top: 50, right: 50, bottom: 50, left: 50 }, animated: true })
+                  { edgePadding: { top: 100, right: 120, bottom: 100, left: 120 }, animated: true })
               }}
-              onDoublePress={(ev) => { this.map.animateCamera({ center: ev.nativeEvent.coordinate }) }}>
+              onDoublePress={(ev) => { this.map.animateCamera({ center: ev.nativeEvent.coordinate }) }}
+              onRegionChangeComplete={(region) => { this.setState({ region: region }) }}>
               {locations.map((location) => {
                 return (
                   <Marker key={location['id']}
-                    coordinate={{ latitude: location['lat'], longitude: location['lon'] }}
-                    title={location['name']}>
+                    coordinate={{ latitude: location['lat'], longitude: location['lon'] }}>
+                    <View>
+                      <View style={[style.sightingMarker, {
+                        borderColor: `rgb(255, 103, 0)`,
+                        backgroundColor: `rgba(255, 103, 0, 0.4)`,
+                      }]} />
+                      <View style={style.markerContainer}>
+                        <View style={{ flexDirection: 'row' }}>
+                          <Image source={require('./assets/images/crosshairs.png')} style={{ width: 25, height: 25 }} />
+                          <Text style={style.markerLabel}>{location['name']}</Text>
+                        </View>
+                      </View>
+                    </View>
                   </Marker>
                 );
               })}
@@ -76,7 +88,7 @@ export default class AddLocationScreen extends React.Component {
                 <TouchableOpacity style={style.locationArrow} onPress={() => {
                   this.map.fitToCoordinates(
                     locations.map(location => ({ latitude: location.lat, longitude: location.lon })),
-                    { edgePadding: { top: 50, right: 50, bottom: 50, left: 50 }, animated: true })
+                    { edgePadding: { top: 100, right: 120, bottom: 100, left: 120 }, animated: true })
                 }}>
                   <Icon name='eye' color={style.locationArrow.color} size={15} />
                 </TouchableOpacity>

@@ -133,11 +133,21 @@ export default StyleSheet.create({
     position: 'absolute',
     top: '50%'
   },
+  sightingMarker: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 1
+  },
+  markerContainer: {
+    top: -42,
+    left: 18
+  },
   markerLabel: {
     color: '#e3e8e8',
     fontWeight: 'normal',
     fontSize: 16,
-    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal'
   },
   button: {
     borderRadius: 10,
@@ -160,7 +170,7 @@ export default StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 10,
     elevation: 10,
-    backgroundColor: 'rgb(255, 103, 0)',
+    backgroundColor: 'rgba(255, 103, 0, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
     height: 40
@@ -174,7 +184,7 @@ export default StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 10,
     elevation: 10,
-    backgroundColor: 'rgb(255, 103, 0)',
+    backgroundColor: 'rgba(255, 103, 0, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
     height: 40,
@@ -265,7 +275,7 @@ export default StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 10,
     elevation: 10,
-    backgroundColor: 'rgb(255, 103, 0)',
+    backgroundColor: 'rgba(255, 103, 0, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
     height: 40,
