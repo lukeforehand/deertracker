@@ -109,7 +109,7 @@ export default class PhotoGrid extends React.Component {
             photos: [...photos]
           });
         } else {
-          ImageResizer.createResizedImage(photo.photo_path, w, h, 'JPEG', 50, 0, thumbPath, false, { mode: 'cover' }).then((thumb) => {
+          ImageResizer.createResizedImage(photo.photo_path, w, h, 'JPEG', 50, 0, null, false, { mode: 'cover' }).then((thumb) => {
             RNFS.moveFile(thumb.uri, thumbPath).catch((err) => {
               RNFS.unlink(thumb.uri);
             }).then(() => {

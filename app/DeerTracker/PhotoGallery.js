@@ -263,18 +263,9 @@ export default class PhotoGallery extends React.Component {
                 let w = (thumbWidth / max) * object.w;
                 let h = (180 / max) * object.h;
                 let cropData = {
-                    offset: {
-                        x: object.x,
-                        y: object.y
-                    },
-                    size: {
-                        width: object.w,
-                        height: object.h
-                    },
-                    displaySize: {
-                        width: w,
-                        height: h
-                    }
+                    offset: { x: object.x, y: object.y },
+                    size: { width: object.w, height: object.h },
+                    displaySize: { width: w, height: h }
                 };
                 ImageEditor.cropImage(object.photo_path, cropData).then(url => {
                     RNFS.moveFile(url, cropPath).catch((err) => {

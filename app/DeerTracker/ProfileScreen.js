@@ -61,6 +61,7 @@ export default class ProfileScreen extends React.Component {
     }
 
     const profile = this.state.profile;
+    let crop = profile.crop;
 
     let photos = profile.objects.map((photo) => {
       photo.photo_path = root + '/' + photo.photo_path;
@@ -71,8 +72,6 @@ export default class ProfileScreen extends React.Component {
       photo.objects = [photo];
       return photo;
     });
-
-    let crop = this.state.crop;
 
     const chartConfig = {
       fillShadowGradientOpacity: 1,
@@ -101,7 +100,7 @@ export default class ProfileScreen extends React.Component {
                 <RefreshControl tintColor='transparent' refreshing={false} onRefresh={() => { this.props.navigation.goBack() }} />
               }>
               <View style={{ width: screenWidth, alignItems: 'center', justifyContent: 'center' }}>
-                <Image source={{ uri: crop.path }} style={{ width: crop.width, height: crop.height }} />
+                <Image source={{ uri: crop.profile_path }} style={{ width: crop.profile_width, height: crop.profile_height }} />
               </View>
               <View style={{ alignItems: 'center' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
@@ -124,7 +123,7 @@ export default class ProfileScreen extends React.Component {
                     backgroundGradientFromOpacity: 0.0,
                     backgroundGradientTo: 'black',
                     backgroundGradientToOpacity: 0.2,
-                    color: (opacity = 1) => `rgba(255, 103, 0, ${opacity})`
+                    color: (opacity = 1) => `rgba(255, 103, 0, ${isNaN(opacity) ? 1 / 2 : opacity})`
                   }}
                   style={{
                     borderWidth: 1,
@@ -215,7 +214,8 @@ export default class ProfileScreen extends React.Component {
     });
     this.db.selectProfileStats(profile.objects[0].profile_id).then((stats) => {
       profile.stats = stats;
-      let crop = profile.objects[0];
+      profile.crop = profile.objects[0];
+      let crop = profile.crop;
       let w = screenWidth;
       let h = (screenWidth / crop.w) * crop.h;
       let cropData = {
@@ -226,12 +226,11 @@ export default class ProfileScreen extends React.Component {
       let cropPath = RNFS.CachesDirectoryPath + '/profile_' + crop.id + '.jpg';
       RNFS.exists(cropPath).then((exists) => {
         if (exists) {
-          crop.path = cropPath;
-          crop.width = w;
-          crop.height = Math.min(w, h);
+          crop.profile_path = cropPath;
+          crop.profile_width = w;
+          crop.profile_height = Math.min(w, h);
           this.setState({
             isLoading: false,
-            crop: crop,
             profile: profile
           });
         } else {
@@ -239,12 +238,11 @@ export default class ProfileScreen extends React.Component {
             RNFS.moveFile(url, cropPath).catch((err) => {
               RNFS.unlink(url);
             }).then(() => {
-              crop.path = cropPath;
-              crop.width = w;
-              crop.height = Math.min(w, h);
+              crop.profile_path = cropPath;
+              crop.profile_width = w;
+              crop.profile_height = Math.min(w, h);
               this.setState({
                 isLoading: false,
-                crop: crop,
                 profile: profile
               });
             });
