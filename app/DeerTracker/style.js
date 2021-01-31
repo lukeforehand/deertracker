@@ -133,6 +133,12 @@ export default StyleSheet.create({
     position: 'absolute',
     top: '50%'
   },
+  markerLabel: {
+    color: '#e3e8e8',
+    fontWeight: 'normal',
+    fontSize: 16,
+    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+  },
   button: {
     borderRadius: 10,
     marginLeft: 60,

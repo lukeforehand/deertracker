@@ -32,8 +32,6 @@ const root = RNFS.DocumentDirectoryPath;
 // TODO: use this
 //const moon = new MoonPhase();
 
-const markers = [];
-
 export default class ProfileScreen extends React.Component {
 
   constructor(props) {
@@ -217,12 +215,26 @@ export default class ProfileScreen extends React.Component {
                   onMapReady={() => {
                     this.map.fitToCoordinates(
                       profile.stats.location.map(location => ({ latitude: location.lat, longitude: location.lon })),
-                      { edgePadding: { top: 50, right: 50, bottom: 50, left: 50 }, animated: true })
+                      { edgePadding: { top: 100, right: 100, bottom: 100, left: 100 }, animated: true })
                   }}>
                   {profile.stats.location.map((location) => {
+                    let dim = location.cnt * location.cnt * 10;
                     return (<Marker key={location.location}
                       coordinate={{ latitude: location.lat, longitude: location.lon }}
-                      title={location.location}>
+                      title={location.location}
+                      description={location.cnt + ' sightings'}>
+                      <View style={{
+                        backgroundColor: 'rgba(255, 103, 0, 0.50)',
+                        borderWidth: 1,
+                        borderColor: 'rgb(255, 103, 0)',
+                        width: dim,
+                        height: dim,
+                        borderRadius: dim / 2,
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                      }}>
+                        <Text style={style.markerLabel}>{location.cnt + ' sightings'}</Text>
+                      </View>
                     </Marker>);
                   })}
                 </MapView>
