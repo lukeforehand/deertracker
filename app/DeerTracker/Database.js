@@ -333,11 +333,19 @@ export default class Database {
         return Object.values(profiles).sort((a, b) => b.objects[0].time - a.objects[0].time);
     }
 
+    async selectClassStats(label) {
+        return await this.selectStats(label, class_sql);
+    }
+
     async selectProfileStats(profileId) {
+        return await this.selectStats(profileId, profile_sql);
+    }
+
+    async selectStats(id, sql) {
         const db = await SQLite.openDatabase({ name: database, location: location });
-        weekday = (await db.executeSql(sighting_sql + `
+        weekday = (await db.executeSql(sql + `
             SELECT weekday, COUNT(*) AS cnt, COUNT(*) * 1.0 / (SELECT COUNT(*) FROM sighting) AS prob
-            FROM sighting GROUP BY weekday ORDER BY prob DESC`, [profileId])).map((r) => {
+            FROM sighting GROUP BY weekday ORDER BY prob DESC`, [id])).map((r) => {
             return r.rows.raw();
         })[0];
         weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((w) => {
@@ -348,18 +356,18 @@ export default class Database {
                 prob: x ? x.prob : 0.0
             }
         });
-        location = (await db.executeSql(sighting_sql + `
+        location = (await db.executeSql(sql + `
             SELECT location, lat, lon, COUNT(*) AS cnt, COUNT(*) * 1.0 / (SELECT COUNT(*) FROM sighting) AS prob
-            FROM sighting GROUP BY location, lat, lon ORDER BY prob DESC`, [profileId])).map((r) => {
+            FROM sighting GROUP BY location, lat, lon ORDER BY prob DESC`, [id])).map((r) => {
             return r.rows.raw();
         })[0];
-        ampm = (await db.executeSql(sighting_sql + `
+        ampm = (await db.executeSql(sql + `
             SELECT ampm, COUNT(*) AS cnt, COUNT(*) * 1.0 / (SELECT COUNT(*) FROM sighting) AS prob
-            FROM sighting GROUP BY ampm ORDER BY prob DESC`, [profileId])).map((r) => {
+            FROM sighting GROUP BY ampm ORDER BY prob DESC`, [id])).map((r) => {
             return r.rows.raw();
         })[0];
-        days = (await db.executeSql(sighting_sql + `
-        SELECT day, COUNT(*) AS cnt FROM sighting GROUP BY day ORDER BY day ASC`, [profileId])).map((r) => {
+        days = (await db.executeSql(sql + `
+        SELECT day, COUNT(*) AS cnt FROM sighting GROUP BY day ORDER BY day ASC`, [id])).map((r) => {
             return r.rows.raw();
         })[0].map((day) => {
             return {
@@ -367,9 +375,9 @@ export default class Database {
                 count: day.cnt
             }
         });
-        all = (await db.executeSql(sighting_sql + `
+        all = (await db.executeSql(sql + `
             SELECT weekday, location, ampm, COUNT(*) AS cnt, COUNT(*) * 1.0 / (SELECT COUNT(*) FROM sighting) AS prob
-            FROM sighting GROUP BY weekday, location, ampm ORDER BY prob DESC`, [profileId])).map((r) => {
+            FROM sighting GROUP BY weekday, location, ampm ORDER BY prob DESC`, [id])).map((r) => {
             return r.rows.raw();
         })[0];
         r = {
@@ -453,7 +461,7 @@ export default class Database {
 
 }
 
-sighting_sql = `WITH sighting AS(
+profile_sql = `WITH sighting AS(
     SELECT i.name AS profile_name, l.name AS location, l.lat, l.lon,
         STRFTIME('%Y-%m-%d', o.time) AS day,
         CASE CAST(STRFTIME('%w', o.time) AS INTEGER)
@@ -472,7 +480,29 @@ sighting_sql = `WITH sighting AS(
     FROM profile i
         JOIN object o ON o.profile_id = i.id
         JOIN location l ON l.id = o.location_id
-    WHERE o.profile_id = ?)`
+    WHERE o.profile_id = ?)
+`
+
+class_sql = `WITH sighting AS(
+    SELECT o.label AS profile_name, l.name AS location, l.lat, l.lon,
+        STRFTIME('%Y-%m-%d', o.time) AS day,
+        CASE CAST(STRFTIME('%w', o.time) AS INTEGER)
+            WHEN 0 THEN 'Sunday'
+            WHEN 1 THEN 'Monday'
+            WHEN 2 THEN 'Tuesday'
+            WHEN 3 THEN 'Wednesday'
+            WHEN 4 THEN 'Thursday'
+            WHEN 5 THEN 'Friday'
+            ELSE 'Saturday' END AS weekday,
+        CASE
+            WHEN CAST(STRFTIME('%H', o.time) AS INTEGER) < 12
+            THEN 'Before Noon'
+            ELSE 'After Noon'
+            END AS ampm
+    FROM object o JOIN location l ON l.id = o.location_id
+    WHERE o.label = ?)
+`
+
 
 CREATE_TABLE_LOCATION = `
 CREATE TABLE IF NOT EXISTS location (

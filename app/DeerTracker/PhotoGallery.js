@@ -12,8 +12,8 @@ import {
 } from 'react-native';
 
 import { Picker } from '@react-native-picker/picker';
-import CameraRoll from "@react-native-community/cameraroll";
-import Swiper from 'react-native-swiper'
+import Share from 'react-native-share';
+import Swiper from 'react-native-swiper';
 
 import RNFS from 'react-native-fs';
 import ImageEditor from "@react-native-community/image-editor";
@@ -77,13 +77,19 @@ export default class PhotoGallery extends React.Component {
                                 <Modal
                                     animationType='slide'
                                     transparent={true}>
-
-                                    <TouchableOpacity style={style.saveToCameraButton} onPress={() => {
-                                        CameraRoll.save(photos[imageIndex].photo_path).then(() => cancel());
+                                    <TouchableOpacity style={style.shareButton} onPress={() => {
+                                        Share.open({
+                                            title: 'Photo',
+                                            message: 'Share photo',
+                                            url: photos[imageIndex].photo_path
+                                        }).then((res) => {
+                                            cancel();
+                                        }).catch((err) => {
+                                            console.log(err);
+                                        });
                                     }}>
-                                        <Text style={style.h1}>Save to Camera Roll</Text>
+                                        <Text style={style.h1}>Share</Text>
                                     </TouchableOpacity>
-
                                     <TouchableWithoutFeedback onPress={() => { cancel() }}>
                                         <View style={{ flex: 1 }} />
                                     </TouchableWithoutFeedback>

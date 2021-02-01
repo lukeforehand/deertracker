@@ -226,7 +226,7 @@ export default StyleSheet.create({
     borderColor: 'gray',
     borderWidth: 1
   },
-  saveToCameraButton: {
+  shareButton: {
     borderRadius: 10,
     marginTop: 280,
     marginLeft: 60,
@@ -235,7 +235,7 @@ export default StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 10,
     elevation: 10,
-    backgroundColor: '#4E603E',
+    backgroundColor: 'rgba(255, 103, 0, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
     height: 40,
@@ -338,7 +338,7 @@ export default StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 10,
     elevation: 10,
-    backgroundColor: '#4E603E',
+    backgroundColor: 'rgba(255, 103, 0, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
     height: 40
