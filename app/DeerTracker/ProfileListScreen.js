@@ -118,10 +118,12 @@ export default class ProfileListScreen extends React.Component {
 
   fetchData() {
     this.db.selectProfiles().then((profiles) => {
-      this.setState({
-        isLoading: false,
-        profiles: profiles
-      });
+      this.db.selectClasses().then((classes) => {
+        this.setState({
+          isLoading: false,
+          profiles: profiles.concat(classes)
+        });
+      })
     }).catch((error) => {
       console.log(error);
     });

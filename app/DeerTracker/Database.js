@@ -324,6 +324,39 @@ export default class Database {
             let profile = profiles[o.profile_name];
             if (!profile) {
                 profile = {
+                    type: 'profile',
+                    objects: []
+                };
+                profiles[o.profile_name] = profile;
+            }
+            profile.objects.push(o);
+        }
+        return Object.values(profiles).sort((a, b) => b.objects[0].time - a.objects[0].time);
+    }
+
+    async selectClasses() {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        rs = await db.executeSql(`
+            SELECT o.label AS profile_name, o.label AS profile_id,
+            p.path AS photo_path, p.time, p.width, p.height,
+            o.id, o.x, o.y, o.w, o.h, o.score_array, o.label_array, o.score, o.label,
+            l.name AS location_name, l.lat, l.lon
+            FROM object o JOIN photo p ON p.id = o.photo_id
+            JOIN location l ON l.id = o.location_id
+            GROUP BY o.photo_id
+            ORDER BY o.time DESC`)
+        let objects = await rs.map((r) => {
+            return r.rows.raw();
+        })[0];
+        let profiles = {};
+        for (o of objects) {
+            o.profile_name = o.profile_name[0].toUpperCase() + o.profile_name.slice(1);
+            o.label_array = JSON.parse(o.label_array);
+            o.score_array = JSON.parse(o.score_array);
+            let profile = profiles[o.profile_name];
+            if (!profile) {
+                profile = {
+                    type: 'class',
                     objects: []
                 };
                 profiles[o.profile_name] = profile;

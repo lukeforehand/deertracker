@@ -255,10 +255,17 @@ export default class ProfileScreen extends React.Component {
       isLoading: true
     });
     let profile = this.state.profile;
-    this.db.selectProfileStats(profile.objects[0].profile_id).then((stats) => {
+    let statsPromise = null;
+    if (profile.type === 'class') {
+      statsPromise = this.db.selectClassStats(profile.objects[0].profile_id);
+    } else {
+      statsPromise = this.db.selectProfileStats(profile.objects[0].profile_id);
+    }
+    statsPromise.then((stats) => {
       profile.stats = stats;
       let location = profile.stats.location[0];
       this.setState({
+        profile: profile,
         region: {
           latitude: parseFloat(location.lat),
           longitude: parseFloat(location.lon),
