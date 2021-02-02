@@ -265,7 +265,6 @@ export default class ProfileScreen extends React.Component {
       profile.stats = stats;
       let location = profile.stats.location[0];
       this.setState({
-        profile: profile,
         region: {
           latitude: parseFloat(location.lat),
           longitude: parseFloat(location.lon),
@@ -276,40 +275,31 @@ export default class ProfileScreen extends React.Component {
 
       profile.crop = profile.objects[0];
       let crop = profile.crop;
+      let cropPath = RNFS.CachesDirectoryPath + '/profile_' + crop.id + '.jpg';
       let w = screenWidth;
       let h = (screenWidth / crop.w) * crop.h;
+      crop.profile_path = cropPath;
+      crop.profile_width = w;
+      crop.profile_height = Math.min(w, h);
       let cropData = {
         offset: { x: crop.x, y: crop.y },
         size: { width: crop.w, height: Math.min(crop.w, crop.h) },
         displaySize: { width: w, height: Math.min(w, h) }
       };
-      let cropPath = RNFS.CachesDirectoryPath + '/profile_' + crop.id + '.jpg';
       RNFS.exists(cropPath).then((exists) => {
-        if (exists) {
-          crop.profile_path = cropPath;
-          crop.profile_width = w;
-          crop.profile_height = Math.min(w, h);
-          this.setState({
-            isLoading: false,
-            profile: profile
-          });
-        } else {
+        if (!exists) {
           ImageEditor.cropImage(root + '/' + crop.photo_path, cropData).then(url => {
             RNFS.moveFile(url, cropPath).catch((err) => {
               RNFS.unlink(url);
-            }).then(() => {
-              crop.profile_path = cropPath;
-              crop.profile_width = w;
-              crop.profile_height = Math.min(w, h);
-              this.setState({
-                isLoading: false,
-                profile: profile
-              });
             });
           }).catch((err) => {
             console.log(err);
           });
         }
+        this.setState({
+          isLoading: false,
+          profile: profile
+        });
       }).catch((error) => {
         console.log(error);
       });
