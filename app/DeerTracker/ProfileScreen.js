@@ -276,30 +276,39 @@ export default class ProfileScreen extends React.Component {
       profile.crop = profile.objects[0];
       let crop = profile.crop;
       let cropPath = RNFS.CachesDirectoryPath + '/profile_' + crop.id + '.jpg';
-      let w = screenWidth;
-      let h = (screenWidth / crop.w) * crop.h;
+      let max = Math.max(crop.w, crop.h);
+      let w = (screenWidth / max) * crop.w;
+      let h = (screenWidth / max) * crop.h;
+      let cropData = {
+        offset: { x: crop.x, y: crop.y },
+        size: { width: crop.w, height: crop.h },
+        displaySize: { width: crop.w, height: crop.h }
+      };
+
       crop.profile_path = cropPath;
       crop.profile_width = w;
       crop.profile_height = Math.min(w, h);
-      let cropData = {
-        offset: { x: crop.x, y: crop.y },
-        size: { width: crop.w, height: Math.min(crop.w, crop.h) },
-        displaySize: { width: w, height: Math.min(w, h) }
-      };
+
       RNFS.exists(cropPath).then((exists) => {
         if (!exists) {
           ImageEditor.cropImage(root + '/' + crop.photo_path, cropData).then(url => {
             RNFS.moveFile(url, cropPath).catch((err) => {
               RNFS.unlink(url);
+            }).then(() => {
+              this.setState({
+                isLoading: false,
+                profile: profile
+              });
             });
           }).catch((err) => {
             console.log(err);
           });
+        } else {
+          this.setState({
+            isLoading: false,
+            profile: profile
+          });
         }
-        this.setState({
-          isLoading: false,
-          profile: profile
-        });
       }).catch((error) => {
         console.log(error);
       });
