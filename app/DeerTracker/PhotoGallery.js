@@ -176,7 +176,7 @@ export default class PhotoGallery extends React.Component {
                                             <Picker
                                                 selectedValue={crop.label}
                                                 style={style.picker}
-                                                itemStyle={[style.h1, { height: h }]}
+                                                itemStyle={[style.h1, { height: style.picker.height - 20 }]}
                                                 onValueChange={(itemValue, itemIndex) => { this.updateObject(crop, itemIndex) }}>
                                                 {crop.label_array.map((label) => {
                                                     return (<Picker.Item key={label} label={label} value={label} />);
@@ -199,7 +199,7 @@ export default class PhotoGallery extends React.Component {
                                                 <Text style={style.h5}>Select Profile</Text>
                                                 <Picker selectedValue={selectedProfile}
                                                     style={{ height: 200 }}
-                                                    itemStyle={style.t2}
+                                                    itemStyle={[style.t2, { height: 160 }]}
                                                     onValueChange={(itemValue, itemIndex) => {
                                                         let profile = profiles[itemIndex - 1];
                                                         if (!profile && itemIndex === 0) {

@@ -29,8 +29,7 @@ import style, { screenHeight, screenWidth, thumbWidth, headerHeight, footerHeigh
 
 const root = RNFS.DocumentDirectoryPath;
 
-// TODO: use this
-//const moon = new MoonPhase();
+const moon = new MoonPhase();
 
 export default class ProfileScreen extends React.Component {
 
@@ -76,6 +75,10 @@ export default class ProfileScreen extends React.Component {
       return photo;
     });
 
+    let latest = photos[0];
+    let phase = moon.phase(new Date(Moment(latest.time)));
+    let moonImage = moon.image(phase);
+
     const chartConfig = {
       fillShadowGradientOpacity: 1,
       fillShadowGradient: 'rgb(255, 103, 0)',
@@ -93,7 +96,7 @@ export default class ProfileScreen extends React.Component {
         <View style={{ height: 40 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
             <Image source={require('./assets/images/crosshairs.png')} style={{ width: 25, height: 25 }} />
-            <Text style={style.t4}>{photos[0].profile_name}</Text>
+            <Text style={style.t4}>{latest.profile_name}</Text>
           </View>
         </View>
         <View style={{ height: screenHeight - 40 - headerHeight - footerHeight }}>
@@ -106,11 +109,14 @@ export default class ProfileScreen extends React.Component {
                 <Image source={{ uri: crop.profile_path }} style={{ width: crop.profile_width, height: crop.profile_height }} />
               </View>
               <View style={{ alignItems: 'center' }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                <View style={{ flexDirection: 'row' }}>
                   <Icon style={{ paddingLeft: 15 }} name='eye' color='black' size={18} />
                   <Text style={style.t5}>{profile.objects.length} Sightings</Text>
                 </View>
-                <Text style={style.t5}>Last seen {Moment(new Date() - Moment(photos[0].time)).format('D')} days ago</Text>
+                <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20, alignItems: 'center' }}>
+                  <Text style={[style.t5, { flex: 1 }]}>Last seen {Moment(new Date() - Moment(latest.time)).format('D')} days ago {Moment(latest.time).format('A') === 'AM' ? 'Before Noon' : 'After Noon'} during a {phase.name}</Text>
+                  <Image style={{ width: 100, height: 100 }} source={moonImage} />
+                </View>
                 <Text style={style.t5}>Best chance at {profile.stats.all[0].location} on {profile.stats.all[0].weekday} {profile.stats.all[0].ampm}</Text>
               </View>
               {/*

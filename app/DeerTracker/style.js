@@ -210,8 +210,8 @@ export default StyleSheet.create({
   profileModal: {
     borderRadius: 10,
     marginTop: 60,
-    marginLeft: 20,
-    marginRight: 20,
+    marginLeft: 60,
+    marginRight: 60,
     backgroundColor: 'white',
     borderColor: 'gray',
     borderWidth: 1
