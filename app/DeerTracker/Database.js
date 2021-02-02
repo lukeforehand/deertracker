@@ -343,7 +343,6 @@ export default class Database {
             l.name AS location_name, l.lat, l.lon
             FROM object o JOIN photo p ON p.id = o.photo_id
             JOIN location l ON l.id = o.location_id
-            GROUP BY o.photo_id
             ORDER BY o.time DESC`)
         let objects = await rs.map((r) => {
             return r.rows.raw();

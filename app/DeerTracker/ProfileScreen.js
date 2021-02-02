@@ -113,6 +113,7 @@ export default class ProfileScreen extends React.Component {
                 <Text style={style.t5}>Last seen {Moment(new Date() - Moment(photos[0].time)).format('D')} days ago</Text>
                 <Text style={style.t5}>Best chance at {profile.stats.all[0].location} on {profile.stats.all[0].weekday} {profile.stats.all[0].ampm}</Text>
               </View>
+              {/*
               <View style={{ alignItems: 'center' }}>
                 <ContributionGraph
                   values={profile.stats.days}
@@ -135,6 +136,7 @@ export default class ProfileScreen extends React.Component {
                   }}
                 />
               </View>
+                */}
               <View style={{ alignItems: 'center' }}>
                 <BarChart
                   data={{
