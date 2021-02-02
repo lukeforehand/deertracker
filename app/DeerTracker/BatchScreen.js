@@ -25,7 +25,7 @@ import Database from './Database';
 import style from './style';
 
 const root = RNFS.DocumentDirectoryPath;
-const detectorUrl = "http://192.168.1.3:5000";
+const detectorUrl = "http://192.168.0.157:5000";
 
 export default class BatchScreen extends React.Component {
 
@@ -183,6 +183,7 @@ export default class BatchScreen extends React.Component {
             });
             return;
           }
+          // FIXME: filter r.objects ON global exclusions list
           if (r.objects.length > 0) {
             for (o of r.objects) {
               o['lat'] = photo['lat'];

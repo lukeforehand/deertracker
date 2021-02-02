@@ -24,7 +24,7 @@ import Moment from 'moment';
 import Database from './Database';
 import style, { screenWidth, screenHeight, thumbWidth, thumbHeight, headerHeight } from './style';
 
-const detectorUrl = "http://192.168.1.3:5000";
+const detectorUrl = "http://192.168.0.157:5000";
 
 export default class PhotoGallery extends React.Component {
 
@@ -160,7 +160,7 @@ export default class PhotoGallery extends React.Component {
         if (crops.length > 0) {
             return (
                 <View style={{ height: 280 }}>
-                    <Swiper loop={true} dot={(<View />)} activeDot={(<View />)} ref={this.swiper}
+                    <Swiper loop={false} dot={(<View />)} activeDot={(<View />)} ref={this.swiper}
                         onIndexChanged={(nextIndex) => { this.generateCrop(crops[nextIndex]) }}>
                         {crops.map((crop) => {
                             let max = Math.max(crop.w, crop.h);

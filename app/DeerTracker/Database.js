@@ -513,7 +513,8 @@ profile_sql = `WITH sighting AS(
     FROM profile i
         JOIN object o ON o.profile_id = i.id
         JOIN location l ON l.id = o.location_id
-    WHERE o.profile_id = ?)
+    WHERE o.profile_id = ?
+    GROUP BY o.photo_id)
 `
 
 class_sql = `WITH sighting AS(
