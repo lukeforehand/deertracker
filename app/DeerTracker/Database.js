@@ -21,7 +21,6 @@ export default class Database {
                 tx.executeSql(`INSERT INTO config (key, value) SELECT 'discard_empty', 'true' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'discard_empty')`);
                 tx.executeSql(`INSERT INTO config (key, value) SELECT 'lookback_days', '90' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'lookback_days')`);
                 tx.executeSql(`INSERT INTO config (key, value) SELECT 'auto_archive', 'false' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'auto_archive')`);
-                tx.executeSql(`INSERT INTO config (key, value) SELECT 'auto_archive_days', '30' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'auto_archive_days')`);
                 tx.executeSql(`INSERT INTO config (key, value) SELECT 'google_drive_key', 'password' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'google_drive_key')`);
             });
         });
@@ -404,6 +403,19 @@ export default class Database {
 
     async selectProfileStats(profileId) {
         return await this.selectStats(profileId, profile_sql);
+    }
+
+    async selectArchivePhotoCount() {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        let condition = await this.selectLookbackCondition('p.time');
+        return (await db.executeSql(`
+            SELECT COUNT(DISTINCT p.id) AS count
+            FROM photo p JOIN object o ON p.id = o.photo_id
+            WHERE TRUE ${condition}
+            AND o.profile_id IS NULL
+        `)).map((r) => {
+            return r.rows.raw();
+        })[0][0].count
     }
 
     async selectStats(id, sql) {

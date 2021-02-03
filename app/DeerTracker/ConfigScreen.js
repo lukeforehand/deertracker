@@ -2,10 +2,13 @@ import React from 'react';
 import {
   SafeAreaView,
   ActivityIndicator,
+  TouchableOpacity,
+  Alert,
   Text,
   TextInput,
   View,
   Switch,
+  ScrollView,
 } from 'react-native';
 
 import { Picker } from '@react-native-picker/picker';
@@ -39,7 +42,7 @@ export default class ConfigScreen extends React.Component {
     }
     return (
       <SafeAreaView>
-        <View>
+        <ScrollView>
           <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
             <View style={style.config}>
               <Text style={style.h2}>Discard Empty Photos</Text>
@@ -53,45 +56,56 @@ export default class ConfigScreen extends React.Component {
           </View>
           <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
             <View style={style.config}>
-              <Text style={style.h2}>Lookback Period</Text>
+              <Text style={style.h2}>Data will be archived</Text>
             </View>
-            <Text style={style.t1}>Time period used for fetching data.</Text>
             <Picker
               selectedValue={config.get('lookback_days')}
               style={{ width: '100%' }}
               itemStyle={{ height: 80 }}
               onValueChange={(itemValue, itemIndex) => this.pickLookbackDays(itemValue)}>
-              <Picker.Item label="1 month" value="30" />
-              <Picker.Item label="2 months" value="60" />
-              <Picker.Item label="3 months" value="90" />
-              <Picker.Item label="6 months" value="180" />
-              <Picker.Item label="1 year" value="360" />
-              <Picker.Item label="2 years" value="720" />
-              <Picker.Item label="All time" value="0" />
+              <Picker.Item label="after 1 month" value="30" />
+              <Picker.Item label="after 2 months" value="60" />
+              <Picker.Item label="after 3 months" value="90" />
+              <Picker.Item label="after 6 months" value="180" />
+              <Picker.Item label="after 1 year" value="360" />
+              <Picker.Item label="after 2 years" value="720" />
+              <Picker.Item label="Never" value="0" />
             </Picker>
+            <Text style={style.t1}>Archive data will not be displayed or used in calculations.</Text>
           </View>
           <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
             <View style={style.config}>
-              <Text style={style.h2}>Auto Archive Photos</Text>
+              <Text style={style.h2}>Remove archive data</Text>
+            </View>
+            <View style={{ height: 15 }} />
+            <TouchableOpacity style={style.button} onPress={() => {
+              Alert.alert(
+                'Delete ' + this.state.archiveCount + ' photos?', '', [
+                {
+                  text: 'Yes',
+                  onPress: () => {
+                    //TODO: write me
+                    //this.db.deleteProfile(profile.profile_id).then(() => {
+                    //  this.fetchData();
+                    //});
+                  }
+                },
+                { text: 'No' }], { cancelable: false });
+            }}>
+              <Text style={style.h1}>Delete {this.state.archiveCount} Photos</Text>
+            </TouchableOpacity>
+            <Text style={style.t1}>Delete archive data from device.</Text>
+          </View>
+          <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
+            <View style={style.config}>
+              <Text style={style.h2}>Sync Archive</Text>
               <Switch
                 trackColor={{ false: '#767577', true: '#4E603E' }}
                 onValueChange={(v) => this.toggle('auto_archive', v)}
                 value={config.get('auto_archive') == 'true'}
               />
             </View>
-            <Text style={style.t1}>Automatically move old photos to cloud storage over time (Recommended).</Text>
-            {config.get('auto_archive') == 'true' &&
-              <Picker
-                selectedValue={config.get('auto_archive_days')}
-                style={{ width: '100%' }}
-                itemStyle={{ height: 80 }}
-                onValueChange={(itemValue, itemIndex) => this.pickArchiveDays(itemValue)}>
-                <Picker.Item label="after 3 days" value="3" />
-                <Picker.Item label="after 1 week" value="7" />
-                <Picker.Item label="after 2 weeks" value="14" />
-                <Picker.Item label="after 1 month" value="30" />
-              </Picker>
-            }
+            <Text style={style.t1}>Automatically copy archive data to cloud storage (Recommended).</Text>
           </View>
           <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
             <View style={style.config}>
@@ -100,7 +114,7 @@ export default class ConfigScreen extends React.Component {
             </View>
             <Text style={style.t1}>Provide Google Drive API Key</Text>
           </View>
-        </View>
+        </ScrollView>
       </SafeAreaView >
     );
   }
@@ -117,16 +131,13 @@ export default class ConfigScreen extends React.Component {
     });
   }
 
-  pickArchiveDays(days) {
-    this.db.updateConfig('auto_archive_days', days).then(() => {
-      this.fetchData();
-    });
-  }
-
   fetchData() {
     this.db.selectConfig().then((config) => {
-      this.setState({
-        config: config
+      this.db.selectArchivePhotoCount().then((photoCount) => {
+        this.setState({
+          config: config,
+          archiveCount: photoCount
+        });
       });
     }).catch((error) => {
       console.log(error);
