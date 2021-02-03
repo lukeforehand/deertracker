@@ -42,7 +42,7 @@ export default class ConfigScreen extends React.Component {
         <View>
           <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
             <View style={style.config}>
-              <Text style={style.h2}>Discard Empty Photos:</Text>
+              <Text style={style.h2}>Discard Empty Photos</Text>
               <Switch
                 trackColor={{ false: '#767577', true: '#4E603E' }}
                 onValueChange={(v) => this.toggle('discard_empty', v)}
@@ -53,7 +53,26 @@ export default class ConfigScreen extends React.Component {
           </View>
           <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
             <View style={style.config}>
-              <Text style={style.h2}>Auto Archive Photos:</Text>
+              <Text style={style.h2}>Lookback Period</Text>
+            </View>
+            <Text style={style.t1}>Time period used for fetching data.</Text>
+            <Picker
+              selectedValue={config.get('lookback_days')}
+              style={{ width: '100%' }}
+              itemStyle={{ height: 80 }}
+              onValueChange={(itemValue, itemIndex) => this.pickLookbackDays(itemValue)}>
+              <Picker.Item label="1 month" value="30" />
+              <Picker.Item label="2 months" value="60" />
+              <Picker.Item label="3 months" value="90" />
+              <Picker.Item label="6 months" value="180" />
+              <Picker.Item label="1 year" value="360" />
+              <Picker.Item label="2 years" value="720" />
+              <Picker.Item label="All time" value="0" />
+            </Picker>
+          </View>
+          <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
+            <View style={style.config}>
+              <Text style={style.h2}>Auto Archive Photos</Text>
               <Switch
                 trackColor={{ false: '#767577', true: '#4E603E' }}
                 onValueChange={(v) => this.toggle('auto_archive', v)}
@@ -76,7 +95,7 @@ export default class ConfigScreen extends React.Component {
           </View>
           <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
             <View style={style.config}>
-              <Text style={style.h2}>Google Drive Key:</Text>
+              <Text style={style.h2}>Google Drive Key</Text>
               <TextInput secureTextEntry={true} style={style.h2}>{config.get('google_drive_key')}</TextInput>
             </View>
             <Text style={style.t1}>Provide Google Drive API Key</Text>
@@ -88,6 +107,12 @@ export default class ConfigScreen extends React.Component {
 
   toggle(key, value) {
     this.db.updateConfig(key, new Boolean(value).toString()).then(() => {
+      this.fetchData();
+    });
+  }
+
+  pickLookbackDays(days) {
+    this.db.updateConfig('lookback_days', days).then(() => {
       this.fetchData();
     });
   }

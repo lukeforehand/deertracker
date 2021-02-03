@@ -19,6 +19,7 @@ export default class Database {
                 tx.executeSql(CREATE_TABLE_OBJECT);
                 tx.executeSql(CREATE_TABLE_CONFIG);
                 tx.executeSql(`INSERT INTO config (key, value) SELECT 'discard_empty', 'true' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'discard_empty')`);
+                tx.executeSql(`INSERT INTO config (key, value) SELECT 'lookback_days', '90' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'lookback_days')`);
                 tx.executeSql(`INSERT INTO config (key, value) SELECT 'auto_archive', 'false' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'auto_archive')`);
                 tx.executeSql(`INSERT INTO config (key, value) SELECT 'auto_archive_days', '30' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'auto_archive_days')`);
                 tx.executeSql(`INSERT INTO config (key, value) SELECT 'google_drive_key', 'password' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'google_drive_key')`);
@@ -38,8 +39,26 @@ export default class Database {
         return await db.executeSql('DELETE FROM batch where id = ?', [id]);
     }
 
+    async selectLookbackCondition(column) {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        let lookbackDays = (await db.executeSql(`SELECT value FROM config WHERE key = 'lookback_days'`)).map((r) => {
+            return r.rows.raw();
+        })[0][0].value;
+        let condition = '';
+        if (lookbackDays) {
+            let start = Moment();
+            start.subtract(lookbackDays, 'days');
+            start = start.format('YYYY-MM-DD HH:mm:ss');
+            condition = ` AND ${column} >= '${start}'`;
+        }
+        return condition;
+    }
+
     async selectBatches() {
         const db = await SQLite.openDatabase({ name: database, location: location });
+
+        let condition = await this.selectLookbackCondition('p.time');
+
         rs = await db.executeSql(`
             SELECT b.*, l.name AS location_name,
                 (SELECT COUNT(*) FROM photo p WHERE p.batch_id = b.id)
@@ -57,6 +76,7 @@ export default class Database {
             FROM batch b
             JOIN location l ON l.id = b.location_id
             JOIN photo p ON b.id = p.batch_id
+            WHERE TRUE ${condition}
             GROUP BY b.id
             ORDER BY b.id DESC
         `);
@@ -179,8 +199,12 @@ export default class Database {
 
     async selectPhotosToReviewCount() {
         const db = await SQLite.openDatabase({ name: database, location: location });
+        let condition = await this.selectLookbackCondition('time');
         return Object.values(
-            (await db.executeSql('SELECT COUNT(*) FROM object WHERE reviewed IS FALSE'))[0].rows.raw()[0])[0];
+            (await db.executeSql(`
+            SELECT COUNT(*) FROM object WHERE reviewed IS FALSE
+            ${condition}
+            `))[0].rows.raw()[0])[0];
     }
 
     async selectPhotosToReview() {
@@ -209,6 +233,7 @@ export default class Database {
 
     async selectObjects(day = null, locationId = null) {
         const db = await SQLite.openDatabase({ name: database, location: location });
+        let condition = await this.selectLookbackCondition('p.time');
         let sql = `
         SELECT * FROM (
             SELECT o.id, STRFTIME('%Y-%m-%d', o.time) AS day, l.name AS location_name,
@@ -219,11 +244,13 @@ export default class Database {
             JOIN photo p ON p.id = o.photo_id
             JOIN location l ON l.id = o.location_id
             LEFT JOIN profile i ON i.id = o.profile_id
+            WHERE TRUE ${condition}
             ORDER BY day DESC
         )`;
         if (day && locationId) {
-            sql = sql + ` WHERE day = ? AND location_id = ?`;
+            sql = sql + ` AND day = ? AND location_id = ?`;
         }
+
         rs = await db.executeSql(sql, [day, locationId]);
         let objects = rs.map((r) => {
             return r.rows.raw();
@@ -303,6 +330,9 @@ export default class Database {
 
     async selectProfiles() {
         const db = await SQLite.openDatabase({ name: database, location: location });
+
+        let condition = await this.selectLookbackCondition('o.time');
+
         rs = await db.executeSql(`
             SELECT i.name AS profile_name, i.id AS profile_id,
             p.path AS photo_path, p.time, p.width, p.height,
@@ -312,6 +342,7 @@ export default class Database {
             JOIN object o ON o.profile_id = i.id
             JOIN photo p ON p.id = o.photo_id
             JOIN location l ON l.id = o.location_id
+            WHERE TRUE ${condition}
             GROUP BY o.photo_id
             ORDER BY o.time DESC`)
         let objects = await rs.map((r) => {
@@ -336,6 +367,7 @@ export default class Database {
 
     async selectClasses() {
         const db = await SQLite.openDatabase({ name: database, location: location });
+        let condition = await this.selectLookbackCondition('o.time');
         rs = await db.executeSql(`
             SELECT o.label AS profile_name, o.label AS profile_id,
             p.path AS photo_path, p.time, p.width, p.height,
@@ -343,6 +375,7 @@ export default class Database {
             l.name AS location_name, l.lat, l.lon
             FROM object o JOIN photo p ON p.id = o.photo_id
             JOIN location l ON l.id = o.location_id
+            WHERE TRUE ${condition}
             ORDER BY o.time DESC`)
         let objects = await rs.map((r) => {
             return r.rows.raw();
