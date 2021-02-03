@@ -44,11 +44,13 @@ export default class AddLocationScreen extends React.Component {
               style={{ ...StyleSheet.absoluteFillObject }}
               showsUserLocation={true}
               mapType="satellite"
-              initialRegion={this.state.region}
+              region={this.state.region}
               onMapReady={() => {
-                this.map.fitToCoordinates(
-                  locations.map(location => ({ latitude: location.lat, longitude: location.lon })),
-                  { edgePadding: { top: 100, right: 120, bottom: 100, left: 120 }, animated: true })
+                if (locations.length > 0) {
+                  this.map.fitToCoordinates(
+                    locations.map(location => ({ latitude: location.lat, longitude: location.lon })),
+                    { edgePadding: { top: 100, right: 120, bottom: 100, left: 120 }, animated: true })
+                }
               }}
               onDoublePress={(ev) => { this.map.animateCamera({ center: ev.nativeEvent.coordinate }) }}
               onRegionChangeComplete={(region) => { this.setState({ region: region }) }}>
@@ -86,9 +88,11 @@ export default class AddLocationScreen extends React.Component {
                   <Icon name='location-arrow' color={style.locationArrow.color} size={15} />
                 </TouchableOpacity>
                 <TouchableOpacity style={style.locationArrow} onPress={() => {
-                  this.map.fitToCoordinates(
-                    locations.map(location => ({ latitude: location.lat, longitude: location.lon })),
-                    { edgePadding: { top: 100, right: 120, bottom: 100, left: 120 }, animated: true })
+                  if (locations.length > 0) {
+                    this.map.fitToCoordinates(
+                      locations.map(location => ({ latitude: location.lat, longitude: location.lon })),
+                      { edgePadding: { top: 100, right: 120, bottom: 100, left: 120 }, animated: true })
+                  }
                 }}>
                   <Icon name='eye' color={style.locationArrow.color} size={15} />
                 </TouchableOpacity>

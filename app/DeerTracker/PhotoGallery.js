@@ -24,7 +24,9 @@ import Moment from 'moment';
 import Database from './Database';
 import style, { screenWidth, screenHeight, thumbWidth, thumbHeight, headerHeight } from './style';
 
-const detectorUrl = "http://192.168.0.157:5000";
+import { detectorUrl, detectorUsername, detectorPassword } from './config';
+
+import base64 from 'react-native-base64';
 
 export default class PhotoGallery extends React.Component {
 
@@ -343,7 +345,13 @@ export default class PhotoGallery extends React.Component {
             formData.append('h', object.h);
             formData.append('label', object.label);
             formData.append('score', object.score);
-            fetch(detectorUrl + '/' + object.upload_id, { method: 'PUT', body: formData }).then((response) => {
+            fetch(detectorUrl + '/' + object.upload_id, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': 'Basic ' + base64.encode(detectorUsername + ":" + detectorPassword)
+                },
+                body: formData
+            }).then((response) => {
                 console.log(response.status);
                 if (response.status == 200) {
                     response.json().then((json) => {

@@ -72,11 +72,13 @@ def server():
 
 
 @server.command(help="Start")
+@click.option("--username", required=True, help="required basic auth username")
+@click.option("--password", required=True, help="required basic auth password")
 @click.option("--port", required=False, default=5000, help="Listen port")
-def start(port):
+def start(port, username, password):
     from deertracker import server
 
-    server.start(port)
+    server.start(port, username, password)
 
 
 @server.command(help="Test Server")

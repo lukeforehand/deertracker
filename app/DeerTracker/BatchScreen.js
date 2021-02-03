@@ -1,4 +1,5 @@
 import React from 'react';
+
 import {
   Alert,
   SafeAreaView,
@@ -24,8 +25,11 @@ import Database from './Database';
 
 import style from './style';
 
+import { detectorUrl, detectorUsername, detectorPassword } from './config';
+
+import base64 from 'react-native-base64';
+
 const root = RNFS.DocumentDirectoryPath;
-const detectorUrl = "http://192.168.0.157:5000";
 
 export default class BatchScreen extends React.Component {
 
@@ -167,7 +171,12 @@ export default class BatchScreen extends React.Component {
       for (p of photos) {
         let photo = p;
         try {
-          let response = await fetch(detectorUrl + '/' + photo['upload_id']);
+          let response = await fetch(detectorUrl + '/' + photo['upload_id'], {
+            method: 'GET',
+            headers: {
+              'Authorization': 'Basic ' + base64.encode(detectorUsername + ":" + detectorPassword)
+            }
+          });
           console.log(photo['id'] + ' GET ' + response.status);
           if (response.status !== 200) {
             this.setState({
@@ -255,6 +264,9 @@ export default class BatchScreen extends React.Component {
         Upload.startUpload({
           url: detectorUrl,
           path: root + '/' + photo['path'],
+          headers: {
+            'Authorization': 'Basic ' + base64.encode(detectorUsername + ":" + detectorPassword)
+          },
           type: 'multipart',
           customUploadId: photo['id'],
           field: 'image',

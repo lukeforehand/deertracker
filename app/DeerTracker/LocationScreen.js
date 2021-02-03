@@ -11,11 +11,16 @@ import {
 } from 'react-native';
 
 import DocumentPicker from 'react-native-document-picker';
+import RNFS from 'react-native-fs';
 
 import Database from './Database';
 import SwipeRow from './SwipeRow';
 
 import style from './style';
+
+const root = RNFS.DocumentDirectoryPath;
+
+RNFS.mkdir(root + '/.data', { NSURLIsExcludedFromBackupKey: true });
 
 export default class LocationScreen extends React.Component {
 
@@ -93,19 +98,50 @@ export default class LocationScreen extends React.Component {
       type: [DocumentPicker.types.images],
       mode: 'import',
     }).then((files) => {
-      this.props.navigation.navigate('ImportScreen', {
-        location: location,
-        files: files.map((file) => {
-          file.photo_path = file.uri;
-          file.url = file.uri;
-          file.path = file.uri;
-          file.location_name = location.name;
-          file.props = {
-            photo: file
-          };
-          return file;
-        })
-      })
+      files = files.map((file) => {
+        file.photo_path = file.uri;
+        file.url = file.uri;
+        file.path = file.uri;
+        file.location_name = location.name;
+        file.props = {
+          photo: file
+        };
+        return file;
+      });
+      Alert.alert(
+        'Import ' + files.length + ' photos from location ' + location['name'] + '?', '', [
+        {
+          text: 'Yes',
+          onPress: () => {
+            this.setState({ isLoading: true });
+            this.db.insertBatch(location['id']).then((rs) => {
+              let batchId = rs[0]['insertId'];
+              let relativePath = '.data/batch/' + batchId;
+              let destPath = root + '/' + relativePath;
+              RNFS.mkdir(destPath, { NSURLIsExcludedFromBackupKey: true }).then(() => {
+                Promise.all(files.map(async (file) => {
+                  return RNFS.hash(file.path, 'md5').then((hash) => {
+                    let relativeDestFile = relativePath + '/' + hash + '.jpg';
+                    this.db.insertPhoto(hash, relativeDestFile, location['lat'], location['lon'], batchId).then(() => {
+                      RNFS.copyFile(file.path, root + '/' + relativeDestFile);
+                    }).catch((error) => {
+                      console.log(error);
+                      console.log("deleting " + file.path);
+                      RNFS.unlink(file.path);
+                    });
+                  });
+                })).then(() => {
+                  this.db.selectBatches().then((batches) => {
+                    this.props.navigation.popToTop('LocationScreen');
+                    this.props.navigation.navigate('BatchScreen', {
+                      batches: batches
+                    });
+                  });
+                });
+              });
+            });
+          }
+        }, { text: 'No' }], { cancelable: false });
     }).catch((err) => {
       if (DocumentPicker.isCancel(err)) {
       } else {

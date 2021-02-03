@@ -2,19 +2,21 @@ import hashlib
 import io
 import multiprocessing
 import numpy as np
+import os
 import time
 
 from datetime import datetime
 from flask import Flask, jsonify, request
+from flask_basicauth import BasicAuth
 from PIL import Image, UnidentifiedImageError
 from werkzeug.exceptions import NotFound, BadRequest
 
 from deertracker import model, database, DEFAULT_PHOTO_STORE
 
 
-def start(port):
+def start(port, username, password):
     pool = multiprocessing.Pool(3)
-    pool.apply_async(start_server, (port,))
+    pool.apply_async(start_server, (port, username, password))
     start_detector(pool)
     pool.close()
     pool.join()
@@ -61,8 +63,13 @@ def start_detector(pool):
         time.sleep(3)
 
 
-def start_server(port):
+def start_server(port, username, password):
     app = Flask(__name__)
+    app.config["BASIC_AUTH_FORCE"] = True
+    app.config["BASIC_AUTH_USERNAME"] = username
+    app.config["BASIC_AUTH_PASSWORD"] = password
+
+    basic_auth = BasicAuth(app)
 
     @app.route(
         "/",

@@ -1,5 +1,13 @@
 # Install
 
+add config.js
+```js
+export const detectorUrl = "https://detector:5000";
+export const detectorUsername = "username";
+export const detectorPassword = "password";
+```
+
+
 ```bash
 npm install
 npx pod-install ios

@@ -3,6 +3,7 @@ click
 colorama
 cvlib
 flask
+Flask-BasicAuth
 futures
 matplotlib
 opencv-python
