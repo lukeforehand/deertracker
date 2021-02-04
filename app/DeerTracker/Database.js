@@ -38,7 +38,7 @@ export default class Database {
         return await db.executeSql('DELETE FROM batch where id = ?', [id]);
     }
 
-    async selectLookbackCondition(column) {
+    async selectLookbackCondition(column, not = '') {
         const db = await SQLite.openDatabase({ name: database, location: location });
         let lookbackDays = (await db.executeSql(`SELECT value FROM config WHERE key = 'lookback_days'`)).map((r) => {
             return r.rows.raw();
@@ -48,7 +48,7 @@ export default class Database {
             let start = Moment();
             start.subtract(lookbackDays, 'days');
             start = start.format('YYYY-MM-DD HH:mm:ss');
-            condition = ` AND ${column} >= '${start}'`;
+            condition = ` AND ${not} ${column} >= '${start}'`;
         }
         return condition;
     }
@@ -176,7 +176,7 @@ export default class Database {
         let objects = rs.map((r) => {
             return r.rows.raw();
         })[0];
-        let photos = {}
+        let photos = {};
         for (o of objects) {
             let photo = photos[o.photo_id];
             if (!photo) {
@@ -304,6 +304,11 @@ export default class Database {
             'DELETE FROM photo WHERE batch_id = ?', [batchId]);
     }
 
+    async deletePhotoObjects(photoId) {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        return await db.executeSql(`DELETE FROM object WHERE photo_id = ?`, [photoId]);
+    }
+
     async deleteBatchObjects(batchId) {
         const db = await SQLite.openDatabase({ name: database, location: location });
         return await db.executeSql(
@@ -405,17 +410,31 @@ export default class Database {
         return await this.selectStats(profileId, profile_sql);
     }
 
-    async selectArchivePhotoCount() {
+    async selectArchive() {
         const db = await SQLite.openDatabase({ name: database, location: location });
-        let condition = await this.selectLookbackCondition('p.time');
-        return (await db.executeSql(`
-            SELECT COUNT(DISTINCT p.id) AS count
+        let condition = await this.selectLookbackCondition('p.time', 'NOT');
+        let objects = (await db.executeSql(`
+            SELECT p.id AS photo_id, p.path AS photo_path, o.id AS id
             FROM photo p JOIN object o ON p.id = o.photo_id
             WHERE TRUE ${condition}
             AND o.profile_id IS NULL
         `)).map((r) => {
             return r.rows.raw();
-        })[0][0].count
+        })[0];
+        let photos = {};
+        for (o of objects) {
+            let photo = photos[o.photo_id];
+            if (!photo) {
+                photo = {
+                    photo_id: o.photo_id,
+                    photo_path: o.photo_path,
+                    objects: []
+                };
+                photos[o.photo_id] = photo;
+            }
+            photo.objects.push(o);
+        }
+        return Object.values(photos);
     }
 
     async selectStats(id, sql) {

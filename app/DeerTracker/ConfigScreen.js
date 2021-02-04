@@ -13,9 +13,13 @@ import {
 
 import { Picker } from '@react-native-picker/picker';
 
+import RNFS from 'react-native-fs';
+
 import Database from './Database';
 
 import style from './style';
+
+const root = RNFS.DocumentDirectoryPath;
 
 export default class ConfigScreen extends React.Component {
 
@@ -63,8 +67,8 @@ export default class ConfigScreen extends React.Component {
               style={{ width: '100%' }}
               itemStyle={{ height: 80 }}
               onValueChange={(itemValue, itemIndex) => this.pickLookbackDays(itemValue)}>
+              <Picker.Item label="after 2 weeks" value="14" />
               <Picker.Item label="after 1 month" value="30" />
-              <Picker.Item label="after 2 months" value="60" />
               <Picker.Item label="after 3 months" value="90" />
               <Picker.Item label="after 6 months" value="180" />
               <Picker.Item label="after 1 year" value="360" />
@@ -80,19 +84,44 @@ export default class ConfigScreen extends React.Component {
             <View style={{ height: 15 }} />
             <TouchableOpacity style={style.button} onPress={() => {
               Alert.alert(
-                'Delete ' + this.state.archiveCount + ' photos?', '', [
+                'Delete ' + this.state.archive.length + ' photos?', '', [
                 {
                   text: 'Yes',
                   onPress: () => {
-                    //TODO: write me
-                    //this.db.deleteProfile(profile.profile_id).then(() => {
-                    //  this.fetchData();
-                    //});
+                    for (photo of this.state.archive) {
+                      this.db.deletePhotoObjects(photo.photo_id).then(() => {
+                        this.db.deletePhoto(photo.photo_id).then(() => {
+                          let path = root + '/' + photo.photo_path;
+                          console.log("deleting " + path);
+                          RNFS.exists(path).then((exists) => {
+                            if (exists) {
+                              RNFS.unlink(path);
+                            }
+                          });
+                          let thumbPath = RNFS.CachesDirectoryPath + '/thumb_' + photo.photo_id + '.jpg';;
+                          console.log("deleting " + thumbPath);
+                          RNFS.exists(thumbPath).then((exists) => {
+                            if (exists) {
+                              RNFS.unlink(thumbPath);
+                            }
+                          });
+                          for (object of photo.objects) {
+                            let cropPath = RNFS.CachesDirectoryPath + '/crop_' + object.id + '.jpg';
+                            console.log("deleting " + cropPath);
+                            RNFS.exists(cropPath).then((exists) => {
+                              if (exists) {
+                                RNFS.unlink(cropPath);
+                              }
+                            });
+                          }
+                          this.fetchData();
+                        });
+                      });
+                    }
                   }
-                },
-                { text: 'No' }], { cancelable: false });
+                }, { text: 'No' }], { cancelable: false });
             }}>
-              <Text style={style.h1}>Delete {this.state.archiveCount} Photos</Text>
+              <Text style={style.h1}>Delete {this.state.archive.length} Photos</Text>
             </TouchableOpacity>
             <Text style={style.t1}>Delete archive data from device.</Text>
           </View>
@@ -133,10 +162,10 @@ export default class ConfigScreen extends React.Component {
 
   fetchData() {
     this.db.selectConfig().then((config) => {
-      this.db.selectArchivePhotoCount().then((photoCount) => {
+      this.db.selectArchive().then((archive) => {
         this.setState({
           config: config,
-          archiveCount: photoCount
+          archive: archive
         });
       });
     }).catch((error) => {
