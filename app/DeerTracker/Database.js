@@ -49,6 +49,8 @@ export default class Database {
             start.subtract(lookbackDays, 'days');
             start = start.format('YYYY-MM-DD HH:mm:ss');
             condition = ` AND ${not} ${column} >= '${start}'`;
+        } else {
+            condition = ` AND ${not} TRUE`;
         }
         return condition;
     }
@@ -125,12 +127,12 @@ export default class Database {
         })[0];
     }
 
-    async updatePhoto(photoId, uploadId, time, width, height) {
+    async updatePhoto(photoId, uploadId, time, moonPhase, width, height) {
         time = Moment(time).format('YYYY-MM-DD HH:mm:ss');
         const db = await SQLite.openDatabase({ name: database, location: location });
         db.executeSql(
-            'UPDATE photo SET upload_id = ?, time = ?, width = ?, height = ? WHERE id = ?',
-            [uploadId, time, width, height, photoId]
+            'UPDATE photo SET upload_id = ?, time = ?, moon_phase = ?, width = ?, height = ? WHERE id = ?',
+            [uploadId, time, moonPhase, width, height, photoId]
         );
         rs = await db.executeSql('SELECT * from photo WHERE id = ?', [photoId]);
         return rs.map((r) => {
@@ -339,7 +341,7 @@ export default class Database {
 
         rs = await db.executeSql(`
             SELECT i.name AS profile_name, i.id AS profile_id,
-            p.path AS photo_path, p.time, p.width, p.height,
+            p.path AS photo_path, p.time, p.moon_phase, p.width, p.height,
             o.id, o.x, o.y, o.w, o.h, o.score_array, o.label_array, o.score, o.label,
             l.name AS location_name, l.lat, l.lon
             FROM profile i
@@ -374,7 +376,7 @@ export default class Database {
         let condition = await this.selectLookbackCondition('o.time');
         rs = await db.executeSql(`
             SELECT o.label AS profile_name, o.label AS profile_id,
-            p.path AS photo_path, p.time, p.width, p.height,
+            p.path AS photo_path, p.time, p.width, p.height, p.moon_phase,
             o.id, o.x, o.y, o.w, o.h, o.score_array, o.label_array, o.score, o.label,
             l.name AS location_name, l.lat, l.lon
             FROM object o JOIN photo p ON p.id = o.photo_id
@@ -447,7 +449,7 @@ export default class Database {
         weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((w) => {
             let x = weekday.find(x => x.weekday == w);
             return {
-                weekday: x ? x.weekday.slice(0, 3) : w.slice(0, 3),
+                weekday: w.slice(0, 3),
                 cnt: x ? x.cnt : 0,
                 prob: x ? x.prob : 0.0
             }
@@ -462,6 +464,19 @@ export default class Database {
             FROM sighting GROUP BY ampm ORDER BY prob DESC`, [id])).map((r) => {
             return r.rows.raw();
         })[0];
+        moon = (await db.executeSql(sql + `
+            SELECT moon_phase, COUNT(*) AS cnt, COUNT(*) * 1.0 / (SELECT COUNT(*) FROM sighting) AS prob
+            FROM sighting GROUP BY moon_phase ORDER BY prob DESC`, [id])).map((r) => {
+            return r.rows.raw();
+        })[0];
+        moon = ['New Moon', 'Waxing Crescent', 'First Quarter', 'Waxing Gibbous', 'Full Moon', 'Waning Gibbous', 'Last Quarter', 'Waning Crescent'].map((m) => {
+            let x = moon.find(x => x.moon_phase == m);
+            return {
+                moon_phase: m,
+                cnt: x ? x.cnt : 0,
+                prob: x ? x.prob : 0.0
+            }
+        });
         days = (await db.executeSql(sql + `
         SELECT day, COUNT(*) AS cnt FROM sighting GROUP BY day ORDER BY day ASC`, [id])).map((r) => {
             return r.rows.raw();
@@ -472,14 +487,15 @@ export default class Database {
             }
         });
         all = (await db.executeSql(sql + `
-            SELECT weekday, location, ampm, COUNT(*) AS cnt, COUNT(*) * 1.0 / (SELECT COUNT(*) FROM sighting) AS prob
-            FROM sighting GROUP BY weekday, location, ampm ORDER BY prob DESC`, [id])).map((r) => {
+            SELECT weekday, location, ampm, moon_phase, COUNT(*) AS cnt, COUNT(*) * 1.0 / (SELECT COUNT(*) FROM sighting) AS prob
+            FROM sighting GROUP BY weekday, location, ampm, moon_phase ORDER BY prob DESC`, [id])).map((r) => {
             return r.rows.raw();
         })[0];
         r = {
             weekday: weekday,
             location: location,
             ampm: ampm,
+            moon: moon,
             days, days,
             all: all
         }
@@ -572,10 +588,12 @@ profile_sql = `WITH sighting AS(
             WHEN CAST(STRFTIME('%H', o.time) AS INTEGER) < 12
             THEN 'Before Noon'
             ELSE 'After Noon'
-            END AS ampm
+            END AS ampm,
+        p.moon_phase
     FROM profile i
         JOIN object o ON o.profile_id = i.id
         JOIN location l ON l.id = o.location_id
+        JOIN photo p ON p.id = o.photo_id
     WHERE o.profile_id = ?
     GROUP BY o.photo_id)
 `
@@ -595,8 +613,11 @@ class_sql = `WITH sighting AS(
             WHEN CAST(STRFTIME('%H', o.time) AS INTEGER) < 12
             THEN 'Before Noon'
             ELSE 'After Noon'
-            END AS ampm
-    FROM object o JOIN location l ON l.id = o.location_id
+            END AS ampm,
+        p.moon_phase
+    FROM object o
+        JOIN location l ON l.id = o.location_id
+        JOIN photo p ON p.id = o.photo_id
     WHERE o.label = ?)
 `
 
@@ -626,6 +647,7 @@ CREATE TABLE IF NOT EXISTS photo (
     processed BOOLEAN NOT NULL,
     upload_id NULL,
     time DATETIME,
+    moon_phase VARCHAR(255),
     lat FLOAT NOT NULL,
     lon FLOAT NOT NULL,
     width INTEGER,

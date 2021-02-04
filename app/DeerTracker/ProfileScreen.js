@@ -19,17 +19,17 @@ import Swiper from 'react-native-swiper';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Moment from 'moment';
 
+import MoonPhase from './MoonPhase';
+
 import { ContributionGraph, PieChart, BarChart } from "react-native-chart-kit";
 
 import PhotoGrid from './PhotoGrid';
-import MoonPhase from './MoonPhase';
 import Database from './Database';
 
 import style, { screenHeight, screenWidth, thumbWidth, headerHeight, footerHeight } from './style';
 
-const root = RNFS.DocumentDirectoryPath;
-
 const moon = new MoonPhase();
+const root = RNFS.DocumentDirectoryPath;
 
 export default class ProfileScreen extends React.Component {
 
@@ -76,8 +76,7 @@ export default class ProfileScreen extends React.Component {
     });
 
     let latest = photos[0];
-    let phase = moon.phase(new Date(Moment(latest.time)));
-    let moonImage = moon.image(phase);
+    let moonImage = moon.image(latest.moon_phase);
 
     const chartConfig = {
       fillShadowGradientOpacity: 1,
@@ -114,10 +113,10 @@ export default class ProfileScreen extends React.Component {
                   <Text style={style.t5}>{profile.objects.length} Sightings</Text>
                 </View>
                 <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20, alignItems: 'center' }}>
-                  <Text style={[style.t5, { flex: 1 }]}>Last seen {Moment(new Date() - Moment(latest.time)).format('D')} days ago {Moment(latest.time).format('A') === 'AM' ? 'Before Noon' : 'After Noon'} during a {phase.name}</Text>
+                  <Text style={[style.t5, { flex: 1 }]}>Last seen {Moment(new Date() - Moment(latest.time)).format('D')} days ago at {latest.location_name} on {Moment(latest.time).format('dddd')} {Moment(latest.time).format('A') === 'AM' ? 'Before Noon' : 'After Noon'} during a {latest.moon_phase}</Text>
                   <Image style={{ width: 100, height: 100 }} source={moonImage} />
                 </View>
-                <Text style={style.t5}>Best chance at {profile.stats.all[0].location} on {profile.stats.all[0].weekday} {profile.stats.all[0].ampm}</Text>
+                <Text style={style.t5}>Best chance at {profile.stats.all[0].location} on {profile.stats.all[0].weekday} {profile.stats.all[0].ampm} during a {profile.stats.all[0].moon_phase}</Text>
               </View>
               {/*
               <View style={{ alignItems: 'center' }}>
@@ -190,6 +189,27 @@ export default class ProfileScreen extends React.Component {
                   data={{
                     labels: profile.stats.location.map((w) => w.location),
                     datasets: [{ data: profile.stats.location.map((w) => (w.cnt)) }]
+                  }}
+                  fromZero={true}
+                  height={200}
+                  width={screenWidth - 10}
+                  chartConfig={chartConfig}
+                  withHorizontalLabels={false}
+                  showValuesOnTopOfBars={true}
+                  withInnerLines={false}
+                  style={{
+                    borderWidth: 1,
+                    borderColor: 'gray',
+                    borderRadius: 10,
+                    paddingRight: -5
+                  }}
+                />
+              </View>
+              <View style={{ alignItems: 'center' }}>
+                <BarChart
+                  data={{
+                    labels: profile.stats.moon.map((m) => m.moon_phase),
+                    datasets: [{ data: profile.stats.moon.map((m) => (m.cnt)) }]
                   }}
                   fromZero={true}
                   height={200}

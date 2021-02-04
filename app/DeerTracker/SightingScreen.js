@@ -69,7 +69,7 @@ export default class SightingScreen extends React.Component {
           {Object.keys(objects).sort().reverse().map((day) => {
             let date = new Date(day);
             let phase = moon.phase(date);
-            let moonImage = moon.image(phase);
+            let moonImage = moon.image(phase.name);
             return (
               <View key={day}>
                 <View style={style.sightingButton}>

@@ -67,12 +67,12 @@ export default class ConfigScreen extends React.Component {
               style={{ width: '100%' }}
               itemStyle={{ height: 80 }}
               onValueChange={(itemValue, itemIndex) => this.pickLookbackDays(itemValue)}>
-              <Picker.Item label="past 2 weeks" value="14" />
-              <Picker.Item label="past month" value="30" />
-              <Picker.Item label="past 3 months" value="90" />
-              <Picker.Item label="past 6 months" value="180" />
-              <Picker.Item label="past year" value="360" />
-              <Picker.Item label="past 2 years" value="720" />
+              <Picker.Item label="last 2 weeks" value="14" />
+              <Picker.Item label="last month" value="30" />
+              <Picker.Item label="last 3 months" value="90" />
+              <Picker.Item label="last 6 months" value="180" />
+              <Picker.Item label="last year" value="360" />
+              <Picker.Item label="last 2 years" value="720" />
               <Picker.Item label="all time" value="0" />
             </Picker>
             <Text style={style.t1}>Only see results within the specified time range.</Text>

@@ -20,6 +20,7 @@ import RNFS from 'react-native-fs';
 
 import Moment from 'moment';
 
+import MoonPhase from './MoonPhase';
 import SwipeRow from './SwipeRow';
 import Database from './Database';
 
@@ -29,6 +30,7 @@ import { detectorUrl, detectorUsername, detectorPassword } from './config';
 
 import base64 from 'react-native-base64';
 
+const moon = new MoonPhase();
 const root = RNFS.DocumentDirectoryPath;
 
 export default class BatchScreen extends React.Component {
@@ -59,12 +61,8 @@ export default class BatchScreen extends React.Component {
     this.focusListener = this.props.navigation.addListener('didFocus', () => { this.fetchConfig(); });
   }
 
-
   componentWillUnmount() {
     this.focusListener.remove();
-  }
-
-  componentWillUnmount() {
     clearInterval(this.checkUploads);
     clearInterval(this.checkProcess);
   }
@@ -294,7 +292,9 @@ export default class BatchScreen extends React.Component {
               return;
             }
             let r = JSON.parse(data.responseBody);
-            this.db.updatePhoto(photoId, r.upload_id, r.time, r.width, r.height).then((uploadedPhoto) => {
+            let phase = moon.phase(new Date(Moment(r.time)));
+            console.log(`moon phase for time ${r.time} is ${phase.name}`);
+            this.db.updatePhoto(photoId, r.upload_id, r.time, phase.name, r.width, r.height).then((uploadedPhoto) => {
               let batchId = uploadedPhoto['batch_id'];
               this.setState(prevState => ({
                 batches: prevState.batches.map((batch) => {

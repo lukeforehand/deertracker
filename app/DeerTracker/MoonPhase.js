@@ -145,8 +145,8 @@ export default class MoonPhase {
 
     }
 
-    image(phase) {
-        let name = phase.name;
+    image(phase_name) {
+        let name = phase_name;
         switch (name) {
             case 'Waxing Gibbous': return require('./assets/images/moons/moon_waxg.png');
             case 'Waxing Crescent': return require('./assets/images/moons/moon_waxc.png');
