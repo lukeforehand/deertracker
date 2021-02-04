@@ -105,7 +105,8 @@ export default class BatchScreen extends React.Component {
                 key={batch['id']}
                 item={batch}
                 onDelete={this.deleteBatch.bind(this)}
-                onArchive={this.archiveBatch.bind(this)}>
+              //onArchive={this.archiveBatch.bind(this)}
+              >
                 <TouchableOpacity
                   key={batch['id']}
                   style={style.locationButton}

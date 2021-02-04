@@ -109,7 +109,7 @@ export default class ProfileScreen extends React.Component {
                 <Image source={{ uri: crop.profile_path }} style={{ width: crop.profile_width, height: crop.profile_height }} />
               </View>
               <View style={{ alignItems: 'center' }}>
-                <View style={{ flexDirection: 'row' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Icon style={{ paddingLeft: 15 }} name='eye' color='black' size={18} />
                   <Text style={style.t5}>{profile.objects.length} Sightings</Text>
                 </View>

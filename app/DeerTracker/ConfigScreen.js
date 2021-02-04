@@ -60,28 +60,28 @@ export default class ConfigScreen extends React.Component {
           </View>
           <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
             <View style={style.config}>
-              <Text style={style.h2}>Data will be archived</Text>
+              <Text style={style.h2}>Time Range Filter</Text>
             </View>
             <Picker
               selectedValue={config.get('lookback_days')}
               style={{ width: '100%' }}
               itemStyle={{ height: 80 }}
               onValueChange={(itemValue, itemIndex) => this.pickLookbackDays(itemValue)}>
-              <Picker.Item label="after 2 weeks" value="14" />
-              <Picker.Item label="after 1 month" value="30" />
-              <Picker.Item label="after 3 months" value="90" />
-              <Picker.Item label="after 6 months" value="180" />
-              <Picker.Item label="after 1 year" value="360" />
-              <Picker.Item label="after 2 years" value="720" />
-              <Picker.Item label="Never" value="0" />
+              <Picker.Item label="past 2 weeks" value="14" />
+              <Picker.Item label="past month" value="30" />
+              <Picker.Item label="past 3 months" value="90" />
+              <Picker.Item label="past 6 months" value="180" />
+              <Picker.Item label="past year" value="360" />
+              <Picker.Item label="past 2 years" value="720" />
+              <Picker.Item label="all time" value="0" />
             </Picker>
-            <Text style={style.t1}>Archive data will not be displayed or used in calculations.</Text>
+            <Text style={style.t1}>Only see results within the specified time range.</Text>
           </View>
           <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
             <View style={style.config}>
-              <Text style={style.h2}>Remove archive data</Text>
+              <Text style={style.h2}>Remove Data</Text>
             </View>
-            <View style={{ height: 15 }} />
+            <View style={{ height: 20 }} />
             <TouchableOpacity style={style.button} onPress={() => {
               Alert.alert(
                 'Delete ' + this.state.archive.length + ' photos?', '', [
@@ -123,8 +123,10 @@ export default class ConfigScreen extends React.Component {
             }}>
               <Text style={style.h1}>Delete {this.state.archive.length} Photos</Text>
             </TouchableOpacity>
-            <Text style={style.t1}>Delete archive data from device.</Text>
+            <View style={{ height: 10 }} />
+            <Text style={style.t1}>Remove unused data outside the time range.</Text>
           </View>
+          {/*
           <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
             <View style={style.config}>
               <Text style={style.h2}>Sync Archive</Text>
@@ -136,13 +138,16 @@ export default class ConfigScreen extends React.Component {
             </View>
             <Text style={style.t1}>Automatically copy archive data to cloud storage (Recommended).</Text>
           </View>
-          <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
-            <View style={style.config}>
-              <Text style={style.h2}>Google Drive Key</Text>
-              <TextInput secureTextEntry={true} style={style.h2}>{config.get('google_drive_key')}</TextInput>
+          {config.get('auto_archive') == 'true' &&
+            <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
+              <View style={style.config}>
+                <Text style={style.h2}>Google Drive Key</Text>
+                <TextInput secureTextEntry={true} style={style.h2}>{config.get('google_drive_key')}</TextInput>
+              </View>
+              <Text style={style.t1}>Provide Google Drive API Key</Text>
             </View>
-            <Text style={style.t1}>Provide Google Drive API Key</Text>
-          </View>
+          }
+        */}
         </ScrollView>
       </SafeAreaView >
     );

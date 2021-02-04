@@ -44,7 +44,7 @@ export default class Database {
             return r.rows.raw();
         })[0][0].value;
         let condition = '';
-        if (lookbackDays) {
+        if (lookbackDays > 0) {
             let start = Moment();
             start.subtract(lookbackDays, 'days');
             start = start.format('YYYY-MM-DD HH:mm:ss');
