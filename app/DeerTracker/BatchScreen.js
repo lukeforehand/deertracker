@@ -293,7 +293,6 @@ export default class BatchScreen extends React.Component {
             }
             let r = JSON.parse(data.responseBody);
             let phase = moon.phase(new Date(Moment(r.time)));
-            console.log(`moon phase for time ${r.time} is ${phase.name}`);
             this.db.updatePhoto(photoId, r.upload_id, r.time, phase.name, r.width, r.height).then((uploadedPhoto) => {
               let batchId = uploadedPhoto['batch_id'];
               this.setState(prevState => ({

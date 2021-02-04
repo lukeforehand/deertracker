@@ -112,32 +112,26 @@ export default class LocationScreen extends React.Component {
         'Import ' + files.length + ' photos from location ' + location['name'] + '?', '', [
         {
           text: 'Yes',
-          onPress: () => {
+          onPress: async () => {
             this.setState({ isLoading: true });
-            this.db.insertBatch(location['id']).then((rs) => {
-              let batchId = rs[0]['insertId'];
-              let relativePath = '.data/batch/' + batchId;
-              let destPath = root + '/' + relativePath;
-              RNFS.mkdir(destPath, { NSURLIsExcludedFromBackupKey: true }).then(() => {
-                Promise.all(files.map(async (file) => {
-                  return RNFS.hash(file.path, 'md5').then((hash) => {
-                    let relativeDestFile = relativePath + '/' + hash + '.jpg';
-                    this.db.insertPhoto(hash, relativeDestFile, location['lat'], location['lon'], batchId).then(() => {
-                      RNFS.copyFile(file.path, root + '/' + relativeDestFile);
-                    }).catch((error) => {
-                      console.log(error);
-                      console.log("deleting " + file.path);
-                      RNFS.unlink(file.path);
-                    });
-                  });
-                })).then(() => {
-                  this.db.selectBatches().then((batches) => {
-                    this.props.navigation.popToTop('LocationScreen');
-                    this.props.navigation.navigate('BatchScreen', {
-                      batches: batches
-                    });
-                  });
-                });
+            let batchId = await this.db.insertBatch(location['id']);
+            let relativePath = '.data/batch/' + batchId;
+            let destPath = root + '/' + relativePath;
+            await RNFS.mkdir(destPath, { NSURLIsExcludedFromBackupKey: true });
+            await Promise.all(files.map(async (file) => {
+              let hash = await RNFS.hash(file.path, 'md5');
+              let relativeDestFile = relativePath + '/' + hash + '.jpg';
+              try {
+                await this.db.insertPhoto(hash, relativeDestFile, location['lat'], location['lon'], batchId);
+                await RNFS.copyFile(file.path, root + '/' + relativeDestFile);
+              } catch (err) {
+                console.log(err);
+              }
+            }));
+            this.db.selectBatches().then((batches) => {
+              this.setState({ isLoading: false });
+              this.props.navigation.navigate('BatchScreen', {
+                batches: batches
               });
             });
           }

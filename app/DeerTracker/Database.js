@@ -28,9 +28,9 @@ export default class Database {
 
     async insertBatch(locationId) {
         const db = await SQLite.openDatabase({ name: database, location: location });
-        return await db.executeSql(
+        return (await db.executeSql(
             'INSERT INTO batch(id, time, location_id) VALUES(NULL, ?, ?)',
-            [Date.now(), locationId]);
+            [Date.now(), locationId]))[0].insertId;
     }
 
     async deleteBatch(id) {
@@ -170,32 +170,12 @@ export default class Database {
 
     async selectBatchPhotos(batchId) {
         const db = await SQLite.openDatabase({ name: database, location: location });
-        rs = await db.executeSql(`
-            SELECT p.batch_id, p.path as photo_path, p.width, p.height, p.time, o.*
-            FROM photo p LEFT OUTER JOIN object o ON o.photo_id = p.id
-            WHERE p.batch_id = ?
-        `, [batchId]);
-        let objects = rs.map((r) => {
+        return (await db.executeSql(`
+            SELECT p.id AS photo_id, p.batch_id, p.path as photo_path, p.width, p.height, p.time
+            FROM photo p WHERE p.batch_id = ?
+        `, [batchId])).map((r) => {
             return r.rows.raw();
         })[0];
-        let photos = {};
-        for (o of objects) {
-            let photo = photos[o.photo_id];
-            if (!photo) {
-                photo = {
-                    batch_id: o.batch_id,
-                    photo_id: o.photo_id,
-                    photo_path: o.photo_path,
-                    time: o.time,
-                    width: o.width,
-                    height: o.height,
-                    objects: []
-                };
-                photos[o.photo_id] = photo;
-            }
-            photo.objects.push(o);
-        }
-        return Object.values(photos);
     }
 
     async selectPhotosToReviewCount() {
@@ -249,7 +229,7 @@ export default class Database {
             ORDER BY day DESC
         )`;
         if (day && locationId) {
-            sql = sql + ` AND day = ? AND location_id = ?`;
+            sql = sql + ` WHERE day = ? AND location_id = ?`;
         }
 
         rs = await db.executeSql(sql, [day, locationId]);
