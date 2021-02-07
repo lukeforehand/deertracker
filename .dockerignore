@@ -1,4 +1,10 @@
-gcloud-config.json
+README.md
+*.pyc
+*.pyo
+*.pyd
+__pycache__
+.pytest_cache
+
 .data/
 *.egg-info/
 .vscode
@@ -6,6 +12,6 @@ __pycache__
 .DS_Store
 deertracker.err
 test/
-.data
+app/
 .tensorboard
 .mypy_cache

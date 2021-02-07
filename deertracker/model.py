@@ -2,13 +2,14 @@ from datetime import datetime
 import hashlib
 import io
 import json
+import multiprocessing
 import numpy as np
 import pathlib
 import tarfile
+import time
 
 from PIL import Image
 
-from PIL.ExifTags import TAGS, GPSTAGS
 
 from deertracker import (
     DEFAULT_CLASSIFIER_PATH,
@@ -19,8 +20,6 @@ from deertracker import (
 )
 
 LOGGER = logger.get_logger()
-EXIF_TAGS = dict(((v, k) for k, v in TAGS.items()))
-GPS_TAGS = dict(((v, k) for k, v in GPSTAGS.items()))
 
 
 class Detector:
@@ -235,10 +234,42 @@ def store_photo(filename, photo):
     return f"{filename}"
 
 
-def get_time(image):
-    try:
-        return datetime.strptime(
-            image.getexif()[EXIF_TAGS["DateTime"]], "%Y:%m:%d %H:%M:%S"
-        )
-    except KeyError:
-        return None
+def start_detector():
+    print(f"Starting detector service")
+    pool = multiprocessing.Pool(1)
+
+    detector = Detector()
+    print(f"Detector service started")
+
+    while True:
+        with database.conn() as db:
+            photos = db.select_unprocessed_photos()
+        if len(photos) > 0:
+            print(f"processing {len(photos)} photos")
+        for photo in photos:
+            photo_path = DEFAULT_PHOTO_STORE / photo["path"]
+            image = Image.open(photo_path)
+            image = np.array(image)
+            now = datetime.now()
+            bboxes, labels, scores, label_arrays, score_arrays = detector.predict(
+                image, photo["id"]
+            )
+            print(
+                f"{photo['id']} {bboxes}, {labels}, {scores} {label_arrays} {score_arrays} took {datetime.now() - now} seconds"
+            )
+            pool.apply_async(
+                process_crops,
+                (
+                    bboxes,
+                    labels,
+                    scores,
+                    label_arrays,
+                    score_arrays,
+                    image,
+                    photo["lat"],
+                    photo["lon"],
+                    photo["time"],
+                    photo["id"],
+                ),
+            )
+        time.sleep(3)
