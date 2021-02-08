@@ -17,11 +17,11 @@ GPS_TAGS = dict(((v, k) for k, v in GPSTAGS.items()))
 
 def start(port, username, password):
     print(f"HTTP service starting on port {port}")
-    app = init_app(port, username, password)
+    app = init_app(username, password)
     app.run(host="0.0.0.0", port=port)
 
 
-def init_app(port, username, password):
+def init_app(username, password):
     app = Flask(__name__)
     app.config["BASIC_AUTH_FORCE"] = True
     app.config["BASIC_AUTH_USERNAME"] = username
@@ -31,10 +31,7 @@ def init_app(port, username, password):
     bucket = storage.Client().get_bucket(os.environ["BUCKET"])
     datastore_client = datastore.Client()
 
-    @app.route(
-        "/",
-        methods=["POST"],
-    )
+    @app.route("/", methods=["POST"])
     def post():
         lat = request.form["lat"]
         lon = request.form["lon"]
@@ -43,10 +40,7 @@ def init_app(port, username, password):
         print(f"sending response {photo}")
         return jsonify(photo)
 
-    @app.route(
-        "/<upload_id>",
-        methods=["GET"],
-    )
+    @app.route("/<upload_id>", methods=["GET"])
     def get(upload_id):
         key = datastore_client.key("photo", upload_id)
         photo = datastore_client.get(key)
@@ -55,10 +49,7 @@ def init_app(port, username, password):
         print(f"sending response {photo}")
         return jsonify(photo)
 
-    @app.route(
-        "/<upload_id>",
-        methods=["PUT"],
-    )
+    @app.route("/<upload_id>", methods=["PUT"])
     def put(upload_id):
         x = int(request.form["x"])
         y = int(request.form["y"])
@@ -69,9 +60,13 @@ def init_app(port, username, password):
 
         key = datastore_client.key("photo", upload_id)
         photo = datastore_client.get(key)
+        if photo is None:
+            raise NotFound()
         objects = photo["objects"]
         for obj in objects:
             if obj.x == x and obj.y == y and obj.w == w and obj.h == h:
+                file_path = f"ground_truth/{label}/{obj['id']}.jpg"
+                bucket.copy_blob(obj["path"], bucket, file_path)
                 obj["label"] = label
                 obj["score"] = score
                 datastore_client.put(photo)
@@ -121,7 +116,6 @@ def upload(bucket, datastore_client, image: bytes, lat, lon):
 
 
 app = init_app(
-    int(os.environ["PORT"]),
     os.environ["BASIC_AUTH_USERNAME"],
     os.environ["BASIC_AUTH_PASSWORD"],
 )

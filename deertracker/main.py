@@ -151,7 +151,7 @@ def export_data(training, assets, models):
         with database.conn() as db:
             print(db.training_dataset_report())
             total = db.training_dataset_count()
-            results = model.export_ground_truth()
+            results = photo.export_ground_truth()
         with click.progressbar(results, length=total) as progress:
             for _ in progress:
                 pass
@@ -174,7 +174,7 @@ def training_report():
 )
 def import_training_crops(crops, ground_truth):
     file_paths = find_files(crops)
-    imported_crops = model.import_training_crops(crops, file_paths, ground_truth)
+    imported_crops = photo.import_training_crops(crops, file_paths, ground_truth)
     with click.progressbar(imported_crops, length=len(file_paths)) as progress:
         for annotation in progress:
             if "error" in annotation:

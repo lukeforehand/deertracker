@@ -1,6 +1,6 @@
 import pathlib
 
-from deertracker import model
+from deertracker import photo
 
 
 def process_annotations(photos, image_ids, bboxes, classes, labels):
@@ -38,7 +38,7 @@ def process_annotations(photos, image_ids, bboxes, classes, labels):
             "bbox": bbox_map[image_id],
         }
         try:
-            yield model.process_annotation(
+            yield photo.process_annotation(
                 photos,
                 annotation["file_path"],
                 annotation["label"],
