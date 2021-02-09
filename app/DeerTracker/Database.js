@@ -231,7 +231,6 @@ export default class Database {
         if (day && locationId) {
             sql = sql + ` WHERE day = ? AND location_id = ?`;
         }
-
         rs = await db.executeSql(sql, [day, locationId]);
         let objects = rs.map((r) => {
             return r.rows.raw();
@@ -510,6 +509,8 @@ export default class Database {
 
     async insertObject(obj) {
         obj['time'] = Moment(obj['time']).format('YYYY-MM-DD HH:mm:ss');
+        obj['label_array'] = JSON.stringify(obj['label_array']);
+        obj['score_array'] = JSON.stringify(obj['score_array']);
         const db = await SQLite.openDatabase({ name: database, location: location });
         return await db.executeSql(
             `INSERT INTO object(id, x, y, w, h, lat, lon, time, label, label_array, score, score_array, reviewed, photo_id, location_id)
