@@ -64,9 +64,9 @@ def init_app(username, password):
             raise NotFound()
         objects = photo["objects"]
         for obj in objects:
-            if obj.x == x and obj.y == y and obj.w == w and obj.h == h:
-                file_path = f"ground_truth/{label}/{obj['id']}.jpg"
-                bucket.copy_blob(obj["path"], bucket, file_path)
+            if obj["x"] == x and obj["y"] == y and obj["w"] == w and obj["h"] == h:
+                blob = bucket.blob(obj["path"])
+                bucket.copy_blob(blob, bucket, f"ground_truth/{label}/{obj['id']}.jpg")
                 obj["label"] = label
                 obj["score"] = score
                 datastore_client.put(photo)

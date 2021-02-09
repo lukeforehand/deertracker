@@ -118,7 +118,6 @@ export default class ProfileListScreen extends React.Component {
   }
 
   deleteProfile(profile, callback) {
-    console.log(profile);
     Alert.alert(
       'Delete Profile ' + profile.profile_name + '?', '', [
       {
