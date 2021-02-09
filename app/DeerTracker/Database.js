@@ -452,6 +452,7 @@ export default class Database {
             let x = moon.find(x => x.moon_phase == m);
             return {
                 moon_phase: m,
+                label: m.slice(0, 1) + m.slice(m.indexOf(" ") + 1, m.indexOf(" ") + 2),
                 cnt: x ? x.cnt : 0,
                 prob: x ? x.prob : 0.0
             }

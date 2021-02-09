@@ -79,6 +79,7 @@ export default class ProfileScreen extends React.Component {
     let moonImage = moon.image(latest.moon_phase);
 
     const chartConfig = {
+      barPercentage: 0.75,
       fillShadowGradientOpacity: 1,
       fillShadowGradient: 'rgb(255, 103, 0)',
       backgroundGradientFrom: 'white',
@@ -114,7 +115,7 @@ export default class ProfileScreen extends React.Component {
                 </View>
                 <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20, alignItems: 'center' }}>
                   <Text style={[style.t5, { flex: 1 }]}>Last seen {Moment(new Date() - Moment(latest.time)).format('D')} days ago at {latest.location_name} on {Moment(latest.time).format('dddd')} {Moment(latest.time).format('A') === 'AM' ? 'Before Noon' : 'After Noon'} during a {latest.moon_phase}</Text>
-                  <Image style={{ width: 100, height: 100 }} source={moonImage} />
+                  <Image style={[style.moon, { width: 100, height: 100 }]} source={moonImage} />
                 </View>
                 <Text style={style.t5}>Best chance at {profile.stats.all[0].location} on {profile.stats.all[0].weekday} {profile.stats.all[0].ampm} during a {profile.stats.all[0].moon_phase}</Text>
               </View>
@@ -143,6 +144,7 @@ export default class ProfileScreen extends React.Component {
               </View>
                 */}
               <View style={{ alignItems: 'center' }}>
+                <Text>Week Day</Text>
                 <BarChart
                   data={{
                     labels: profile.stats.weekday.map((w) => w.weekday),
@@ -159,11 +161,12 @@ export default class ProfileScreen extends React.Component {
                     borderWidth: 1,
                     borderColor: 'gray',
                     borderRadius: 10,
-                    paddingRight: -5
+                    paddingRight: 0
                   }}
                 />
               </View>
               <View style={{ alignItems: 'center' }}>
+                <Text>Time of Day</Text>
                 <PieChart
                   data={profile.stats.ampm.map((x) => {
                     return {
@@ -174,17 +177,22 @@ export default class ProfileScreen extends React.Component {
                       legendFontSize: 14
                     }
                   })}
-                  width={screenWidth}
+                  width={screenWidth - 10}
                   height={100}
                   chartConfig={chartConfig}
                   accessor={'count'}
                   center={[30, 0]}
                   style={{
-                    marginRight: 40,
+                    borderWidth: 1,
+                    borderColor: 'gray',
+                    borderRadius: 10,
+                    paddingRight: 0
+
                   }}
                 />
               </View>
               <View style={{ alignItems: 'center' }}>
+                <Text>Location</Text>
                 <BarChart
                   data={{
                     labels: profile.stats.location.map((w) => w.location),
@@ -201,14 +209,23 @@ export default class ProfileScreen extends React.Component {
                     borderWidth: 1,
                     borderColor: 'gray',
                     borderRadius: 10,
-                    paddingRight: -5
+                    paddingRight: 0
                   }}
                 />
               </View>
               <View style={{ alignItems: 'center' }}>
+                <Text>Moon Phase</Text>
+                <View style={{ flexDirection: 'row' }}>
+                  {profile.stats.moon.map((m) => {
+                    let moonLabel = moon.image(m.moon_phase);
+                    return (
+                      <Image style={[style.moon, { width: (screenWidth - 10) / 8, height: (screenWidth - 10) / 8 }]} source={moonLabel} />
+                    );
+                  })}
+                </View>
                 <BarChart
                   data={{
-                    labels: profile.stats.moon.map((m) => m.moon_phase),
+                    labels: profile.stats.moon.map((m) => m.label),
                     datasets: [{ data: profile.stats.moon.map((m) => (m.cnt)) }]
                   }}
                   fromZero={true}
@@ -222,7 +239,7 @@ export default class ProfileScreen extends React.Component {
                     borderWidth: 1,
                     borderColor: 'gray',
                     borderRadius: 10,
-                    paddingRight: -5
+                    paddingRight: 0
                   }}
                 />
               </View>

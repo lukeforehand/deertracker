@@ -76,7 +76,7 @@ export default class SightingScreen extends React.Component {
                   <Text style={style.h6}>
                     {Moment(date).format('ddd, MMM Do YYYY')}
                   </Text>
-                  <Image style={{ width: 45, height: 45 }} source={moonImage} />
+                  <Image style={[style.moon, { width: 45, height: 45 }]} source={moonImage} />
                 </View>
                 <View>
                   {Object.keys(objects[day]).map((locationId) => {

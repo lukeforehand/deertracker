@@ -238,9 +238,7 @@ export default StyleSheet.create({
     backgroundColor: 'rgba(255, 103, 0, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
+    height: 40
   },
   input: {
     borderColor: 'gray',
@@ -346,5 +344,12 @@ export default StyleSheet.create({
   picker: {
     backgroundColor: 'black',
     height: 180
+  },
+  moon: {
+    borderRadius: 50, shadowColor: '#000',
+    shadowOpacity: 1.0,
+    shadowOffset: { width: 0, height: 0 },
+    shadowRadius: 5
   }
+
 });
