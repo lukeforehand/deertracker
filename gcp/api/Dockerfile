@@ -19,4 +19,4 @@ RUN echo $PYTHONPATH
 
 # For environments with multiple CPU cores, increase the number of workers
 # to be equal to the cores available.
-CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 deertracker.server:app
+CMD exec gunicorn --bind :$PORT --workers 4 --threads 1 --timeout 0 deertracker.server:app
