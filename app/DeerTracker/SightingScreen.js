@@ -71,8 +71,8 @@ export default class SightingScreen extends React.Component {
             let phase = moon.phase(date);
             let moonImage = moon.image(phase.name);
             return (
-              <View key={day}>
-                <View style={style.sightingButton}>
+              <View key={day} style={style.sightingButton}>
+                <View style={style.itemHeader}>
                   <Text style={style.h6}>
                     {Moment(date).format('ddd, MMM Do YYYY')}
                   </Text>
@@ -87,7 +87,7 @@ export default class SightingScreen extends React.Component {
                       <View key={locationId}>
                         <TouchableOpacity
                           key={photo.photo_path}
-                          style={style.locationButton}
+                          style={[style.locationButton, { borderTopLeftRadius: 0, borderTopRightRadius: 0, borderWidth: 0 }]}
                           onPress={() => { this.getPhotos(day, location.location_id) }}>
                           <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                             <View style={{ flex: 1 }}>
@@ -133,7 +133,8 @@ export default class SightingScreen extends React.Component {
             );
           })}
         </ScrollView>
-        {this.state.newSightings > 0 &&
+        {
+          this.state.newSightings > 0 &&
           <TouchableOpacity style={style.highlightButton} onPress={() => { this.getPhotosToReview() }}>
             <Text style={style.highlightButtonText}>Review {this.state.newSightings} New Sightings</Text>
           </TouchableOpacity>

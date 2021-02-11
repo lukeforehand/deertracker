@@ -109,9 +109,11 @@ export default class BatchScreen extends React.Component {
                   key={batch['id']}
                   style={style.locationButton}
                   onPress={() => { this.getPhotos(batch) }}>
-                  <Text style={style.h3}>
-                    {Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY hh:mm A')}
-                  </Text>
+                  <View style={style.itemHeader}>
+                    <Text style={style.h3}>
+                      {Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY hh:mm A')}
+                    </Text>
+                  </View>
                   <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', margin: 10 }}>
                       <Image source={require('./assets/images/crosshairs.png')} style={{ width: 25, height: 25 }} />

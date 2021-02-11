@@ -32,11 +32,11 @@ export default StyleSheet.create({
   },
   h3: {
     color: '#e3e8e8',
-    backgroundColor: '#4E603E',
     textAlign: 'left',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
     fontSize: 16,
-    padding: 10
+    padding: 10,
+    borderRadius: 10,
   },
   h4: {
     color: '#e3e8e8',
@@ -245,6 +245,13 @@ export default StyleSheet.create({
     borderWidth: 1,
     padding: 10
   },
+  itemHeader: {
+    backgroundColor: '#4E603E',
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   locationButton: {
     shadowColor: '#000',
     shadowOpacity: 0.5,
@@ -252,7 +259,7 @@ export default StyleSheet.create({
     elevation: 10,
     borderRadius: 10,
     backgroundColor: 'white',
-    borderColor: 'gray',
+    borderColor: 'black',
     borderWidth: 1
   },
   sightingButton: {
@@ -260,10 +267,10 @@ export default StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 10,
     elevation: 10,
-    backgroundColor: '#4E603E',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    borderColor: 'black',
+    borderWidth: 1
   },
   highlightButton: {
     borderRadius: 10,
