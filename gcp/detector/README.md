@@ -19,6 +19,7 @@ docker run -it \
 ### deploy
 
 ```bash
-docker push gcr.io/deertracker/detector
-gcloud run deploy --image gcr.io/deertracker/detector --platform managed
+docker build -t gcr.io/deertracker/detector -f ./gcp/detector/Dockerfile . && \
+docker push gcr.io/deertracker/detector && \
+gcloud run deploy detector --image gcr.io/deertracker/detector --platform managed
 ```

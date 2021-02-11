@@ -38,8 +38,18 @@ def init_app(username, password):
         if user is None:
             user = datastore.Entity(key=key)
             user["subscription"] = "free"
+            user["photo_credits"] = 1000
+            user["photo_credits_left"] = 1000
             datastore_client.put(user)
         return jsonify(user)
+
+    @app.route("/user/<device_id>", methods=["PUT"])
+    def user_put(device_id):
+        photo_credits_left = int(request.form["photo_credits_left"])
+        key = datastore_client.key("user", device_id)
+        user = datastore_client.get(key)
+        user["photo_credits_left"] = photo_credits_left
+        datastore_client.put(user)
 
     @app.route("/", methods=["POST"])
     def post():

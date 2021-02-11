@@ -7,6 +7,25 @@ const deviceId = DeviceInfo.getUniqueId();
 
 export default class User {
 
+    static async setPhotoCreditsLeft(photoCreditsLeft) {
+        try {
+            const formData = new FormData();
+            formData.append('photo_credits_left', photoCreditsLeft);
+            let response = await fetch(api.url + '/user/' + deviceId, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': 'Basic ' + base64.encode(api.username + ":" + api.password)
+                },
+                body: formData
+            });
+            if (response.status !== 200) {
+                console.log(JSON.stringify(response));
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
     static async getUser() {
         try {
             let response = await fetch(api.url + '/user/' + deviceId, {
