@@ -24,7 +24,7 @@ import Moment from 'moment';
 import Database from './Database';
 import style, { screenWidth, screenHeight, thumbWidth, thumbHeight, headerHeight } from './style';
 
-import { detectorUrl, detectorUsername, detectorPassword } from './config';
+import { api } from './config';
 
 import base64 from 'react-native-base64';
 
@@ -346,10 +346,10 @@ export default class PhotoGallery extends React.Component {
             formData.append('h', object.h);
             formData.append('label', object.label);
             formData.append('score', object.score);
-            fetch(detectorUrl + '/' + object.upload_id, {
+            fetch(api.url + '/' + object.upload_id, {
                 method: 'PUT',
                 headers: {
-                    'Authorization': 'Basic ' + base64.encode(detectorUsername + ":" + detectorPassword)
+                    'Authorization': 'Basic ' + base64.encode(api.username + ":" + api.password)
                 },
                 body: formData
             }).then((response) => {

@@ -2,9 +2,9 @@
 
 add config.js
 ```js
-export const detectorUrl = "https://detector:5000";
-export const detectorUsername = "username";
-export const detectorPassword = "password";
+export const apiUrl = "http://localhost:8080";
+export const apiUsername = "username";
+export const apiPassword = "password";
 ```
 
 

@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   Alert,
   Text,
-  TextInput,
   View,
   Switch,
   ScrollView,
@@ -18,6 +17,8 @@ import RNFS from 'react-native-fs';
 import Database from './Database';
 
 import style from './style';
+
+import User from './User';
 
 const root = RNFS.DocumentDirectoryPath;
 
@@ -167,12 +168,15 @@ export default class ConfigScreen extends React.Component {
 
   fetchData() {
     this.db.selectConfig().then((config) => {
-      this.db.selectArchive().then((archive) => {
-        this.setState({
-          config: config,
-          archive: archive
+      User.getUser().then((user) => {
+        this.db.selectArchive().then((archive) => {
+          this.setState({
+            config: config,
+            user: user,
+            archive: archive
+          });
         });
-      });
+      })
     }).catch((error) => {
       console.log(error);
     });

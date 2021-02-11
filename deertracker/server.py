@@ -31,6 +31,16 @@ def init_app(username, password):
     bucket = storage.Client().get_bucket(os.environ["BUCKET"])
     datastore_client = datastore.Client()
 
+    @app.route("/user/<device_id>", methods=["GET"])
+    def user_get(device_id):
+        key = datastore_client.key("user", device_id)
+        user = datastore_client.get(key)
+        if user is None:
+            user = datastore.Entity(key=key)
+            user["subscription"] = "free"
+            datastore_client.put(user)
+        return jsonify(user)
+
     @app.route("/", methods=["POST"])
     def post():
         lat = request.form["lat"]

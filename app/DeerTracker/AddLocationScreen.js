@@ -43,7 +43,7 @@ export default class AddLocationScreen extends React.Component {
               ref={ref => { this.map = ref; }}
               style={{ ...StyleSheet.absoluteFillObject }}
               showsUserLocation={true}
-              mapType="satellite"
+              mapType="hybrid"
               initialRegion={this.state.region}
               onMapReady={() => {
                 if (locations.length > 0) {

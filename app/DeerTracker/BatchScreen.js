@@ -26,7 +26,7 @@ import Database from './Database';
 
 import style from './style';
 
-import { detectorUrl, detectorUsername, detectorPassword } from './config';
+import { api } from './config';
 
 import base64 from 'react-native-base64';
 
@@ -172,10 +172,10 @@ export default class BatchScreen extends React.Component {
       for (p of photos) {
         let photo = p;
         try {
-          let response = await fetch(detectorUrl + '/' + photo['upload_id'], {
+          let response = await fetch(api.url + '/' + photo['upload_id'], {
             method: 'GET',
             headers: {
-              'Authorization': 'Basic ' + base64.encode(detectorUsername + ":" + detectorPassword)
+              'Authorization': 'Basic ' + base64.encode(api.username + ":" + api.password)
             }
           });
           console.log(photo['id'] + ' GET ' + response.status);
@@ -263,10 +263,10 @@ export default class BatchScreen extends React.Component {
         let photo = p;
         Upload.cancelUpload(photo['id']);
         Upload.startUpload({
-          url: detectorUrl,
+          url: api.url,
           path: root + '/' + photo['path'],
           headers: {
-            'Authorization': 'Basic ' + base64.encode(detectorUsername + ":" + detectorPassword)
+            'Authorization': 'Basic ' + base64.encode(api.username + ":" + api.password)
           },
           type: 'multipart',
           customUploadId: photo['id'],
