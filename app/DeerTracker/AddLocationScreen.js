@@ -19,7 +19,7 @@ import MapView, { Marker } from 'react-native-maps';
 
 import Database from './Database';
 
-import style from './style';
+import style, { screenWidth, screenHeight } from './style';
 
 export default class AddLocationScreen extends React.Component {
 
@@ -44,15 +44,15 @@ export default class AddLocationScreen extends React.Component {
               style={{ ...StyleSheet.absoluteFillObject }}
               showsUserLocation={true}
               mapType="satellite"
-              region={this.state.region}
+              initialRegion={this.state.region}
               onMapReady={() => {
                 if (locations.length > 0) {
                   this.map.fitToCoordinates(
                     locations.map(location => ({ latitude: location.lat, longitude: location.lon })),
-                    { edgePadding: { top: 100, right: 120, bottom: 100, left: 120 }, animated: true })
+                    { edgePadding: { top: 120, right: 120, bottom: 120, left: 120 }, animated: true })
                 }
               }}
-              onDoublePress={(ev) => { this.map.animateCamera({ center: ev.nativeEvent.coordinate }) }}
+              //onDoublePress={(ev) => { this.map.animateCamera({ center: ev.nativeEvent.coordinate }) }}
               onRegionChangeComplete={(region) => { this.setState({ region: region }) }}>
               {locations.map((location) => {
                 return (
@@ -91,7 +91,7 @@ export default class AddLocationScreen extends React.Component {
                   if (locations.length > 0) {
                     this.map.fitToCoordinates(
                       locations.map(location => ({ latitude: location.lat, longitude: location.lon })),
-                      { edgePadding: { top: 100, right: 120, bottom: 100, left: 120 }, animated: true })
+                      { edgePadding: { top: 120, right: 120, bottom: 120, left: 120 }, animated: true })
                   }
                 }}>
                   <Icon name='eye' color={style.locationArrow.color} size={15} />
@@ -153,14 +153,19 @@ export default class AddLocationScreen extends React.Component {
   }
 
   getCurrentPosition() {
+
+    let ASPECT_RATIO = screenWidth / screenHeight;
+    let LATITUDE_DELTA = 0.0922;
+    let LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+
     Geolocation.getCurrentPosition(
       (position) => {
         this.setState({
           region: {
             latitude: parseFloat(position.coords.latitude),
             longitude: parseFloat(position.coords.longitude),
-            latitudeDelta: 0.001,
-            longitudeDelta: 0.001
+            latitudeDelta: LATITUDE_DELTA,
+            longitudeDelta: LONGITUDE_DELTA
           }
         });
         this.map.animateCamera({ center: position.coords });

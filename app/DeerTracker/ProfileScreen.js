@@ -219,7 +219,7 @@ export default class ProfileScreen extends React.Component {
                   {profile.stats.moon.map((m) => {
                     let moonLabel = moon.image(m.moon_phase);
                     return (
-                      <Image style={[style.moon, { width: (screenWidth - 10) / 8, height: (screenWidth - 10) / 8 }]} source={moonLabel} />
+                      <Image key={m.moon_phase} style={[style.moon, { width: (screenWidth - 10) / 8, height: (screenWidth - 10) / 8 }]} source={moonLabel} />
                     );
                   })}
                 </View>
@@ -261,7 +261,7 @@ export default class ProfileScreen extends React.Component {
                     if (profile.stats.location.length > 1) {
                       this.map.fitToCoordinates(
                         profile.stats.location.map(location => ({ latitude: location.lat, longitude: location.lon })),
-                        { edgePadding: { top: 100, right: 120, bottom: 100, left: 120 }, animated: true })
+                        { edgePadding: { top: 120, right: 120, bottom: 120, left: 120 }, animated: true })
                     } else {
                       let location = profile.stats.location[0];
                       this.map.animateCamera({ center: { latitude: location.lat, longitude: location.lon } });
@@ -309,12 +309,17 @@ export default class ProfileScreen extends React.Component {
     statsPromise.then((stats) => {
       profile.stats = stats;
       let location = profile.stats.location[0];
+
+      let ASPECT_RATIO = screenWidth / screenHeight;
+      let LATITUDE_DELTA = 0.0922;
+      let LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+
       this.setState({
         region: {
           latitude: parseFloat(location.lat),
           longitude: parseFloat(location.lon),
-          latitudeDelta: 0.001,
-          longitudeDelta: 0.001
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA
         }
       });
 
