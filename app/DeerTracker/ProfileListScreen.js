@@ -136,6 +136,15 @@ export default class ProfileListScreen extends React.Component {
     this.db.selectProfiles().then((profiles) => {
       this.db.selectClasses().then((classes) => {
         profiles = profiles.concat(classes);
+        profiles.map((profile) => {
+          profile.objects.map((photo) => {
+            photo.url = root + '/' + photo.photo_path;
+            photo.props = {
+              photo: photo
+            };
+            photo.objects = [photo];
+          });
+        });
         this.setState({
           isLoading: false,
           profiles: profiles

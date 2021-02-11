@@ -80,10 +80,11 @@ export default class PhotoGallery extends React.Component {
                                     animationType='slide'
                                     transparent={true}>
                                     <TouchableOpacity style={style.shareButton} onPress={() => {
+                                        let photo = photos[imageIndex];
                                         Share.open({
                                             title: 'Photo',
-                                            message: 'Share photo',
-                                            url: photos[imageIndex].photo_path
+                                            message: `Check out this ${photo.label} photo taken at ${photo.location_name}`,
+                                            url: photo.photo_path
                                         }).then((res) => {
                                             cancel();
                                         }).catch((err) => {

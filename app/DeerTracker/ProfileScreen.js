@@ -65,15 +65,7 @@ export default class ProfileScreen extends React.Component {
     const profile = this.state.profile;
 
     let crop = profile.crop;
-    let photos = profile.objects.map((photo) => {
-      photo.photo_path = root + '/' + photo.photo_path;
-      photo.url = photo.photo_path;
-      photo.props = {
-        photo: photo
-      };
-      photo.objects = [photo];
-      return photo;
-    });
+    let photos = profile.objects;
 
     let latest = photos[0];
     let moonImage = moon.image(latest.moon_phase);
@@ -111,7 +103,7 @@ export default class ProfileScreen extends React.Component {
               <View style={{ alignItems: 'center' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Icon style={{ paddingLeft: 15 }} name='eye' color='black' size={18} />
-                  <Text style={style.t5}>{profile.objects.length} Sightings</Text>
+                  <Text style={style.t5}>{photos.length} Sightings</Text>
                 </View>
                 <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20, alignItems: 'center' }}>
                   <Text style={[style.t5, { flex: 1 }]}>Last seen {Moment(new Date() - Moment(latest.time)).format('D')} days ago at {latest.location_name} on {Moment(latest.time).format('dddd')} {Moment(latest.time).format('A') === 'AM' ? 'Before Noon' : 'After Noon'} during a {latest.moon_phase}</Text>

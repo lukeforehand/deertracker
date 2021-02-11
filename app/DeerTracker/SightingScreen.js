@@ -71,7 +71,7 @@ export default class SightingScreen extends React.Component {
             let phase = moon.phase(date);
             let moonImage = moon.image(phase.name);
             return (
-              <View key={day} style={style.sightingButton}>
+              <View key={day} style={style.locationButton}>
                 <View style={style.itemHeader}>
                   <Text style={style.h6}>
                     {Moment(date).format('ddd, MMM Do YYYY')}

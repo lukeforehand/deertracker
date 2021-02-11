@@ -36,7 +36,6 @@ export default StyleSheet.create({
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
     fontSize: 16,
     padding: 10,
-    borderRadius: 10,
   },
   h4: {
     color: '#e3e8e8',
@@ -61,7 +60,7 @@ export default StyleSheet.create({
     textAlign: 'left',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
     fontSize: 16,
-    padding: 10
+    padding: 10,
   },
   t1: {
     color: 'black',
@@ -259,16 +258,6 @@ export default StyleSheet.create({
     elevation: 10,
     borderRadius: 10,
     backgroundColor: 'white',
-    borderColor: 'black',
-    borderWidth: 1
-  },
-  sightingButton: {
-    shadowColor: '#000',
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    elevation: 10,
-    backgroundColor: 'white',
-    borderRadius: 10,
     borderColor: 'black',
     borderWidth: 1
   },
