@@ -15,7 +15,6 @@ import RNFS from 'react-native-fs';
 
 import Database from './Database';
 import SwipeRow from './SwipeRow';
-import User from './User';
 
 import style from './style';
 
@@ -115,13 +114,6 @@ export default class LocationScreen extends React.Component {
           text: 'Yes',
           onPress: async () => {
             this.setState({ isLoading: true });
-            let user = await User.getUser();
-            let credits = user.photo_credits;
-            if (credits < files.length) {
-              alert(`You have reached your photo processing limit, upgrade your subscription to continue.`);
-              this.setState({ isLoading: false });
-              return;
-            }
             let batchId = await this.db.insertBatch(location['id']);
             let relativePath = '.data/batch/' + batchId;
             let destPath = root + '/' + relativePath;
@@ -136,7 +128,6 @@ export default class LocationScreen extends React.Component {
                 console.log(err);
               }
             }));
-            User.setPhotoCreditsLeft(credits - files.length);
             this.db.selectBatches().then((batches) => {
               this.setState({ isLoading: false });
               this.props.navigation.navigate('BatchScreen', {

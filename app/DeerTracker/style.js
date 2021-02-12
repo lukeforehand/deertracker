@@ -206,6 +206,16 @@ export default StyleSheet.create({
     borderColor: 'gray',
     borderWidth: 1
   },
+  subscribeModal: {
+    borderRadius: 10,
+    marginTop: 120,
+    marginLeft: 10,
+    marginRight: 10,
+    backgroundColor: 'white',
+    borderColor: 'gray',
+    borderWidth: 1,
+    padding: 10
+  },
   profileModal: {
     borderRadius: 10,
     marginTop: 60,
@@ -282,6 +292,18 @@ export default StyleSheet.create({
     textAlign: 'center',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
     fontSize: 16,
+  },
+  subscribeButton: {
+    borderRadius: 10,
+    margin: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 10,
+    backgroundColor: 'rgba(255, 103, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 40,
   },
   thumbnail: {
     borderWidth: 1,

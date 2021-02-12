@@ -50,6 +50,8 @@ def init_app(username, password):
         user = datastore_client.get(key)
         user["photo_credits_left"] = photo_credits_left
         datastore_client.put(user)
+        print(f"sending response {user}")
+        return jsonify(user)
 
     @app.route("/", methods=["POST"])
     def post():

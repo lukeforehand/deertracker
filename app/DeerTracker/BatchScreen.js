@@ -8,7 +8,9 @@ import {
   Text,
   Image,
   View,
+  Modal,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   RefreshControl
 } from 'react-native';
 
@@ -23,6 +25,7 @@ import Moment from 'moment';
 import MoonPhase from './MoonPhase';
 import SwipeRow from './SwipeRow';
 import Database from './Database';
+import User from './User';
 
 import style from './style';
 
@@ -95,6 +98,24 @@ export default class BatchScreen extends React.Component {
         }>
           {batches && batches.length <= 0 &&
             <Text style={style.t3}>No photos, load card or pull down to refresh</Text>
+          }
+          {this.state.resubscribe &&
+            <TouchableOpacity style={style.subscribeButton} onPress={() => { this.setState({ subscribeVisible: true }) }}>
+              <Text style={style.highlightButtonText}>No credits left</Text>
+            </TouchableOpacity>
+          }
+          {this.state.subscribeVisible &&
+            <Modal
+              animationType='slide'
+              transparent={true}
+              visible={this.state.subscribeVisible}>
+              <View style={style.subscribeModal}>
+                <Text>TODO: ability to subscribe here</Text>
+              </View>
+              <TouchableWithoutFeedback onPress={() => { this.setState({ subscribeVisible: false }) }}>
+                <View style={{ flex: 1 }} />
+              </TouchableWithoutFeedback>
+            </Modal>
           }
           {batches.map((batch) => {
             let progress = parseInt(100 * ((batch['num_uploaded'] + batch['num_processed']) / (batch['num_photos'] * 2)));
@@ -252,13 +273,21 @@ export default class BatchScreen extends React.Component {
 
   async uploadPhotos() {
     if (this.state.photosToUpload <= 0) {
-      const photos = await this.db.selectPhotosToUpload();
+      let photos = await this.db.selectPhotosToUpload();
       if (photos.length == 0) {
         return;
       }
       this.setState({
         photosToUpload: photos.length
       });
+
+      let user = await User.getUser();
+      let credits = user.photo_credits_left;
+      photos = photos.slice(0, Math.min(credits, photos.length));
+      if (photos.length === 0) {
+        this.setState({ isLoading: false, resubscribe: true });
+        return;
+      }
       for (p of photos) {
         let photo = p;
         Upload.cancelUpload(photo['id']);
@@ -315,6 +344,7 @@ export default class BatchScreen extends React.Component {
           }));
         });
       }
+      User.setPhotoCreditsLeft(credits - photos.length);
     }
   }
 

@@ -1,5 +1,6 @@
 import DeviceInfo from 'react-native-device-info';
 import base64 from 'react-native-base64';
+import Moment from 'moment';
 
 import { api } from './config';
 
@@ -38,7 +39,14 @@ export default class User {
                 console.log(JSON.stringify(response));
                 return null;
             }
-            return await response.json();
+            let user = await response.json();
+            if ('expiration' in user) {
+                let now = new Date();
+                if (now > Moment(user.expiration)) {
+                    user.photo_credits_left = 0;
+                }
+            }
+            return user;
         } catch (err) {
             console.log(err);
             return null;
