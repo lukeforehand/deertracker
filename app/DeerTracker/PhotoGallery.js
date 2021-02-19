@@ -8,11 +8,11 @@ import {
     TouchableOpacity,
     TouchableWithoutFeedback,
     Image,
+    Share,
     StyleSheet,
 } from 'react-native';
 
 import { Picker } from '@react-native-picker/picker';
-import Share from 'react-native-share';
 import Swiper from 'react-native-swiper';
 
 import RNFS from 'react-native-fs';
@@ -81,9 +81,9 @@ export default class PhotoGallery extends React.Component {
                                     transparent={true}>
                                     <TouchableOpacity style={style.shareButton} onPress={() => {
                                         let photo = photos[imageIndex];
-                                        Share.open({
+                                        Share.share({
                                             title: 'Photo',
-                                            message: `Check out this ${photo.label} photo taken at ${photo.location_name}`,
+                                            message: `Check out this ${photo.label ? photo.label : ""} photo taken at ${photo.location_name}`,
                                             url: photo.photo_path
                                         }).then((res) => {
                                             cancel();
