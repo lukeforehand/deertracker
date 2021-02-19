@@ -58,7 +58,7 @@ export default class PhotoGallery extends React.Component {
                     imageUrls={photos}
                     index={imageIndex}
                     enableSwipeDown={true}
-                    enableImageZoom={false}
+                    enableImageZoom={true}
                     renderImage={this.renderImage.bind(this)}
                     onChange={(index) => {
                         if (this.props.showCrops) {
@@ -83,7 +83,7 @@ export default class PhotoGallery extends React.Component {
                                         let photo = photos[imageIndex];
                                         Share.share({
                                             title: 'Photo',
-                                            message: `Check out this ${photo.label ? photo.label : ""} photo taken at ${photo.location_name}`,
+                                            message: `Check out this ${photo.label ? photo.label + " " : ""}photo taken at ${photo.location_name}`,
                                             url: photo.photo_path
                                         }).then((res) => {
                                             cancel();
@@ -109,7 +109,7 @@ export default class PhotoGallery extends React.Component {
         let photo = props.photo;
         let time = photo.time ? Moment(photo.time).utc().format('ddd, MMM Do YYYY h:mm A') : ""
         let top = 0;
-        let titleHeight = 40;
+        let titleHeight = 32;
         props.style.top = -titleHeight;
         if (this.props.showCrops) {
             top = -photo.height * (screenWidth / photo.width) / 2 + titleHeight;

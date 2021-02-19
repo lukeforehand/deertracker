@@ -108,7 +108,8 @@ export default StyleSheet.create({
     fontFamily: 'Courier',
     paddingBottom: 10,
     paddingTop: 5,
-    paddingLeft: 10
+    paddingLeft: 10,
+    paddingRight: 10
   },
   t6: {
     color: 'gray',

@@ -39,7 +39,6 @@ export default class AddLocationScreen extends React.Component {
             style={{ ...StyleSheet.absoluteFillObject }}
             showsUserLocation={true}
             mapType="hybrid"
-            initialRegion={this.state.region}
             onRegionChange={(region) => {
               this.setState({ region: region });
             }}
