@@ -95,8 +95,7 @@ export default class ProfileListScreen extends React.Component {
                   <Text style={style.t5}>Last seen {Moment(new Date() - Moment(crop.time).utc()).format('D')} days ago</Text>
                 </View>
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-
-                  <Image source={{ uri: crop.photo_path }}
+                  <Image source={{ uri: root + '/' + crop.photo_path }}
                     style={{ width: parseInt(thumbWidth), height: parseInt(crop.height * ratio) }} />
                   <View style={{
                     ...StyleSheet.absoluteFillObject,
@@ -145,8 +144,7 @@ export default class ProfileListScreen extends React.Component {
         profiles = profiles.concat(classes);
         profiles.map((profile) => {
           profile.objects.map((photo) => {
-            photo.photo_path = root + '/' + photo.photo_path;
-            photo.url = photo.photo_path;
+            photo.url = root + '/' + photo.photo_path;
             photo.props = {
               photo: photo
             };

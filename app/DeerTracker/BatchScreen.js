@@ -111,7 +111,7 @@ export default class BatchScreen extends React.Component {
             </Modal>
           }
           {batches.map((batch) => {
-            let progress = parseInt(100 * ((batch['num_uploaded'] + batch['num_processed']) / (batch['num_photos'] * 2)));
+            let progress = parseInt(100 * ((batch.num_uploaded + batch.num_processed) / (batch.num_photos * 2)));
             return (
               <SwipeRow
                 key={batch['id']}
@@ -120,18 +120,18 @@ export default class BatchScreen extends React.Component {
               //onArchive={this.archiveBatch.bind(this)}
               >
                 <TouchableOpacity
-                  key={batch['id']}
+                  key={batch.id}
                   style={style.locationButton}
                   onPress={() => { this.getPhotos(batch) }}>
                   <View style={style.itemHeader}>
                     <Text style={style.h3}>
-                      {Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY h:mm A')}
+                      {Moment(batch.time).utc().format('ddd, MMM Do YYYY h:mm A')}
                     </Text>
                   </View>
                   <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', margin: 10 }}>
                       <Image source={require('./assets/images/crosshairs.png')} style={{ width: 25, height: 25 }} />
-                      <Text style={style.h2}>{batch['location_name']}</Text>
+                      <Text style={style.h2}>{batch.location_name}</Text>
                     </View>
                     {progress < 100 &&
                       <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end' }}>
@@ -144,24 +144,24 @@ export default class BatchScreen extends React.Component {
                     <View style={{ flex: 1 }}>
                       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
                         <Icon style={{ paddingLeft: 15 }} name='eye' color='black' size={18} />
-                        <Text style={style.t5}>{batch['num_objects']} Sightings</Text>
+                        <Text style={style.t5}>{batch.num_objects} Sightings</Text>
                       </View>
                       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
                         <Icon style={{ paddingLeft: 15 }} name='camera' color='black' size={18} />
-                        <Text style={style.t5}>{batch['num_photos']} Photos</Text>
+                        <Text style={style.t5}>{batch.num_photos} Photos</Text>
                       </View>
                       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
                         <Icon style={{ paddingLeft: 15 }} name='upload' color='black' size={18} />
-                        <Text style={style.t5}>{batch['num_uploaded']} Uploaded</Text>
+                        <Text style={style.t5}>{batch.num_uploaded} Uploaded</Text>
                       </View>
                       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
                         <Icon style={{ paddingLeft: 15 }} name='check' color='black' size={18} />
-                        <Text style={style.t5}>{batch['num_processed']} Processed</Text>
+                        <Text style={style.t5}>{batch.num_processed} Processed</Text>
                       </View>
                     </View>
                     <View>
-                      {batch['photo_path'] &&
-                        <Image source={{ uri: root + '/' + batch['photo_path'] }} style={style.smallThumbnail} />
+                      {batch.photo_path &&
+                        <Image source={{ uri: root + '/' + batch.photo_path }} style={style.smallThumbnail} />
                       }
                     </View>
                   </View>
@@ -186,13 +186,13 @@ export default class BatchScreen extends React.Component {
       for (p of photos) {
         let photo = p;
         try {
-          let response = await fetch(api.url + '/' + photo['upload_id'], {
+          let response = await fetch(api.url + '/' + photo.upload_id, {
             method: 'GET',
             headers: {
               'Authorization': 'Basic ' + base64.encode(api.username + ":" + api.password)
             }
           });
-          console.log(photo['id'] + ' GET ' + response.status);
+          console.log(photo.id + ' GET ' + response.status);
           if (response.status !== 200) {
             this.setState({
               photosToProcess: 0
@@ -200,53 +200,53 @@ export default class BatchScreen extends React.Component {
             return;
           }
           let r = await response.json();
-          console.log(photo['id'] + ' responseBody: ' + JSON.stringify(r));
+          console.log(photo.id + ' responseBody: ' + JSON.stringify(r));
           if (!Boolean(r.processed)) {
             this.setState({
               photosToProcess: 0
             });
             return;
           }
-          // FIXME: filter r.objects ON global exclusions list
+          // FIXME: filter r.objects ON global exclusions list?
           if (r.objects.length > 0) {
             for (o of r.objects) {
-              o['lat'] = photo['lat'];
-              o['lon'] = photo['lon'];
-              o['time'] = photo['time'];
-              o['photo_id'] = photo['id'];
-              o['location_id'] = photo['location_id'];
+              o.lat = photo.lat;
+              o.lon = photo.lon;
+              o.time = photo.time;
+              o.photo_id = photo.id;
+              o.location_id = photo.location_id;
               this.db.insertObject(o);
             }
           } else if (this.state.config.get('discard_empty') == 'true') {
             console.log(`discarding ${JSON.stringify(photo)}`);
-            let path = root + '/' + photo['path'];
+            let path = root + '/' + photo.path;
             console.log("deleting " + path);
             RNFS.unlink(path);
-            this.db.deletePhoto(photo['id']).then(() => {
-              let batchId = photo['batch_id'];
+            this.db.deletePhoto(photo.id).then(() => {
+              let batchId = photo.batch_id;
               this.setState(prevState => ({
                 batches: prevState.batches.map((batch) => {
-                  if (batch['id'] === batchId) {
-                    batch['num_photos'] = batch['num_photos'] - 1;
-                    batch['num_uploaded'] = batch['num_uploaded'] - 1;
-                    batch['num_processed'] = batch['num_processed'] - 1;
+                  if (batch.id === batchId) {
+                    batch.num_photos = batch.num_photos - 1;
+                    batch.num_uploaded = batch.num_uploaded - 1;
+                    batch.num_processed = batch.num_processed - 1;
                   }
                   return batch;
                 }).filter((batch) => {
                   // TODO VERIFY THIS WORKS
-                  return batch['num_photos'] > 0;
+                  return batch.num_photos > 0;
                 }),
                 photosToProcess: prevState.photosToProcess - 1
               }));
             });
           }
-          this.db.processPhoto(photo['id']).then(() => {
-            let batchId = photo['batch_id'];
+          this.db.processPhoto(photo.id).then(() => {
+            let batchId = photo.batch_id;
             this.setState(prevState => ({
               batches: prevState.batches.map((batch) => {
-                if (batch['id'] === batchId) {
-                  batch['num_processed'] = batch['num_processed'] + 1;
-                  batch['num_objects'] = batch['num_objects'] + r.objects.length;
+                if (batch.id === batchId) {
+                  batch.num_processed = batch.num_processed + 1;
+                  batch.num_objects = batch.num_objects + r.objects.length;
                 }
                 return batch;
               }),
@@ -286,19 +286,19 @@ export default class BatchScreen extends React.Component {
       }
       for (p of photos) {
         let photo = p;
-        Upload.cancelUpload(photo['id']);
+        Upload.cancelUpload(photo.id);
         Upload.startUpload({
           url: api.url,
-          path: root + '/' + photo['path'],
+          path: root + '/' + photo.path,
           headers: {
             'Authorization': 'Basic ' + base64.encode(api.username + ":" + api.password)
           },
           type: 'multipart',
-          customUploadId: photo['id'],
+          customUploadId: photo.id,
           field: 'image',
           parameters: {
-            'lat': photo['location_lat'],
-            'lon': photo['location_lon']
+            'lat': photo.location_lat,
+            'lon': photo.location_lon
           }
         }).then((photoId) => {
           Upload.addListener('error', photoId, (err) => {
@@ -321,11 +321,11 @@ export default class BatchScreen extends React.Component {
             let r = JSON.parse(data.responseBody);
             let phase = moon.phase(new Date(Moment(r.time)));
             this.db.updatePhoto(photoId, r.upload_id, r.time, phase.name, r.width, r.height).then((uploadedPhoto) => {
-              let batchId = uploadedPhoto['batch_id'];
+              let batchId = uploadedPhoto.batch_id;
               this.setState(prevState => ({
                 batches: prevState.batches.map((batch) => {
-                  if (batch['id'] === batchId) {
-                    batch['num_uploaded'] = batch['num_uploaded'] + 1;
+                  if (batch.id === batchId) {
+                    batch.num_uploaded = batch.num_uploaded + 1;
                   }
                   return batch;
                 }),
@@ -346,8 +346,8 @@ export default class BatchScreen extends React.Component {
 
   getPhotos(batch) {
     let batchId = batch['id'];
-    let title = Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY h:mm A');
-    let subTitle = batch['location_name'];
+    let title = Moment(new Date(batch.time)).format('ddd, MMM Do YYYY h:mm A');
+    let subTitle = batch.location_name;
     this.db.selectBatchPhotos(batchId).then((photos) => {
       if (photos.length > 0) {
         this.props.navigation.navigate('PhotoScreen', {
@@ -355,9 +355,8 @@ export default class BatchScreen extends React.Component {
           subTitle: subTitle,
           showCrops: false,
           photos: photos.map((photo) => {
-            photo.photo_path = root + '/' + photo.photo_path;
-            photo.location_name = batch['location_name'];
-            photo.url = photo.photo_path;
+            photo.location_name = batch.location_name;
+            photo.url = root + '/' + photo.photo_path;
             photo.props = {
               photo: photo
             };
@@ -370,7 +369,7 @@ export default class BatchScreen extends React.Component {
 
   archiveBatch(batch, callback) {
     Alert.alert(
-      `Archive ${batch['num_photos']} Photo(s) ?`, '', [
+      `Archive ${batch.num_photos} Photo(s) ?`, '', [
       {
         text: 'Yes',
         onPress: () => {
@@ -383,14 +382,14 @@ export default class BatchScreen extends React.Component {
 
   deleteBatch(batch, callback) {
     Alert.alert(
-      `Permanently Delete ${batch['num_photos']} Photo(s) ?`, '', [
+      `Permanently Delete ${batch.num_photos} Photo(s) ?`, '', [
       {
         text: 'Yes',
         onPress: () => {
-          this.db.deleteBatchObjects(batch['id']).then(() => {
-            this.db.deleteBatchPhotos(batch['id']).then(() => {
-              this.db.deleteBatch(batch['id']).then(() => {
-                let dir = RNFS.DocumentDirectoryPath + '/.data/batch/' + batch['id'];
+          this.db.deleteBatchObjects(batch.id).then(() => {
+            this.db.deleteBatchPhotos(batch.id).then(() => {
+              this.db.deleteBatch(batch.id).then(() => {
+                let dir = RNFS.DocumentDirectoryPath + '/.data/batch/' + batch.id;
                 console.log("deleting " + dir);
                 RNFS.unlink(dir);
                 this.db.selectBatches().then((batches) => {

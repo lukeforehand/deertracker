@@ -28,6 +28,8 @@ import { api } from './config';
 
 import base64 from 'react-native-base64';
 
+const root = RNFS.DocumentDirectoryPath;
+
 export default class PhotoGallery extends React.Component {
 
     constructor(props) {
@@ -276,7 +278,7 @@ export default class PhotoGallery extends React.Component {
                     size: { width: object.w, height: object.h },
                     displaySize: { width: w, height: h }
                 };
-                ImageEditor.cropImage(object.photo_path, cropData).then(url => {
+                ImageEditor.cropImage(root + '/' + object.photo_path, cropData).then(url => {
                     RNFS.moveFile(url, cropPath).catch((err) => {
                         RNFS.unlink(url);
                     }).then(() => {

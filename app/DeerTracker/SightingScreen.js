@@ -154,8 +154,7 @@ export default class SightingScreen extends React.Component {
     this.db.selectPhotosToReview().then((photos) => {
       this.props.navigation.navigate('ReviewScreen', {
         photos: photos.map((photo) => {
-          photo.photo_path = root + '/' + photo.photo_path;
-          photo.url = photo.photo_path;
+          photo.url = root + '/' + photo.photo_path;
           photo.props = {
             photo: photo
           };
@@ -175,13 +174,8 @@ export default class SightingScreen extends React.Component {
         subTitle: subTitle,
         showCrops: true,
         photos: Object.values(photos).map((photo) => {
-          photo.photo_path = root + '/' + photo.photo_path;
-          photo.objects = photo.objects.map((object) => {
-            object.photo_path = root + '/' + object.photo_path;
-            return object;
-          });
           photo.location_name = objects[day][locationId].location_name;
-          photo.url = photo.photo_path;
+          photo.url = root + '/' + photo.photo_path;
           photo.props = {
             photo: photo
           };
