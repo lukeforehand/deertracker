@@ -136,7 +136,7 @@ export default class ProfileScreen extends React.Component {
               </View>
                 */}
               <View style={{ alignItems: 'center' }}>
-                <Text>Week Day</Text>
+                <Text style={style.t3}>Week Day</Text>
                 <BarChart
                   data={{
                     labels: profile.stats.weekday.map((w) => w.weekday),
@@ -153,12 +153,12 @@ export default class ProfileScreen extends React.Component {
                     borderWidth: 1,
                     borderColor: 'gray',
                     borderRadius: 10,
-                    paddingRight: 0
+                    paddingRight: 0,
                   }}
                 />
               </View>
               <View style={{ alignItems: 'center' }}>
-                <Text>Time of Day</Text>
+                <Text style={style.t3}>Time of Day</Text>
                 <PieChart
                   data={profile.stats.ampm.map((x) => {
                     return {
@@ -184,7 +184,7 @@ export default class ProfileScreen extends React.Component {
                 />
               </View>
               <View style={{ alignItems: 'center' }}>
-                <Text>Location</Text>
+                <Text style={style.t3}>Location</Text>
                 <BarChart
                   data={{
                     labels: profile.stats.location.map((w) => w.location),
@@ -206,7 +206,7 @@ export default class ProfileScreen extends React.Component {
                 />
               </View>
               <View style={{ alignItems: 'center' }}>
-                <Text>Moon Phase</Text>
+                <Text style={style.t3}>Moon Phase</Text>
                 <View style={{ flexDirection: 'row' }}>
                   {profile.stats.moon.map((m) => {
                     let moonLabel = moon.image(m.moon_phase);
@@ -288,9 +288,6 @@ export default class ProfileScreen extends React.Component {
   }
 
   fetchData() {
-    this.setState({
-      isLoading: true
-    });
     let profile = this.state.profile;
     let statsPromise = null;
     if (profile.type === 'class') {

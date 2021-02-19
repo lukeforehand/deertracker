@@ -194,9 +194,6 @@ export default class SightingScreen extends React.Component {
   }
 
   fetchData() {
-    this.setState({
-      isLoading: true
-    });
     this.db.selectObjects().then((objects) => {
       this.db.selectPhotosToReviewCount().then((count) => {
         this.setState({

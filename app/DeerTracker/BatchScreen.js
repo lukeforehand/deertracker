@@ -41,7 +41,7 @@ export default class BatchScreen extends React.Component {
   constructor(props) {
     super(props);
     this.db = new Database();
-    this.state = { isLoading: true, photosToUpload: 0, photosToProcess: 0 }
+    this.state = { isLoading: true, photosToUpload: 0, photosToProcess: 0, resubscribe: false }
   }
 
   componentDidMount() {
@@ -266,6 +266,7 @@ export default class BatchScreen extends React.Component {
 
   async uploadPhotos() {
     if (this.state.photosToUpload <= 0) {
+      this.fetchData();
       let photos = await this.db.selectPhotosToUpload();
       if (photos.length == 0) {
         return;
@@ -407,9 +408,6 @@ export default class BatchScreen extends React.Component {
   }
 
   async fetchData() {
-    this.setState({
-      isLoading: true
-    });
     this.db.selectBatches().then((batches) => {
       this.fetchConfig().then(() => {
         this.setState({
