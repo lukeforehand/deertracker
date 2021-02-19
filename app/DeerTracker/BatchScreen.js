@@ -125,7 +125,7 @@ export default class BatchScreen extends React.Component {
                   onPress={() => { this.getPhotos(batch) }}>
                   <View style={style.itemHeader}>
                     <Text style={style.h3}>
-                      {Moment(batch.time).utc().format('ddd, MMM Do YYYY h:mm A')}
+                      {Moment(batch.time).format('ddd, MMM Do YYYY h:mm A')}
                     </Text>
                   </View>
                   <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>

@@ -92,7 +92,7 @@ export default class ProfileListScreen extends React.Component {
                     <Icon style={{ paddingLeft: 15 }} name='eye' color='black' size={18} />
                     <Text style={style.t5}>{profile.objects.length} Sightings</Text>
                   </View>
-                  <Text style={style.t5}>Last seen {Moment(new Date() - Moment(crop.time).utc()).format('D')} days ago</Text>
+                  <Text style={style.t5}>{Moment(new Date() - Moment(crop.time).utc()).format('D')} days ago</Text>
                 </View>
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                   <Image source={{ uri: root + '/' + crop.photo_path }}

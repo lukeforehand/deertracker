@@ -94,7 +94,7 @@ export default class SightingScreen extends React.Component {
                       <View key={locationId}>
                         <TouchableOpacity
                           key={photo.photo_path}
-                          style={[style.locationButton, { borderTopLeftRadius: 0, borderTopRightRadius: 0, borderWidth: 0 }]}
+                          style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0, borderWidth: 0 }}
                           onPress={() => { this.getPhotos(day, location.location_id) }}>
                           <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                             <View style={{ flex: 1 }}>

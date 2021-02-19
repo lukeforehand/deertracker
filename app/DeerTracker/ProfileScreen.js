@@ -105,8 +105,8 @@ export default class ProfileScreen extends React.Component {
                   <Icon style={{ paddingLeft: 15 }} name='eye' color='black' size={18} />
                   <Text style={style.t5}>{photos.length} Sightings</Text>
                 </View>
-                <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20, alignItems: 'center' }}>
-                  <Text style={[style.t5, { flex: 1 }]}>Last seen {Moment(new Date() - Moment(latest.time).utc()).format('D')} days ago at {latest.location_name} on {Moment(latest.time).format('dddd')} {Moment(latest.time).format('A') === 'AM' ? 'Before Noon' : 'After Noon'} during a {latest.moon_phase}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Text style={[style.t5, { flex: 1 }]}>{Moment(new Date() - Moment(latest.time).utc()).format('D')} days ago at {latest.location_name} on {Moment(latest.time).format('dddd')} {Moment(latest.time).format('A') === 'AM' ? 'Before Noon' : 'After Noon'} during a {latest.moon_phase}</Text>
                   <Image style={[style.moon, { width: 100, height: 100 }]} source={moonImage} />
                 </View>
                 <Text style={style.t5}>Best chance at {profile.stats.all[0].location} on {profile.stats.all[0].weekday} {profile.stats.all[0].ampm} during a {profile.stats.all[0].moon_phase}</Text>
