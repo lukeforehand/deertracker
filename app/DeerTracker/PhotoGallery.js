@@ -107,7 +107,7 @@ export default class PhotoGallery extends React.Component {
 
     renderImage(props) {
         let photo = props.photo;
-        let time = photo.time ? Moment(photo.time).format('ddd, MMM Do YYYY hh:mm A') : ""
+        let time = photo.time ? Moment(photo.time).utc().format('ddd, MMM Do YYYY h:mm A') : ""
         let top = 0;
         let titleHeight = 40;
         props.style.top = -titleHeight;

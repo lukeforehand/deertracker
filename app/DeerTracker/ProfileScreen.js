@@ -106,7 +106,7 @@ export default class ProfileScreen extends React.Component {
                   <Text style={style.t5}>{photos.length} Sightings</Text>
                 </View>
                 <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20, alignItems: 'center' }}>
-                  <Text style={[style.t5, { flex: 1 }]}>Last seen {Moment(new Date() - Moment(latest.time)).format('D')} days ago at {latest.location_name} on {Moment(latest.time).format('dddd')} {Moment(latest.time).format('A') === 'AM' ? 'Before Noon' : 'After Noon'} during a {latest.moon_phase}</Text>
+                  <Text style={[style.t5, { flex: 1 }]}>Last seen {Moment(new Date() - Moment(latest.time).utc()).format('D')} days ago at {latest.location_name} on {Moment(latest.time).format('dddd')} {Moment(latest.time).format('A') === 'AM' ? 'Before Noon' : 'After Noon'} during a {latest.moon_phase}</Text>
                   <Image style={[style.moon, { width: 100, height: 100 }]} source={moonImage} />
                 </View>
                 <Text style={style.t5}>Best chance at {profile.stats.all[0].location} on {profile.stats.all[0].weekday} {profile.stats.all[0].ampm} during a {profile.stats.all[0].moon_phase}</Text>
@@ -303,7 +303,7 @@ export default class ProfileScreen extends React.Component {
       let location = profile.stats.location[0];
 
       let ASPECT_RATIO = screenWidth / screenHeight;
-      let LATITUDE_DELTA = 0.0922;
+      let LATITUDE_DELTA = 0.001;
       let LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
       this.setState({

@@ -37,7 +37,7 @@
 			</dict>
 		</dict>
 	</dict>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>To associate photos with a location.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>To save photos to camera roll.</string>

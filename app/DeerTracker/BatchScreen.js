@@ -44,15 +44,6 @@ export default class BatchScreen extends React.Component {
     this.state = { isLoading: true, photosToUpload: 0, photosToProcess: 0 }
   }
 
-  componentDidUpdate() {
-    let batches = this.props.navigation.getParam('batches');
-    if (batches && batches !== this.state.batches) {
-      this.setState({
-        batches: batches
-      });
-    }
-  }
-
   componentDidMount() {
     this.fetchData();
     this.uploadPhotos().then(() => {
@@ -61,7 +52,9 @@ export default class BatchScreen extends React.Component {
     this.processPhotos().then(() => {
       this.checkProcess = setInterval(() => { this.processPhotos() }, 5000);
     });
-    this.focusListener = this.props.navigation.addListener('didFocus', () => { this.fetchConfig(); });
+    this.focusListener = this.props.navigation.addListener('didFocus', () => {
+      this.fetchData();
+    });
   }
 
   componentWillUnmount() {
@@ -132,7 +125,7 @@ export default class BatchScreen extends React.Component {
                   onPress={() => { this.getPhotos(batch) }}>
                   <View style={style.itemHeader}>
                     <Text style={style.h3}>
-                      {Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY hh:mm A')}
+                      {Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY h:mm A')}
                     </Text>
                   </View>
                   <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -287,6 +280,8 @@ export default class BatchScreen extends React.Component {
       if (photos.length === 0) {
         this.setState({ isLoading: false, resubscribe: true });
         return;
+      } else {
+        this.setState({ resubscribe: false });
       }
       for (p of photos) {
         let photo = p;
@@ -306,7 +301,7 @@ export default class BatchScreen extends React.Component {
           }
         }).then((photoId) => {
           Upload.addListener('error', photoId, (err) => {
-            console.log(photoId + ' ' + JSON.stringify(err));
+            console.log(photoId + ' error handler ' + JSON.stringify(err));
             Upload.cancelUpload(photoId).then(() => {
               this.setState(prevState => ({
                 photosToUpload: prevState.photosToUpload - 1
@@ -314,7 +309,7 @@ export default class BatchScreen extends React.Component {
             });
           });
           Upload.addListener('completed', photoId, (data) => {
-            console.log(photoId + ' ' + ' POST ' + data.responseCode + ' ' + data.responseBody);
+            console.log(photoId + ' completed handler ' + ' POST ' + data.responseCode + ' ' + data.responseBody);
             if (data.responseCode !== 200 || data.responseBody === null) {
               console.log(photoId + ' responseBody: ' + data.responseBody);
               this.setState(prevState => ({
@@ -350,7 +345,7 @@ export default class BatchScreen extends React.Component {
 
   getPhotos(batch) {
     let batchId = batch['id'];
-    let title = Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY hh:mm A');
+    let title = Moment(new Date(batch['time'])).format('ddd, MMM Do YYYY h:mm A');
     let subTitle = batch['location_name'];
     this.db.selectBatchPhotos(batchId).then((photos) => {
       if (photos.length > 0) {
@@ -398,7 +393,7 @@ export default class BatchScreen extends React.Component {
                 console.log("deleting " + dir);
                 RNFS.unlink(dir);
                 this.db.selectBatches().then((batches) => {
-                  this.props.navigation.navigate('BatchScreen', {
+                  this.setState({
                     batches: batches
                   });
                 });

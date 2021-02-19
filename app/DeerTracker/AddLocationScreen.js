@@ -29,52 +29,49 @@ export default class AddLocationScreen extends React.Component {
     this.state = { modalVisible: false }
   }
 
-  componentDidMount() {
-    this.getCurrentPosition();
-  }
-
   render() {
     const locations = this.props.navigation.getParam('locations');
     return (
       <SafeAreaView>
         <View style={style.container}>
-          {this.state.region &&
-            <MapView
-              ref={ref => { this.map = ref; }}
-              style={{ ...StyleSheet.absoluteFillObject }}
-              showsUserLocation={true}
-              mapType="hybrid"
-              initialRegion={this.state.region}
-              onMapReady={() => {
-                if (locations.length > 0) {
-                  this.map.fitToCoordinates(
-                    locations.map(location => ({ latitude: location.lat, longitude: location.lon })),
-                    { edgePadding: { top: 120, right: 120, bottom: 120, left: 120 }, animated: true })
-                }
-              }}
-              //onDoublePress={(ev) => { this.map.animateCamera({ center: ev.nativeEvent.coordinate }) }}
-              onRegionChangeComplete={(region) => { this.setState({ region: region }) }}>
-              {locations.map((location) => {
-                return (
-                  <Marker key={location['id']}
-                    coordinate={{ latitude: location['lat'], longitude: location['lon'] }}>
-                    <View>
-                      <View style={[style.sightingMarker, {
-                        borderColor: `rgb(255, 103, 0)`,
-                        backgroundColor: `rgba(255, 103, 0, 0.4)`,
-                      }]} />
-                      <View style={style.markerContainer}>
-                        <View style={{ flexDirection: 'row' }}>
-                          <Image source={require('./assets/images/crosshairs.png')} style={{ width: 25, height: 25 }} />
-                          <Text style={style.markerLabel}>{location['name']}</Text>
-                        </View>
+          <MapView
+            ref={ref => { this.map = ref; }}
+            style={{ ...StyleSheet.absoluteFillObject }}
+            showsUserLocation={true}
+            mapType="hybrid"
+            initialRegion={this.state.region}
+            onRegionChange={(region) => {
+              this.setState({ region: region });
+            }}
+            onMapReady={() => {
+              if (locations.length > 0) {
+                this.map.fitToCoordinates(
+                  locations.map(location => ({ latitude: location.lat, longitude: location.lon })),
+                  { edgePadding: { top: 120, right: 120, bottom: 120, left: 120 }, animated: true })
+              } else {
+                this.getCurrentPosition();
+              }
+            }}>
+            {locations.map((location) => {
+              return (
+                <Marker key={location['id']}
+                  coordinate={{ latitude: location['lat'], longitude: location['lon'] }}>
+                  <View>
+                    <View style={[style.sightingMarker, {
+                      borderColor: `rgb(255, 103, 0)`,
+                      backgroundColor: `rgba(255, 103, 0, 0.4)`,
+                    }]} />
+                    <View style={style.markerContainer}>
+                      <View style={{ flexDirection: 'row' }}>
+                        <Image source={require('./assets/images/crosshairs.png')} style={{ width: 25, height: 25 }} />
+                        <Text style={style.markerLabel}>{location['name']}</Text>
                       </View>
                     </View>
-                  </Marker>
-                );
-              })}
-            </MapView>
-          }
+                  </View>
+                </Marker>
+              );
+            })}
+          </MapView>
           <View style={style.markerFixed}>
             <Image source={require('./assets/images/crosshairs.png')} style={{ width: 80, height: 80 }} />
           </View>
@@ -92,6 +89,8 @@ export default class AddLocationScreen extends React.Component {
                     this.map.fitToCoordinates(
                       locations.map(location => ({ latitude: location.lat, longitude: location.lon })),
                       { edgePadding: { top: 120, right: 120, bottom: 120, left: 120 }, animated: true })
+                  } else {
+                    this.getCurrentPosition();
                   }
                 }}>
                   <Icon name='eye' color={style.locationArrow.color} size={15} />
@@ -155,7 +154,7 @@ export default class AddLocationScreen extends React.Component {
   getCurrentPosition() {
 
     let ASPECT_RATIO = screenWidth / screenHeight;
-    let LATITUDE_DELTA = 0.0922;
+    let LATITUDE_DELTA = 0.001;
     let LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
     Geolocation.getCurrentPosition(
@@ -168,7 +167,8 @@ export default class AddLocationScreen extends React.Component {
             longitudeDelta: LONGITUDE_DELTA
           }
         });
-        this.map.animateCamera({ center: position.coords });
+        this.map.fitToCoordinates([position.coords],
+          { edgePadding: { top: 120, right: 120, bottom: 120, left: 120 }, animated: true });
       },
       (error) => {
         console.log(error.code, error.message);

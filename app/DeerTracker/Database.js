@@ -173,6 +173,7 @@ export default class Database {
         return (await db.executeSql(`
             SELECT p.id AS photo_id, p.batch_id, p.path as photo_path, p.width, p.height, p.time
             FROM photo p WHERE p.batch_id = ?
+            ORDER BY p.time ASC
         `, [batchId])).map((r) => {
             return r.rows.raw();
         })[0];
@@ -226,7 +227,7 @@ export default class Database {
             JOIN location l ON l.id = o.location_id
             LEFT JOIN profile i ON i.id = o.profile_id
             WHERE TRUE ${condition}
-            ORDER BY day DESC
+            ORDER BY o.time ASC
         )`;
         if (day && locationId) {
             sql = sql + ` WHERE day = ? AND location_id = ?`;

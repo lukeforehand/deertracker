@@ -35,6 +35,13 @@ export default class SightingScreen extends React.Component {
 
   componentDidMount() {
     this.fetchData();
+    this.focusListener = this.props.navigation.addListener('didFocus', () => {
+      this.fetchData();
+    });
+  }
+
+  componentWillUnmount() {
+    this.focusListener.remove();
   }
 
   refreshing() {
@@ -74,7 +81,7 @@ export default class SightingScreen extends React.Component {
               <View key={day} style={style.locationButton}>
                 <View style={style.itemHeader}>
                   <Text style={style.h6}>
-                    {Moment(date).format('ddd, MMM Do YYYY')}
+                    {Moment(day).format('ddd, MMM Do YYYY')}
                   </Text>
                   <Image style={[style.moon, { width: 45, height: 45 }]} source={moonImage} />
                 </View>
@@ -161,7 +168,7 @@ export default class SightingScreen extends React.Component {
   getPhotos(day, locationId) {
     this.db.selectObjects(day, locationId).then((objects) => {
       let photos = objects[day][locationId].photos;
-      let title = Moment(new Date(day)).format('ddd, MMM Do YYYY');
+      let title = Moment(day).format('ddd, MMM Do YYYY');
       let subTitle = objects[day][locationId].location_name;
       this.props.navigation.navigate('PhotoScreen', {
         title: title,

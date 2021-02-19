@@ -33,6 +33,13 @@ export default class ProfileListScreen extends React.Component {
 
   componentDidMount() {
     this.fetchData();
+    this.focusListener = this.props.navigation.addListener('didFocus', () => {
+      this.fetchData();
+    });
+  }
+
+  componentWillUnmount() {
+    this.focusListener.remove();
   }
 
   refreshing() {
@@ -85,11 +92,11 @@ export default class ProfileListScreen extends React.Component {
                     <Icon style={{ paddingLeft: 15 }} name='eye' color='black' size={18} />
                     <Text style={style.t5}>{profile.objects.length} Sightings</Text>
                   </View>
-                  <Text style={style.t5}>Last seen {Moment(new Date() - Moment(crop.time)).format('D')} days ago</Text>
+                  <Text style={style.t5}>Last seen {Moment(new Date() - Moment(crop.time).utc()).format('D')} days ago</Text>
                 </View>
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
 
-                  <Image source={{ uri: root + '/' + crop.photo_path }}
+                  <Image source={{ uri: crop.photo_path }}
                     style={{ width: parseInt(thumbWidth), height: parseInt(crop.height * ratio) }} />
                   <View style={{
                     ...StyleSheet.absoluteFillObject,
@@ -138,7 +145,8 @@ export default class ProfileListScreen extends React.Component {
         profiles = profiles.concat(classes);
         profiles.map((profile) => {
           profile.objects.map((photo) => {
-            photo.url = root + '/' + photo.photo_path;
+            photo.photo_path = root + '/' + photo.photo_path;
+            photo.url = photo.photo_path;
             photo.props = {
               photo: photo
             };

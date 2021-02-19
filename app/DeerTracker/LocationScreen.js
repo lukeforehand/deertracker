@@ -128,12 +128,8 @@ export default class LocationScreen extends React.Component {
                 console.log(err);
               }
             }));
-            this.db.selectBatches().then((batches) => {
-              this.setState({ isLoading: false });
-              this.props.navigation.navigate('BatchScreen', {
-                batches: batches
-              });
-            });
+            this.setState({ isLoading: false });
+            this.props.navigation.navigate('BatchScreen');
           }
         }, { text: 'No' }], { cancelable: false });
     }).catch((err) => {
