@@ -266,18 +266,16 @@ export default class BatchScreen extends React.Component {
 
   async uploadPhotos() {
     if (this.state.photosToUpload <= 0) {
-      this.fetchData();
       let photos = await this.db.selectPhotosToUpload();
       if (photos.length == 0) {
         return;
       }
-      this.setState({
-        photosToUpload: photos.length
-      });
-
       let user = await User.getUser();
       let credits = user.photo_credits_left;
       photos = photos.slice(0, Math.min(credits, photos.length));
+      this.setState({
+        photosToUpload: photos.length
+      });
       if (photos.length === 0) {
         this.setState({ isLoading: false, resubscribe: true });
         return;

@@ -541,9 +541,7 @@ export default class Database {
         let config = rs.map((r) => {
             return r.rows.raw();
         })[0];
-        return new Map(config.map((c) => {
-            return [c['key'], c['value']];
-        }));
+        return Object.assign({}, ...config.map((c) => ({ [c.key]: c.value })));
     }
 
     async updateConfig(key, value) {

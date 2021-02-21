@@ -109,12 +109,13 @@ export default class PhotoGallery extends React.Component {
 
     renderImage(props) {
         let photo = props.photo;
+        let ratio = screenWidth / photo.width;
         let time = photo.time ? Moment(photo.time).utc().format('ddd, MMM Do YYYY h:mm A') : ""
         let top = 0;
         let titleHeight = 32;
         props.style.top = -titleHeight;
         if (this.props.showCrops) {
-            top = -photo.height * (screenWidth / photo.width) / 2 + titleHeight;
+            top = (-photo.height * ratio / 2) + titleHeight;
         }
         return (
             <View style={{ top: top }}>
@@ -134,7 +135,6 @@ export default class PhotoGallery extends React.Component {
                     if (this.state.crop && this.state.crop.id == object.id) {
                         borderColor = 'rgb(255, 103, 0)'
                     }
-                    let ratio = screenWidth / photo.width;
                     return (
                         <TouchableOpacity
                             key={object.id}
