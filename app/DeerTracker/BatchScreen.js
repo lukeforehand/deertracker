@@ -217,7 +217,7 @@ export default class BatchScreen extends React.Component {
               o.location_id = photo.location_id;
               this.db.insertObject(o);
             }
-          } else if (this.state.config.get('discard_empty') == 'true') {
+          } else if (this.state.config.discard_empty == 'true') {
             console.log(`discarding ${JSON.stringify(photo)}`);
             let path = root + '/' + photo.path;
             console.log("deleting " + path);
