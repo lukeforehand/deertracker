@@ -15,9 +15,7 @@ import {
 } from 'react-native';
 
 import Upload from 'react-native-background-upload';
-
 import Icon from 'react-native-vector-icons/FontAwesome5';
-
 import RNFS from 'react-native-fs';
 
 import Moment from 'moment';
@@ -26,6 +24,7 @@ import MoonPhase from './MoonPhase';
 import SwipeRow from './SwipeRow';
 import Database from './Database';
 import User from './User';
+import Subscribe from './Subscribe';
 
 import style from './style';
 
@@ -103,7 +102,7 @@ export default class BatchScreen extends React.Component {
               transparent={true}
               visible={this.state.subscribeVisible}>
               <View style={style.subscribeModal}>
-                <Text>TODO: ability to subscribe here</Text>
+                <Subscribe />
               </View>
               <TouchableWithoutFeedback onPress={() => { this.setState({ subscribeVisible: false }) }}>
                 <View style={{ flex: 1 }} />

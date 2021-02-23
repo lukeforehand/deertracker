@@ -1,0 +1,89 @@
+{
+  "products" : [
+
+  ],
+  "settings" : {
+
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "AF91CF8E",
+      "localizations" : [
+
+      ],
+      "name" : "1 Year Plan",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "displayPrice" : "39.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "9DC9DA40",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Process 100,000 photos per year",
+              "displayName" : "1 Year 100k",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "1_yr_100k",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "1_yr_100k",
+          "subscriptionGroupID" : "AF91CF8E",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "displayPrice" : "19.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "402A452E",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Process 50,000 photos per year",
+              "displayName" : "1 Year 50k",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "1_yr_50k",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "1_yr_50k",
+          "subscriptionGroupID" : "AF91CF8E",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "displayPrice" : "199.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "F09FB533",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Process 500,000 photos per year",
+              "displayName" : "1 Year 500k",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "1_yr_500k",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "1_yr_500k",
+          "subscriptionGroupID" : "AF91CF8E",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 1,
+    "minor" : 0
+  }
+}

@@ -46,6 +46,10 @@ def init_app(username, password):
     @app.route("/user/<device_id>", methods=["PUT"])
     def user_put(device_id):
         photo_credits_left = int(request.form["photo_credits_left"])
+        # TODO: record expiration (transactionDate + 1 year)
+        # TODO: record subscription (product_id)
+        # TODO: record photo_credits
+        # TODO: record photo_credits_left
         key = datastore_client.key("user", device_id)
         user = datastore_client.get(key)
         user["photo_credits_left"] = photo_credits_left

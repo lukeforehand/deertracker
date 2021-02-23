@@ -18,6 +18,7 @@
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* DeerTrackerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* DeerTrackerTests.m */; };
 		39549EBB151C42C6A826BA98 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A5C44370FB0447DCA94AFBD4 /* FontAwesome.ttf */; };
+		397270AB25E33A9100E76ABC /* Configuration.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 397270AA25E33A9100E76ABC /* Configuration.storekit */; };
 		3EC6ACE5A35B40DCB6E110D0 /* libPods-DeerTracker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 788514FA33DC34DC1059247A /* libPods-DeerTracker.a */; };
 		44C064BCF43E880944F0BC4A /* libPods-DeerTracker-DeerTrackerTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C62A32C80DC95B6ECBDBDB35 /* libPods-DeerTracker-DeerTrackerTests.a */; };
 		51D734D6E66041AC9CFAD4AB /* Foundation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9B3AC081F7CF496ABD975236 /* Foundation.ttf */; };
@@ -73,6 +74,7 @@
 		2D02E4901E0B4A5D006451C7 /* DeerTracker-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "DeerTracker-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		309030599B49CC6DD25D3C6C /* Pods-DeerTracker-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DeerTracker-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-DeerTracker-tvOS/Pods-DeerTracker-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
 		30E8E5631C4A4E7D8BE7A032 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = ../assets/fonts/Ionicons.ttf; sourceTree = "<group>"; };
+		397270AA25E33A9100E76ABC /* Configuration.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Configuration.storekit; sourceTree = "<group>"; };
 		4033D05C1BC88E00B5046B03 /* Pods-DeerTracker-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DeerTracker-tvOS.release.xcconfig"; path = "Target Support Files/Pods-DeerTracker-tvOS/Pods-DeerTracker-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		47442B9F8749EF70E4C5F31A /* Pods-DeerTracker-DeerTrackerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DeerTracker-DeerTrackerTests.debug.xcconfig"; path = "Target Support Files/Pods-DeerTracker-DeerTrackerTests/Pods-DeerTracker-DeerTrackerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		61DD49EAF21D83EE330348D4 /* Pods-DeerTracker.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DeerTracker.release.xcconfig"; path = "Target Support Files/Pods-DeerTracker/Pods-DeerTracker.release.xcconfig"; sourceTree = "<group>"; };
@@ -157,6 +159,7 @@
 		13B07FAE1A68108700A75B9A /* DeerTracker */ = {
 			isa = PBXGroup;
 			children = (
+				397270AA25E33A9100E76ABC /* Configuration.storekit */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -399,6 +402,7 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				B7C36486F0CC4DF9B23F9CED /* AntDesign.ttf in Resources */,
+				397270AB25E33A9100E76ABC /* Configuration.storekit in Resources */,
 				9F242D524FDD475ABE8FA706 /* Entypo.ttf in Resources */,
 				C66628865CBD4A39A0D3D7D2 /* EvilIcons.ttf in Resources */,
 				0565176D00104E3A92CB7BD4 /* Feather.ttf in Resources */,
@@ -787,6 +791,7 @@
 				DEVELOPMENT_TEAM = 6KKG5JRQ8R;
 				INFOPLIST_FILE = DeerTracker/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

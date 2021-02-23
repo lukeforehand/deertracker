@@ -3,31 +3,38 @@ import {
   SafeAreaView,
   ActivityIndicator,
   TouchableOpacity,
+  Modal,
   Alert,
   Text,
+  Linking,
+  TouchableWithoutFeedback,
   View,
   Switch,
   ScrollView,
 } from 'react-native';
 
 import { Picker } from '@react-native-picker/picker';
-
 import RNFS from 'react-native-fs';
 
 import Database from './Database';
+import User from './User';
+import Subscribe from './Subscribe';
 
 import style from './style';
 
-import User from './User';
-
 const root = RNFS.DocumentDirectoryPath;
+
+const cancelLink = Platform.select({
+  ios: 'https://apps.apple.com/account/subscriptions',
+  android: 'https://play.google.com/store/account/subscriptions?package=DeerTracker&sku=DeerTracker',
+});
 
 export default class ConfigScreen extends React.Component {
 
   constructor(props) {
     super(props);
     this.db = new Database();
-    this.state = {};
+    this.state = { subscribeVisible: false };
   }
 
   componentDidMount() {
@@ -48,6 +55,41 @@ export default class ConfigScreen extends React.Component {
     return (
       <SafeAreaView>
         <ScrollView>
+          <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
+            {this.state.user.photo_credits_left <= 0 &&
+              <TouchableOpacity style={style.button} onPress={() => { this.setState({ subscribeVisible: true }) }}>
+                <Text style={style.h1}>Upgrade Plan</Text>
+              </TouchableOpacity>
+            }
+            <View style={{ height: 10 }} />
+            <View style={style.config}>
+              <Text style={style.t1}>Plan</Text>
+              <Text style={style.h2}>{this.state.user.subscription}</Text>
+            </View>
+            <View style={style.config}>
+              <Text style={style.t1}>Credits Remaining</Text>
+              <Text style={style.h2}>{this.state.user.photo_credits_left}</Text>
+            </View>
+            {this.state.user.expiration &&
+              <View style={style.config}>
+                <Text style={style.t1}>Plan Expires</Text>
+                <Text style={style.h2}>{this.state.user.expiration}</Text>
+              </View>
+            }
+            {this.state.subscribeVisible &&
+              <Modal
+                animationType='slide'
+                transparent={true}
+                visible={this.state.subscribeVisible}>
+                <View style={style.subscribeModal}>
+                  <Subscribe />
+                </View>
+                <TouchableWithoutFeedback onPress={() => { this.setState({ subscribeVisible: false }) }}>
+                  <View style={{ flex: 1 }} />
+                </TouchableWithoutFeedback>
+              </Modal>
+            }
+          </View>
           <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
             <View style={style.config}>
               <Text style={style.h2}>Discard Empty Photos</Text>
@@ -127,6 +169,19 @@ export default class ConfigScreen extends React.Component {
             <View style={{ height: 10 }} />
             <Text style={style.t1}>Remove unused data outside the time range.</Text>
           </View>
+          {this.state.user.subscription !== 'frese' &&
+            <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
+              <TouchableOpacity style={style.button} onPress={() => {
+                Alert.alert(
+                  'Cancel plan?', '', [{
+                    text: 'Yes',
+                    onPress: () => { Linking.openURL(cancelLink); }
+                  }, { text: 'No' }], { cancelable: false });
+              }}>
+                <Text style={style.h1}>Cancel Plan</Text>
+              </TouchableOpacity>
+            </View>
+          }
           {/*
           <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
             <View style={style.config}>
