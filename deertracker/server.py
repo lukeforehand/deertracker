@@ -37,22 +37,16 @@ def init_app(username, password):
         user = datastore_client.get(key)
         if user is None:
             user = datastore.Entity(key=key)
-            user["subscription"] = "free"
             user["photo_credits"] = 1000
-            user["photo_credits_left"] = 1000
             datastore_client.put(user)
         return jsonify(user)
 
     @app.route("/user/<device_id>", methods=["PUT"])
     def user_put(device_id):
-        photo_credits_left = int(request.form["photo_credits_left"])
-        # TODO: record expiration (transactionDate + 1 year)
-        # TODO: record subscription (product_id)
-        # TODO: record photo_credits
-        # TODO: record photo_credits_left
+        photo_credits = int(request.form["photo_credits"])
         key = datastore_client.key("user", device_id)
         user = datastore_client.get(key)
-        user["photo_credits_left"] = photo_credits_left
+        user["photo_credits"] = photo_credits
         datastore_client.put(user)
         print(f"sending response {user}")
         return jsonify(user)
