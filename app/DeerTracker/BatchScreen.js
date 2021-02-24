@@ -24,7 +24,7 @@ import MoonPhase from './MoonPhase';
 import SwipeRow from './SwipeRow';
 import Database from './Database';
 import User from './User';
-import Subscribe from './Subscribe';
+import Purchase from './Purchase';
 
 import style from './style';
 
@@ -102,7 +102,7 @@ export default class BatchScreen extends React.Component {
               transparent={true}
               visible={this.state.subscribeVisible}>
               <View style={style.subscribeModal}>
-                <Subscribe />
+                <Purchase />
               </View>
               <TouchableWithoutFeedback onPress={() => { this.setState({ subscribeVisible: false }) }}>
                 <View style={{ flex: 1 }} />
@@ -270,7 +270,10 @@ export default class BatchScreen extends React.Component {
         return;
       }
       let user = await User.getUser();
-      let credits = user.photo_credits_left;
+      if (user === null) {
+        return;
+      }
+      let credits = user.photo_credits;
       photos = photos.slice(0, Math.min(credits, photos.length));
       this.setState({
         photosToUpload: photos.length
@@ -337,7 +340,7 @@ export default class BatchScreen extends React.Component {
           }));
         });
       }
-      User.setPhotoCreditsLeft(credits - photos.length);
+      User.setPhotoCredits(credits - photos.length);
     }
   }
 

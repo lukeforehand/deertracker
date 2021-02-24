@@ -1,86 +1,86 @@
 {
   "products" : [
-
+    {
+      "displayPrice" : "3.99",
+      "familyShareable" : false,
+      "internalID" : "340353CB",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "1,000 Photo credits",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.deertracker.photo_credits.1000",
+      "referenceName" : "1k",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "11.99",
+      "familyShareable" : false,
+      "internalID" : "F904E245",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "3,000 Photo credits",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.deertracker.photo_credits.3000",
+      "referenceName" : "3k",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "19.99",
+      "familyShareable" : false,
+      "internalID" : "0298639E",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "5,000 Photos credits",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.deertracker.photo_credits.5000",
+      "referenceName" : "5k",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "39.99",
+      "familyShareable" : false,
+      "internalID" : "097D6E72",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "10,000 Photo credits",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.deertracker.photo_credits.10000",
+      "referenceName" : "10k",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "199.99",
+      "familyShareable" : false,
+      "internalID" : "2CC43956",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "50,000 Photo credits",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.deertracker.photo_credits.50000",
+      "referenceName" : "50k",
+      "type" : "Consumable"
+    }
   ],
   "settings" : {
 
   },
   "subscriptionGroups" : [
-    {
-      "id" : "AF91CF8E",
-      "localizations" : [
 
-      ],
-      "name" : "1 Year Plan",
-      "subscriptions" : [
-        {
-          "adHocOffers" : [
-
-          ],
-          "displayPrice" : "39.99",
-          "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "9DC9DA40",
-          "introductoryOffer" : null,
-          "localizations" : [
-            {
-              "description" : "Process 100,000 photos per year",
-              "displayName" : "1 Year 100k",
-              "locale" : "en_US"
-            }
-          ],
-          "productID" : "1_yr_100k",
-          "recurringSubscriptionPeriod" : "P1Y",
-          "referenceName" : "1_yr_100k",
-          "subscriptionGroupID" : "AF91CF8E",
-          "type" : "RecurringSubscription"
-        },
-        {
-          "adHocOffers" : [
-
-          ],
-          "displayPrice" : "19.99",
-          "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "402A452E",
-          "introductoryOffer" : null,
-          "localizations" : [
-            {
-              "description" : "Process 50,000 photos per year",
-              "displayName" : "1 Year 50k",
-              "locale" : "en_US"
-            }
-          ],
-          "productID" : "1_yr_50k",
-          "recurringSubscriptionPeriod" : "P1Y",
-          "referenceName" : "1_yr_50k",
-          "subscriptionGroupID" : "AF91CF8E",
-          "type" : "RecurringSubscription"
-        },
-        {
-          "adHocOffers" : [
-
-          ],
-          "displayPrice" : "199.99",
-          "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "F09FB533",
-          "introductoryOffer" : null,
-          "localizations" : [
-            {
-              "description" : "Process 500,000 photos per year",
-              "displayName" : "1 Year 500k",
-              "locale" : "en_US"
-            }
-          ],
-          "productID" : "1_yr_500k",
-          "recurringSubscriptionPeriod" : "P1Y",
-          "referenceName" : "1_yr_500k",
-          "subscriptionGroupID" : "AF91CF8E",
-          "type" : "RecurringSubscription"
-        }
-      ]
-    }
   ],
   "version" : {
     "major" : 1,

@@ -18,7 +18,7 @@ import RNFS from 'react-native-fs';
 
 import Database from './Database';
 import User from './User';
-import Subscribe from './Subscribe';
+import Purchase from './Purchase';
 
 import style from './style';
 
@@ -56,35 +56,27 @@ export default class ConfigScreen extends React.Component {
       <SafeAreaView>
         <ScrollView>
           <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
-            {this.state.user.photo_credits_left <= 0 &&
-              <TouchableOpacity style={style.button} onPress={() => { this.setState({ subscribeVisible: true }) }}>
-                <Text style={style.h1}>Upgrade Plan</Text>
-              </TouchableOpacity>
-            }
+            <TouchableOpacity style={style.button} onPress={() => { this.setState({ subscribeVisible: true }) }}>
+              <Text style={style.h1}>Get photo credits</Text>
+            </TouchableOpacity>
             <View style={{ height: 10 }} />
             <View style={style.config}>
-              <Text style={style.t1}>Plan</Text>
-              <Text style={style.h2}>{this.state.user.subscription}</Text>
+              <Text style={style.h2}>Photo credits remaining</Text>
+              <Text style={style.t1}>{this.state.user.photo_credits}</Text>
             </View>
-            <View style={style.config}>
-              <Text style={style.t1}>Credits Remaining</Text>
-              <Text style={style.h2}>{this.state.user.photo_credits_left}</Text>
-            </View>
-            {this.state.user.expiration &&
-              <View style={style.config}>
-                <Text style={style.t1}>Plan Expires</Text>
-                <Text style={style.h2}>{this.state.user.expiration}</Text>
-              </View>
-            }
+            <Text style={style.t1}>Credits are used to upload and process photos.</Text>
             {this.state.subscribeVisible &&
               <Modal
                 animationType='slide'
                 transparent={true}
                 visible={this.state.subscribeVisible}>
                 <View style={style.subscribeModal}>
-                  <Subscribe />
+                  <Purchase />
                 </View>
-                <TouchableWithoutFeedback onPress={() => { this.setState({ subscribeVisible: false }) }}>
+                <TouchableWithoutFeedback onPress={() => {
+                  this.fetchData();
+                  this.setState({ subscribeVisible: false });
+                }}>
                   <View style={{ flex: 1 }} />
                 </TouchableWithoutFeedback>
               </Modal>

@@ -8,10 +8,10 @@ const deviceId = DeviceInfo.getUniqueId();
 
 export default class User {
 
-    static async setPhotoCreditsLeft(photoCreditsLeft) {
+    static async setPhotoCredits(photoCredits) {
         try {
             const formData = new FormData();
-            formData.append('photo_credits_left', photoCreditsLeft);
+            formData.append('photo_credits', photoCredits);
             let response = await fetch(api.url + '/user/' + deviceId, {
                 method: 'PUT',
                 headers: {
@@ -40,12 +40,6 @@ export default class User {
                 return null;
             }
             let user = await response.json();
-            if ('expiration' in user) {
-                let now = new Date();
-                if (now > Moment(user.expiration)) {
-                    user.photo_credits_left = 0;
-                }
-            }
             return user;
         } catch (err) {
             console.log(err);
