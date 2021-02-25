@@ -39,6 +39,13 @@ export default class ConfigScreen extends React.Component {
 
   componentDidMount() {
     this.fetchData();
+    this.focusListener = this.props.navigation.addListener('didFocus', () => {
+      this.fetchData();
+    });
+  }
+
+  componentWillUnmount() {
+    this.focusListener.remove();
   }
 
   render() {
@@ -84,6 +91,17 @@ export default class ConfigScreen extends React.Component {
           </View>
           <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
             <View style={style.config}>
+              <Text style={style.h2}>Ignore Unknown Animals</Text>
+              <Switch
+                trackColor={{ false: '#767577', true: '#4E603E' }}
+                onValueChange={(v) => this.toggle('ignore_unknown_animals', v)}
+                value={config.ignore_unknown_animals == 'true'}
+              />
+            </View>
+            <Text style={style.t1}>Ignore animals that could not be classified (Recommended).</Text>
+          </View>
+          <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
+            <View style={style.config}>
               <Text style={style.h2}>Discard Empty Photos</Text>
               <Switch
                 trackColor={{ false: '#767577', true: '#4E603E' }}
@@ -91,7 +109,7 @@ export default class ConfigScreen extends React.Component {
                 value={config.discard_empty == 'true'}
               />
             </View>
-            <Text style={style.t1}>During object detection, automatically discard photos with no recognizable objects (Recommended).</Text>
+            <Text style={style.t1}>Discard photos with no recognizable objects (Recommended).</Text>
           </View>
           <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
             <View style={style.config}>
@@ -161,19 +179,6 @@ export default class ConfigScreen extends React.Component {
             <View style={{ height: 10 }} />
             <Text style={style.t1}>Remove unused data outside the time range.</Text>
           </View>
-          {this.state.user.subscription !== 'frese' &&
-            <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
-              <TouchableOpacity style={style.button} onPress={() => {
-                Alert.alert(
-                  'Cancel plan?', '', [{
-                    text: 'Yes',
-                    onPress: () => { Linking.openURL(cancelLink); }
-                  }, { text: 'No' }], { cancelable: false });
-              }}>
-                <Text style={style.h1}>Cancel Plan</Text>
-              </TouchableOpacity>
-            </View>
-          }
           {/*
           <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
             <View style={style.config}>
@@ -213,6 +218,7 @@ export default class ConfigScreen extends React.Component {
     config.lookback_days = itemValue;
     this.setState({ config: config });
     this.db.updateConfig('lookback_days', config.lookback_days);
+    this.fetchData();
   }
 
   fetchData() {

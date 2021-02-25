@@ -19,6 +19,7 @@ export default class Database {
                 tx.executeSql(CREATE_TABLE_OBJECT);
                 tx.executeSql(CREATE_TABLE_CONFIG);
                 tx.executeSql(`INSERT INTO config (key, value) SELECT 'discard_empty', 'true' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'discard_empty')`);
+                tx.executeSql(`INSERT INTO config (key, value) SELECT 'ignore_unknown_animals', 'true' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'ignore_unknown_animals')`);
                 tx.executeSql(`INSERT INTO config (key, value) SELECT 'lookback_days', '90' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'lookback_days')`);
                 tx.executeSql(`INSERT INTO config (key, value) SELECT 'auto_archive', 'false' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'auto_archive')`);
                 tx.executeSql(`INSERT INTO config (key, value) SELECT 'google_drive_key', 'password' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'google_drive_key')`);
@@ -76,7 +77,7 @@ export default class Database {
                 AS photo_path
             FROM batch b
             JOIN location l ON l.id = b.location_id
-            JOIN photo p ON b.id = p.batch_id
+            LEFT JOIN photo p ON b.id = p.batch_id
             WHERE TRUE ${condition}
             GROUP BY b.id
             ORDER BY b.id DESC

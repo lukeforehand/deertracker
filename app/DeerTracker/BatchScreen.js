@@ -149,14 +149,18 @@ export default class BatchScreen extends React.Component {
                         <Icon style={{ paddingLeft: 15 }} name='camera' color='black' size={18} />
                         <Text style={style.t5}>{batch.num_photos} Photos</Text>
                       </View>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                        <Icon style={{ paddingLeft: 15 }} name='upload' color='black' size={18} />
-                        <Text style={style.t5}>{batch.num_uploaded} Uploaded</Text>
-                      </View>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                        <Icon style={{ paddingLeft: 15 }} name='check' color='black' size={18} />
-                        <Text style={style.t5}>{batch.num_processed} Processed</Text>
-                      </View>
+                      {batch.num_photos > 0 &&
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                          <Icon style={{ paddingLeft: 15 }} name='upload' color='black' size={18} />
+                          <Text style={style.t5}>{batch.num_uploaded} Uploaded</Text>
+                        </View>
+                      }
+                      {batch.num_photos > 0 &&
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                          <Icon style={{ paddingLeft: 15 }} name='check' color='black' size={18} />
+                          <Text style={style.t5}>{batch.num_processed} Processed</Text>
+                        </View>
+                      }
                     </View>
                     <View>
                       {batch.photo_path &&
@@ -174,7 +178,7 @@ export default class BatchScreen extends React.Component {
   }
 
   async processPhotos() {
-    if (this.state.photosToProcess <= 0) {
+    if (this.state.photosToProcess <= 0 && this.state.config) {
       const photos = await this.db.selectPhotosToProcess();
       if (photos.length == 0) {
         return;
@@ -182,6 +186,8 @@ export default class BatchScreen extends React.Component {
       this.setState({
         photosToProcess: photos.length
       });
+      let discardEmpty = this.state.config.discard_empty;
+      let ignoreUnknownAnimals = this.state.config.ignore_unknown_animals;
       for (p of photos) {
         let photo = p;
         try {
@@ -206,7 +212,9 @@ export default class BatchScreen extends React.Component {
             });
             return;
           }
-          // FIXME: filter r.objects ON global exclusions list?
+          r.objects = r.objects.filter((o) => {
+            return ignoreUnknownAnimals !== 'true' || o.label !== 'animal';
+          });
           if (r.objects.length > 0) {
             for (o of r.objects) {
               o.lat = photo.lat;
@@ -216,7 +224,7 @@ export default class BatchScreen extends React.Component {
               o.location_id = photo.location_id;
               this.db.insertObject(o);
             }
-          } else if (this.state.config.discard_empty == 'true') {
+          } else if (discardEmpty == 'true') {
             console.log(`discarding ${JSON.stringify(photo)}`);
             let path = root + '/' + photo.path;
             console.log("deleting " + path);
@@ -408,23 +416,16 @@ export default class BatchScreen extends React.Component {
 
   async fetchData() {
     this.db.selectBatches().then((batches) => {
-      this.fetchConfig().then(() => {
+      this.db.selectConfig().then((config) => {
         this.setState({
           isLoading: false,
-          batches: batches
+          batches: batches,
+          config: config
         });
       });
     }).catch((error) => {
       console.log(error);
     });
-  }
-
-  async fetchConfig() {
-    this.db.selectConfig().then((config) => {
-      this.setState({
-        config: config
-      });
-    })
   }
 
 }

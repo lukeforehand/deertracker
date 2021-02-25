@@ -92,7 +92,7 @@ export default class Purchase extends React.Component {
                 onPress={() => { this.purchase(product) }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Image source={require('./assets/images/crosshairs.png')} style={{ margin: 10, width: 30, height: 30 }} />
-                  <Text style={[style.t4, { marginLeft: -5, width: 70 }]}>{product.localizedPrice}</Text>
+                  <Text style={[style.t4, { marginLeft: -5, width: 80 }]}>{product.localizedPrice}</Text>
                   <Text style={[style.t4, { marginLeft: -5 }]}>{product.title}</Text>
                 </View>
               </TouchableOpacity>
