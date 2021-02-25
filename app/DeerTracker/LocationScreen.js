@@ -51,6 +51,7 @@ export default class LocationScreen extends React.Component {
     if (this.refreshing()) {
       return (
         <SafeAreaView>
+          <Text style={style.t3}>Don't forget to format your SD card after import.</Text>
           <View style={style.activity}>
             <ActivityIndicator size='large' />
           </View>
@@ -64,16 +65,16 @@ export default class LocationScreen extends React.Component {
           <Text style={style.t3}>Where were these photos taken?</Text>
           {this.state.locations.map((location) => {
             return (
-              <SwipeRow key={location['id']} item={location} onDelete={this.deleteLocation.bind(this)}>
+              <SwipeRow key={location.id} item={location} onDelete={this.deleteLocation.bind(this)}>
                 <TouchableOpacity
-                  key={location['id']}
+                  key={location.id}
                   style={style.locationButton}
                   onPress={() => { this.pickFiles(location) }}>
                   <View style={{ flexDirection: 'row' }}>
                     <Image source={require('./assets/images/crosshairs.png')} style={{ margin: 10, width: 60, height: 60 }} />
                     <View style={{ justifyContent: 'center' }}>
-                      <Text style={style.h2}>{location['name']}</Text>
-                      <Text style={style.h2}>({location['lat'].toFixed(5)}, {location['lon'].toFixed(5)})</Text>
+                      <Text style={style.h2}>{location.name}</Text>
+                      <Text style={style.h2}>({location.lat.toFixed(5)}, {location.lon.toFixed(5)})</Text>
                     </View>
                   </View>
                 </TouchableOpacity>
@@ -109,12 +110,12 @@ export default class LocationScreen extends React.Component {
         return file;
       });
       Alert.alert(
-        'Import ' + files.length + ' photos from location ' + location['name'] + '?', '', [
+        'Import ' + files.length + ' photos from location `' + location.name + '`?', '', [
         {
           text: 'Yes',
           onPress: async () => {
             this.setState({ isLoading: true });
-            let batchId = await this.db.insertBatch(location['id']);
+            let batchId = await this.db.insertBatch(location.id);
             let relativePath = '.data/batch/' + batchId;
             let destPath = root + '/' + relativePath;
             await RNFS.mkdir(destPath, { NSURLIsExcludedFromBackupKey: true });
@@ -122,7 +123,7 @@ export default class LocationScreen extends React.Component {
               let hash = await RNFS.hash(file.path, 'md5');
               let relativeDestFile = relativePath + '/' + hash + '.jpg';
               try {
-                await this.db.insertPhoto(hash, relativeDestFile, location['lat'], location['lon'], batchId);
+                await this.db.insertPhoto(hash, relativeDestFile, location.lat, location.lon, batchId);
                 await RNFS.copyFile(file.path, root + '/' + relativeDestFile);
               } catch (err) {
                 console.log(err);
@@ -142,11 +143,29 @@ export default class LocationScreen extends React.Component {
 
   deleteLocation(location, callback) {
     Alert.alert(
-      'Delete Location ' + location['name'] + '?', '', [
+      'Permenantly Delete location `' + location.name + '` and all photos associated with it?', '', [
       {
         text: 'Yes',
         onPress: () => {
-          this.db.deleteLocation(location['id']).then(() => {
+          this.db.selectBatches(location.id).then((batches) => {
+            for (batch of batches) {
+              this.db.deleteBatchObjects(batch.id).then(() => {
+                this.db.deleteBatchPhotos(batch.id).then(() => {
+                  this.db.deleteBatch(batch.id).then(() => {
+                    let dir = RNFS.DocumentDirectoryPath + '/.data/batch/' + batch.id;
+                    console.log("deleting " + dir);
+                    RNFS.unlink(dir);
+                    this.db.selectBatches().then((batches) => {
+                      this.setState({
+                        batches: batches
+                      });
+                    });
+                  });
+                });
+              });
+            }
+          });
+          this.db.deleteLocation(location.id).then(() => {
             this.db.selectLocations().then((locations) => {
               this.props.navigation.navigate('LocationScreen', {
                 locations: locations

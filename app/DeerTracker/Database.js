@@ -56,11 +56,12 @@ export default class Database {
         return condition;
     }
 
-    async selectBatches() {
+    async selectBatches(locationId = null) {
         const db = await SQLite.openDatabase({ name: database, location: location });
-
         let condition = await this.selectLookbackCondition('p.time');
-
+        if (locationId) {
+            condition = condition + ` AND b.location_id = ${locationId} `;
+        }
         rs = await db.executeSql(`
             SELECT b.*, l.name AS location_name,
                 (SELECT COUNT(*) FROM photo p WHERE p.batch_id = b.id)

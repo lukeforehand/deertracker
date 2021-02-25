@@ -113,7 +113,7 @@ export default class BatchScreen extends React.Component {
             let progress = parseInt(100 * ((batch.num_uploaded + batch.num_processed) / (batch.num_photos * 2)));
             return (
               <SwipeRow
-                key={batch['id']}
+                key={batch.id}
                 item={batch}
                 onDelete={this.deleteBatch.bind(this)}
               //onArchive={this.archiveBatch.bind(this)}
@@ -231,34 +231,31 @@ export default class BatchScreen extends React.Component {
             RNFS.unlink(path);
             this.db.deletePhoto(photo.id).then(() => {
               let batchId = photo.batch_id;
-              this.setState(prevState => ({
-                batches: prevState.batches.map((batch) => {
+              this.setState({
+                batches: this.state.batches.map((batch) => {
                   if (batch.id === batchId) {
                     batch.num_photos = batch.num_photos - 1;
                     batch.num_uploaded = batch.num_uploaded - 1;
                     batch.num_processed = batch.num_processed - 1;
                   }
                   return batch;
-                }).filter((batch) => {
-                  // TODO VERIFY THIS WORKS
-                  return batch.num_photos > 0;
                 }),
-                photosToProcess: prevState.photosToProcess - 1
-              }));
+                photosToProcess: this.state.photosToProcess - 1
+              });
             });
           }
           this.db.processPhoto(photo.id).then(() => {
             let batchId = photo.batch_id;
-            this.setState(prevState => ({
-              batches: prevState.batches.map((batch) => {
+            this.setState({
+              batches: this.state.batches.map((batch) => {
                 if (batch.id === batchId) {
                   batch.num_processed = batch.num_processed + 1;
                   batch.num_objects = batch.num_objects + r.objects.length;
                 }
                 return batch;
               }),
-              photosToProcess: prevState.photosToProcess - 1
-            }));
+              photosToProcess: this.state.photosToProcess - 1
+            });
           });
         } catch (err) {
           console.log(err);
@@ -312,40 +309,40 @@ export default class BatchScreen extends React.Component {
           Upload.addListener('error', photoId, (err) => {
             console.log(photoId + ' error handler ' + JSON.stringify(err));
             Upload.cancelUpload(photoId).then(() => {
-              this.setState(prevState => ({
-                photosToUpload: prevState.photosToUpload - 1
-              }));
+              this.setState({
+                photosToUpload: this.state.photosToUpload - 1
+              });
             });
           });
           Upload.addListener('completed', photoId, (data) => {
             console.log(photoId + ' completed handler ' + ' POST ' + data.responseCode + ' ' + data.responseBody);
             if (data.responseCode !== 200 || data.responseBody === null) {
               console.log(photoId + ' responseBody: ' + data.responseBody);
-              this.setState(prevState => ({
-                photosToUpload: prevState.photosToUpload - 1
-              }));
+              this.setState({
+                photosToUpload: this.state.photosToUpload - 1
+              });
               return;
             }
             let r = JSON.parse(data.responseBody);
             let phase = moon.phase(new Date(Moment(r.time)));
             this.db.updatePhoto(photoId, r.upload_id, r.time, phase.name, r.width, r.height).then((uploadedPhoto) => {
               let batchId = uploadedPhoto.batch_id;
-              this.setState(prevState => ({
-                batches: prevState.batches.map((batch) => {
+              this.setState({
+                batches: this.state.batches.map((batch) => {
                   if (batch.id === batchId) {
                     batch.num_uploaded = batch.num_uploaded + 1;
                   }
                   return batch;
                 }),
-                photosToUpload: prevState.photosToUpload - 1
-              }));
+                photosToUpload: this.state.photosToUpload - 1
+              });
             });
           });
         }).catch((err) => {
           console.log(err);
-          this.setState(prevState => ({
-            photosToUpload: prevState.photosToUpload - 1
-          }));
+          this.setState({
+            photosToUpload: this.state.photosToUpload - 1
+          });
         });
       }
       User.setPhotoCredits(credits - photos.length);
@@ -353,7 +350,7 @@ export default class BatchScreen extends React.Component {
   }
 
   getPhotos(batch) {
-    let batchId = batch['id'];
+    let batchId = batch.id;
     let title = Moment(new Date(batch.time)).format('ddd, MMM Do YYYY h:mm A');
     let subTitle = batch.location_name;
     this.db.selectBatchPhotos(batchId).then((photos) => {
