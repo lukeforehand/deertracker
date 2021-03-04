@@ -33,37 +33,6 @@ def find_files(input_dir):
     ]
 
 
-# API commands
-@click.group(help="Deer Tracker")
-def main():
-    pass
-
-
-@main.command(help="Add camera location")
-@click.option("--name", required=True, help="Name of location")
-@click.option("--lat", required=True, help="Latitude of location")
-@click.option("--lon", required=True, help="Longitude of location")
-def add_location(name, lat, lon):
-    location = photo.add_location(name, lat, lon)
-    click.echo(location)
-
-
-@main.command(help="Import photos")
-@click.option("--photos", required=True, help="Location of photos to process")
-@click.option(
-    "--location",
-    required=True,
-    help="Name of location to associate with photos",
-)
-def import_photos(photos, location):
-    file_paths = find_files(photos)
-    imported_photos = PhotoProcessor(file_paths, location).import_photos()
-    with click.progressbar(imported_photos, length=len(file_paths)) as progress:
-        for imported_photo in progress:
-            if imported_photo and "error" in imported_photo:
-                click.secho(str(imported_photo), bg="red")
-
-
 # Server
 @main.group(help="Server commands")
 def server():
