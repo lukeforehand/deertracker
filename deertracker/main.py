@@ -10,7 +10,6 @@ from deertracker import (
     database,
     nabirds as nab,
     photo,
-    model,
     tkteach,
     visualize,
 )
