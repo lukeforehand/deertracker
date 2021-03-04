@@ -13,7 +13,6 @@ from deertracker import (
     tkteach,
     visualize,
 )
-from deertracker.photo import PhotoProcessor
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 warnings.filterwarnings("ignore")
@@ -31,6 +30,12 @@ def find_files(input_dir):
         for x in pathlib.Path(input_dir).glob(f"**/*{ext}")
         if x.is_file()
     ]
+
+
+# API commands
+@click.group(help="Deer Tracker")
+def main():
+    pass
 
 
 # Server
@@ -147,17 +152,6 @@ def import_training_crops(crops, ground_truth):
         for annotation in progress:
             if "error" in annotation:
                 click.secho(str(annotation), bg="red")
-
-
-@label.command(help="Import training photos")
-@click.option("--photos", required=True, help="Location of photos to process")
-def import_training_photos(photos):
-    file_paths = find_files(photos)
-    imported_photos = PhotoProcessor(file_paths, None).import_photos()
-    with click.progressbar(imported_photos, length=len(file_paths)) as progress:
-        for imported_photo in progress:
-            if "error" in imported_photo:
-                click.secho(str(imported_photo), bg="red")
 
 
 @label.command(help="Review and correct labels")
