@@ -9,7 +9,6 @@ from PIL import Image
 from deertracker import (
     database,
     logger,
-    server,
     DEFAULT_CROP_STORE,
     DEFAULT_DETECTOR_PATH,
     DEFAULT_CLASSIFIER_PATH,
