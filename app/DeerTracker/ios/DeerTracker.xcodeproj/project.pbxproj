@@ -400,9 +400,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
+				397270AB25E33A9100E76ABC /* Configuration.storekit in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				B7C36486F0CC4DF9B23F9CED /* AntDesign.ttf in Resources */,
-				397270AB25E33A9100E76ABC /* Configuration.storekit in Resources */,
 				9F242D524FDD475ABE8FA706 /* Entypo.ttf in Resources */,
 				C66628865CBD4A39A0D3D7D2 /* EvilIcons.ttf in Resources */,
 				0565176D00104E3A92CB7BD4 /* Feather.ttf in Resources */,

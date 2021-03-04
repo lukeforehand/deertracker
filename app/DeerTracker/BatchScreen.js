@@ -187,7 +187,9 @@ export default class BatchScreen extends React.Component {
         photosToProcess: photos.length
       });
       let discardEmpty = this.state.config.discard_empty;
-      let ignoreUnknownAnimals = this.state.config.ignore_unknown_animals;
+      let labelFilter = config.object_filter.map((o) => {
+        return o.label;
+      });
       for (p of photos) {
         let photo = p;
         try {
@@ -212,9 +214,6 @@ export default class BatchScreen extends React.Component {
             });
             return;
           }
-          r.objects = r.objects.filter((o) => {
-            return ignoreUnknownAnimals !== 'true' || o.label !== 'animal';
-          });
           if (r.objects.length > 0) {
             for (o of r.objects) {
               o.lat = photo.lat;
@@ -250,7 +249,10 @@ export default class BatchScreen extends React.Component {
               batches: this.state.batches.map((batch) => {
                 if (batch.id === batchId) {
                   batch.num_processed = batch.num_processed + 1;
-                  batch.num_objects = batch.num_objects + r.objects.length;
+                  let filteredObjects = r.objects.filter((o) => {
+                    return o.label in labelFilter;
+                  });
+                  batch.num_objects = batch.num_objects + filteredObjects.length;
                 }
                 return batch;
               }),

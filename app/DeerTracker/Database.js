@@ -19,10 +19,22 @@ export default class Database {
                 tx.executeSql(CREATE_TABLE_OBJECT);
                 tx.executeSql(CREATE_TABLE_CONFIG);
                 tx.executeSql(`INSERT INTO config (key, value) SELECT 'discard_empty', 'true' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'discard_empty')`);
-                tx.executeSql(`INSERT INTO config (key, value) SELECT 'ignore_unknown_animals', 'true' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'ignore_unknown_animals')`);
                 tx.executeSql(`INSERT INTO config (key, value) SELECT 'lookback_days', '90' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'lookback_days')`);
                 tx.executeSql(`INSERT INTO config (key, value) SELECT 'auto_archive', 'false' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'auto_archive')`);
                 tx.executeSql(`INSERT INTO config (key, value) SELECT 'google_drive_key', 'password' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'google_drive_key')`);
+
+                tx.executeSql(`INSERT INTO config (key, value) SELECT 'filter_buck', 'true' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'filter_buck')`);
+                tx.executeSql(`INSERT INTO config (key, value) SELECT 'filter_doe', 'true' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'filter_doe')`);
+                tx.executeSql(`INSERT INTO config (key, value) SELECT 'filter_turkey', 'true' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'filter_turkey')`);
+                tx.executeSql(`INSERT INTO config (key, value) SELECT 'filter_bear', 'true' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'filter_bear')`);
+                tx.executeSql(`INSERT INTO config (key, value) SELECT 'filter_person', 'true' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'filter_person')`);
+                tx.executeSql(`INSERT INTO config (key, value) SELECT 'filter_vehicle', 'true' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'filter_vehicle')`);
+                tx.executeSql(`INSERT INTO config (key, value) SELECT 'filter_rabbit', 'false' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'filter_rabbit')`);
+                tx.executeSql(`INSERT INTO config (key, value) SELECT 'filter_squirrel', 'false' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'filter_squirrel')`);
+                tx.executeSql(`INSERT INTO config (key, value) SELECT 'filter_opossum', 'false' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'filter_opossum')`);
+                tx.executeSql(`INSERT INTO config (key, value) SELECT 'filter_crow', 'false' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'filter_crow')`);
+                tx.executeSql(`INSERT INTO config (key, value) SELECT 'filter_animal', 'false' WHERE NOT EXISTS(SELECT 1 FROM config WHERE key = 'filter_animal')`);
+
             });
         });
     }
@@ -49,16 +61,28 @@ export default class Database {
             let start = Moment();
             start.subtract(lookbackDays, 'days');
             start = start.format('YYYY-MM-DD HH:mm:ss');
-            condition = ` AND ${not} ${column} >= '${start}'`;
+            condition = `${not} ${column} >= '${start}'`;
         } else {
-            condition = ` AND ${not} TRUE`;
+            condition = `${not} TRUE`;
         }
         return condition;
+    }
+
+    async selectObjectFilterCondition(column) {
+        const db = await SQLite.openDatabase({ name: database, location: location });
+        let rs = await db.executeSql(`SELECT SUBSTR(key, 8) AS label FROM config WHERE key LIKE 'filter_%' AND value = 'true'`);
+        let filters = rs.map((r) => {
+            return r.rows.raw();
+        })[0].map((f) => {
+            return f.label;
+        });
+        return `${column} IN ('${filters.join('\',\'')}')`;
     }
 
     async selectBatches(locationId = null) {
         const db = await SQLite.openDatabase({ name: database, location: location });
         let condition = await this.selectLookbackCondition('p.time');
+        let filterCondition = await this.selectObjectFilterCondition('o.label')
         if (locationId) {
             condition = condition + ` AND b.location_id = ${locationId} `;
         }
@@ -72,14 +96,15 @@ export default class Database {
                 (SELECT COUNT(*) FROM photo p
                 WHERE p.batch_id = b.id AND (p.upload_id IS NOT NULL OR p.processed = TRUE))
                 AS num_uploaded,
-                (SELECT COUNT(*) FROM object o JOIN photo p ON o.photo_id = p.id WHERE p.batch_id = b.id)
+                (SELECT COUNT(*) FROM object o JOIN photo p ON o.photo_id = p.id WHERE p.batch_id = b.id
+                    AND ${filterCondition})
                 AS num_objects,
                 FIRST_VALUE(p.path) OVER (PARTITION BY b.id ORDER BY b.id DESC)
                 AS photo_path
             FROM batch b
             JOIN location l ON l.id = b.location_id
             LEFT JOIN photo p ON b.id = p.batch_id
-            WHERE TRUE ${condition}
+            WHERE TRUE AND ${condition}
             GROUP BY b.id
             ORDER BY b.id DESC
         `);
@@ -184,10 +209,10 @@ export default class Database {
     async selectPhotosToReviewCount() {
         const db = await SQLite.openDatabase({ name: database, location: location });
         let condition = await this.selectLookbackCondition('time');
+        let filterCondition = await this.selectObjectFilterCondition('label')
         return Object.values(
             (await db.executeSql(`
-            SELECT COUNT(*) FROM object WHERE reviewed IS FALSE
-            ${condition}
+            SELECT COUNT(*) FROM object WHERE reviewed IS FALSE AND ${condition} AND ${filterCondition}
             `))[0].rows.raw()[0])[0];
     }
 
@@ -218,6 +243,7 @@ export default class Database {
     async selectObjects(day = null, locationId = null) {
         const db = await SQLite.openDatabase({ name: database, location: location });
         let condition = await this.selectLookbackCondition('p.time');
+        let filterCondition = await this.selectObjectFilterCondition('o.label')
         let sql = `
         SELECT * FROM (
             SELECT o.id, STRFTIME('%Y-%m-%d', o.time) AS day, l.name AS location_name,
@@ -228,7 +254,7 @@ export default class Database {
             JOIN photo p ON p.id = o.photo_id
             JOIN location l ON l.id = o.location_id
             LEFT JOIN profile i ON i.id = o.profile_id
-            WHERE TRUE ${condition}
+            WHERE TRUE AND ${condition} AND ${filterCondition}
             ORDER BY o.time ASC
         )`;
         if (day && locationId) {
@@ -318,9 +344,7 @@ export default class Database {
 
     async selectProfiles() {
         const db = await SQLite.openDatabase({ name: database, location: location });
-
         let condition = await this.selectLookbackCondition('o.time');
-
         rs = await db.executeSql(`
             SELECT i.name AS profile_name, i.id AS profile_id,
             p.path AS photo_path, p.time, p.moon_phase, p.width, p.height,
@@ -330,7 +354,7 @@ export default class Database {
             JOIN object o ON o.profile_id = i.id
             JOIN photo p ON p.id = o.photo_id
             JOIN location l ON l.id = o.location_id
-            WHERE TRUE ${condition}
+            WHERE TRUE AND ${condition}
             GROUP BY o.photo_id
             ORDER BY o.time DESC`)
         let objects = await rs.map((r) => {
@@ -356,6 +380,7 @@ export default class Database {
     async selectClasses() {
         const db = await SQLite.openDatabase({ name: database, location: location });
         let condition = await this.selectLookbackCondition('o.time');
+        let filterCondition = await this.selectObjectFilterCondition('o.label')
         rs = await db.executeSql(`
             SELECT o.label AS profile_name, o.label AS profile_id,
             p.path AS photo_path, p.time, p.width, p.height, p.moon_phase,
@@ -363,7 +388,7 @@ export default class Database {
             l.name AS location_name, l.lat, l.lon
             FROM object o JOIN photo p ON p.id = o.photo_id
             JOIN location l ON l.id = o.location_id
-            WHERE TRUE ${condition}
+            WHERE TRUE AND ${condition} AND ${filterCondition}
             ORDER BY o.time DESC`)
         let objects = await rs.map((r) => {
             return r.rows.raw();
@@ -400,8 +425,7 @@ export default class Database {
         let objects = (await db.executeSql(`
             SELECT p.id AS photo_id, p.path AS photo_path, o.id AS id
             FROM photo p JOIN object o ON p.id = o.photo_id
-            WHERE TRUE ${condition}
-            AND o.profile_id IS NULL
+            WHERE TRUE AND ${condition} AND o.profile_id IS NULL
         `)).map((r) => {
             return r.rows.raw();
         })[0];
@@ -540,10 +564,25 @@ export default class Database {
     async selectConfig() {
         const db = await SQLite.openDatabase({ name: database, location: location });
         rs = await db.executeSql('SELECT * FROM config');
-        let config = rs.map((r) => {
+        let config = Object.assign({}, ...rs.map((r) => {
             return r.rows.raw();
-        })[0];
-        return Object.assign({}, ...config.map((c) => ({ [c.key]: c.value })));
+        })[0].map((c) => ({ [c.key]: c.value })))
+        let configKeys = [];
+        for (prop in config) {
+            if (prop.startsWith("filter_")) {
+                configKeys.push(prop);
+            }
+        }
+        config.object_filter = configKeys.map((key) => {
+            let label = key.slice(7);
+            return {
+                "label": label,
+                "filter": label.slice(0, 1).toUpperCase() + label.slice(1),
+                "key": key,
+                "value": config[key]
+            }
+        });
+        return config;
     }
 
     async updateConfig(key, value) {

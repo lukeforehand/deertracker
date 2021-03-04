@@ -6,7 +6,6 @@ import {
   Modal,
   Alert,
   Text,
-  Linking,
   TouchableWithoutFeedback,
   View,
   Switch,
@@ -14,6 +13,7 @@ import {
 } from 'react-native';
 
 import { Picker } from '@react-native-picker/picker';
+import CheckBox from '@react-native-community/checkbox';
 import RNFS from 'react-native-fs';
 
 import Database from './Database';
@@ -91,17 +91,6 @@ export default class ConfigScreen extends React.Component {
           </View>
           <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
             <View style={style.config}>
-              <Text style={style.h2}>Ignore Unknown Animals</Text>
-              <Switch
-                trackColor={{ false: '#767577', true: '#4E603E' }}
-                onValueChange={(v) => this.toggle('ignore_unknown_animals', v)}
-                value={config.ignore_unknown_animals == 'true'}
-              />
-            </View>
-            <Text style={style.t1}>Ignore animals that could not be classified (Recommended).</Text>
-          </View>
-          <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
-            <View style={style.config}>
               <Text style={style.h2}>Discard Empty Photos</Text>
               <Switch
                 trackColor={{ false: '#767577', true: '#4E603E' }}
@@ -129,6 +118,31 @@ export default class ConfigScreen extends React.Component {
               <Picker.Item label='all time' value='0' />
             </Picker>
             <Text style={style.t1}>Only see results within the specified time range.</Text>
+          </View>
+          <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
+            <View style={style.config}>
+              <Text style={style.h2}>Show Objects</Text>
+            </View>
+            {config.object_filter.map((object) => {
+              return (
+                <View key={object.key} style={[style.config, { justifyContent: 'flex-start', marginTop: 10, marginLeft: 20 }]}>
+                  <CheckBox
+                    onTintColor='#767577'
+                    onCheckColor='white'
+                    onFillColor='#4E603E'
+                    style={{ margin: 5 }}
+                    disabled={false}
+                    value={object.value === 'true'}
+                    onValueChange={(v) => this.toggle(object.key, v)}
+                  />
+                  <Text style={style.h2}>{object.filter}</Text>
+                  {object.filter === 'animal' &&
+                    <Text style={style.t1}>(Not Recommended)</Text>
+                  }
+                </View>
+              );
+            })}
+            <Text style={style.t1}>Only see results for some objects.</Text>
           </View>
           <View style={{ borderWidth: 1, borderColor: 'grey', padding: 5 }}>
             <View style={style.config}>
