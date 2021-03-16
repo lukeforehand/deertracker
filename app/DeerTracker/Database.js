@@ -63,7 +63,7 @@ export default class Database {
             start = start.format('YYYY-MM-DD HH:mm:ss');
             condition = `${not} ${column} >= '${start}'`;
         } else {
-            condition = `${not} TRUE`;
+            condition = `${not} 1`;
         }
         return condition;
     }
@@ -91,20 +91,20 @@ export default class Database {
                 (SELECT COUNT(*) FROM photo p WHERE p.batch_id = b.id)
                 AS num_photos,
                 (SELECT COUNT(*) FROM photo p
-                WHERE p.batch_id = b.id AND p.processed = TRUE)
+                WHERE p.batch_id = b.id AND p.processed = 1)
                 AS num_processed,
                 (SELECT COUNT(*) FROM photo p
-                WHERE p.batch_id = b.id AND (p.upload_id IS NOT NULL OR p.processed = TRUE))
+                WHERE p.batch_id = b.id AND (p.upload_id IS NOT NULL OR p.processed = 1))
                 AS num_uploaded,
                 (SELECT COUNT(*) FROM object o JOIN photo p ON o.photo_id = p.id WHERE p.batch_id = b.id
                     AND ${filterCondition})
                 AS num_objects,
-                FIRST_VALUE(p.path) OVER (PARTITION BY b.id ORDER BY b.id DESC)
+                (SELECT p.path FROM photo p WHERE p.batch_id = b.id LIMIT 1)
                 AS photo_path
             FROM batch b
             JOIN location l ON l.id = b.location_id
             LEFT JOIN photo p ON b.id = p.batch_id
-            WHERE TRUE AND ${condition}
+            WHERE 1 AND ${condition}
             GROUP BY b.id
             ORDER BY b.id DESC
         `);
@@ -116,7 +116,7 @@ export default class Database {
     async insertPhoto(id, path, lat, lon, batchId) {
         const db = await SQLite.openDatabase({ name: database, location: location });
         return await db.executeSql(
-            'INSERT INTO photo(id, path, processed, upload_id, lat, lon, batch_id) VALUES(?, ?, FALSE, NULL, ?, ?, ?)',
+            'INSERT INTO photo(id, path, processed, upload_id, lat, lon, batch_id) VALUES(?, ?, 0, NULL, ?, ?, ?)',
             [id, path, lat, lon, batchId]);
     }
 
@@ -132,7 +132,7 @@ export default class Database {
             FROM photo p
             JOIN batch b ON b.id = p.batch_id
             JOIN location l ON l.id = b.location_id
-            WHERE p.processed = FALSE AND p.upload_id IS NOT NULL
+            WHERE p.processed = 0 AND p.upload_id IS NOT NULL
             ORDER BY p.batch_id ASC, p.id ASC`);
         return rs.map((r) => {
             return r.rows.raw();
@@ -146,7 +146,7 @@ export default class Database {
             FROM photo p
             JOIN batch b ON b.id = p.batch_id
             JOIN location l ON l.id = b.location_id
-            WHERE p.upload_id IS NULL AND p.processed = FALSE
+            WHERE p.upload_id IS NULL AND p.processed = 0
             ORDER BY p.batch_id ASC, p.id ASC
             LIMIT 20`);
         return rs.map((r) => {
@@ -177,13 +177,13 @@ export default class Database {
 
     async updateObjectReview(objectId) {
         const db = await SQLite.openDatabase({ name: database, location: location });
-        return await db.executeSql('UPDATE object SET reviewed = TRUE WHERE id = ?', [objectId]);
+        return await db.executeSql('UPDATE object SET reviewed = 1 WHERE id = ?', [objectId]);
     }
 
     async updateObject(objectId, label, score) {
         const db = await SQLite.openDatabase({ name: database, location: location });
         return await db.executeSql(
-            'UPDATE object SET label = ?, score = ?, reviewed = TRUE WHERE id = ?',
+            'UPDATE object SET label = ?, score = ?, reviewed = 1 WHERE id = ?',
             [label, score, objectId]
         );
     }
@@ -191,7 +191,7 @@ export default class Database {
     async processPhoto(photoId) {
         const db = await SQLite.openDatabase({ name: database, location: location });
         return await db.executeSql(
-            'UPDATE photo SET processed = TRUE WHERE id = ?', [photoId]
+            'UPDATE photo SET processed = 1 WHERE id = ?', [photoId]
         );
     }
 
@@ -212,7 +212,7 @@ export default class Database {
         let filterCondition = await this.selectObjectFilterCondition('label')
         return Object.values(
             (await db.executeSql(`
-            SELECT COUNT(*) FROM object WHERE reviewed IS FALSE AND ${condition} AND ${filterCondition}
+            SELECT COUNT(*) FROM object WHERE reviewed = 0 AND ${condition} AND ${filterCondition}
             `))[0].rows.raw()[0])[0];
     }
 
@@ -227,7 +227,7 @@ export default class Database {
         JOIN photo p ON p.id = o.photo_id
         JOIN location l ON l.id = o.location_id
         LEFT JOIN profile i ON i.id = o.profile_id
-        WHERE o.reviewed IS FALSE ORDER BY p.time ASC
+        WHERE o.reviewed = 0 ORDER BY p.time ASC
         `);
         let objects = rs.map((r) => {
             return r.rows.raw();
@@ -254,7 +254,7 @@ export default class Database {
             JOIN photo p ON p.id = o.photo_id
             JOIN location l ON l.id = o.location_id
             LEFT JOIN profile i ON i.id = o.profile_id
-            WHERE TRUE AND ${condition} AND ${filterCondition}
+            WHERE 1 AND ${condition} AND ${filterCondition}
             ORDER BY o.time ASC
         )`;
         if (day && locationId) {
@@ -354,7 +354,7 @@ export default class Database {
             JOIN object o ON o.profile_id = i.id
             JOIN photo p ON p.id = o.photo_id
             JOIN location l ON l.id = o.location_id
-            WHERE TRUE AND ${condition}
+            WHERE 1 AND ${condition}
             GROUP BY o.photo_id
             ORDER BY o.time DESC`)
         let objects = await rs.map((r) => {
@@ -388,7 +388,7 @@ export default class Database {
             l.name AS location_name, l.lat, l.lon
             FROM object o JOIN photo p ON p.id = o.photo_id
             JOIN location l ON l.id = o.location_id
-            WHERE TRUE AND ${condition} AND ${filterCondition}
+            WHERE 1 AND ${condition} AND ${filterCondition}
             ORDER BY o.time DESC`)
         let objects = await rs.map((r) => {
             return r.rows.raw();
@@ -425,7 +425,7 @@ export default class Database {
         let objects = (await db.executeSql(`
             SELECT p.id AS photo_id, p.path AS photo_path, o.id AS id
             FROM photo p JOIN object o ON p.id = o.photo_id
-            WHERE TRUE AND ${condition} AND o.profile_id IS NULL
+            WHERE 1 AND ${condition} AND o.profile_id IS NULL
         `)).map((r) => {
             return r.rows.raw();
         })[0];
@@ -542,7 +542,7 @@ export default class Database {
         const db = await SQLite.openDatabase({ name: database, location: location });
         return await db.executeSql(
             `INSERT INTO object(id, x, y, w, h, lat, lon, time, label, label_array, score, score_array, reviewed, photo_id, location_id)
-            VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, FALSE, ?, ?)`,
+            VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)`,
             [
                 obj['x'],
                 obj['y'],

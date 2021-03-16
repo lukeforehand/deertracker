@@ -186,7 +186,6 @@ const TabNavigator = createBottomTabNavigator(
       style: { height: footerHeight },
       labelStyle: {
         fontSize: 12,
-        //fontFamily: Platform.OS === 'ios' ? 'Metamorphous' : 'metamorphous_regular'
       }
     }
   }

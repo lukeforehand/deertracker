@@ -13,39 +13,39 @@ export const headerHeight = 65;
 export default StyleSheet.create({
   header: {
     fontSize: 18,
-    fontFamily: 'Courier',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'courier',
   },
   h1: {
     color: '#e3e8e8',
     textAlign: 'center',
-    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontWeight: 'bold',
     fontSize: 16,
-    fontFamily: 'Courier',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'courier',
     margin: 10
   },
   h2: {
     color: 'black',
     textAlign: 'left',
-    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontWeight: 'bold',
     fontSize: 18,
-    fontFamily: 'Courier',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'courier',
     marginLeft: 10,
     marginRight: 10
   },
   h3: {
     color: '#e3e8e8',
     textAlign: 'left',
-    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontWeight: 'bold',
     fontSize: 16,
-    fontFamily: 'Courier',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'courier',
     padding: 10,
   },
   h4: {
     color: '#e3e8e8',
     textAlign: 'left',
-    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontWeight: 'bold',
     fontSize: 16,
-    fontFamily: 'Courier',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'courier',
   },
   h5: {
     color: '#e3e8e8',
@@ -55,17 +55,17 @@ export default StyleSheet.create({
     shadowRadius: 10,
     elevation: 10,
     textAlign: 'center',
-    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontWeight: 'bold',
     fontSize: 16,
-    fontFamily: 'Courier',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'courier',
     padding: 10
   },
   h6: {
     color: '#e3e8e8',
     textAlign: 'left',
-    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontWeight: 'bold',
     fontSize: 16,
-    fontFamily: 'Courier',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'courier',
     padding: 10,
   },
   t1: {
@@ -74,38 +74,38 @@ export default StyleSheet.create({
     fontWeight: 'normal',
     margin: 10,
     fontSize: 18,
-    fontFamily: 'Courier',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'courier',
   },
   t2: {
     color: 'black',
     textAlign: 'center',
-    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontWeight: 'bold',
     fontSize: 16,
-    fontFamily: 'Courier',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'courier',
     margin: 15
   },
   t3: {
     color: 'black',
     textAlign: 'center',
-    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontWeight: 'bold',
     fontSize: 16,
-    fontFamily: 'Courier',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'courier',
     margin: 15
   },
   t4: {
     color: 'black',
     textAlign: 'left',
-    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontWeight: 'bold',
     fontSize: 16,
-    fontFamily: 'Courier',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'courier',
     margin: 10
   },
   t5: {
     color: 'black',
     textAlign: 'left',
-    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontWeight: 'bold',
     fontSize: 16,
-    fontFamily: 'Courier',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'courier',
     paddingBottom: 10,
     paddingTop: 5,
     paddingLeft: 10,
@@ -114,16 +114,16 @@ export default StyleSheet.create({
   t6: {
     color: 'gray',
     textAlign: 'center',
-    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontWeight: 'bold',
     fontSize: 16,
-    fontFamily: 'Courier',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'courier',
   },
   t7: {
     color: 'gray',
     textAlign: 'center',
-    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontWeight: 'bold',
     fontSize: 16,
-    fontFamily: 'Courier',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'courier',
   },
   activity: {
     paddingTop: screenHeight / 2,
@@ -160,7 +160,7 @@ export default StyleSheet.create({
     color: '#e3e8e8',
     fontWeight: 'normal',
     fontSize: 16,
-    fontFamily: 'Courier',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'courier',
     fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal'
   },
   button: {
@@ -305,9 +305,9 @@ export default StyleSheet.create({
   highlightButtonText: {
     color: '#e3e8e8',
     textAlign: 'center',
-    fontWeight: Platform.OS === 'ios' ? 'bold' : 'normal',
+    fontWeight: 'bold',
     fontSize: 16,
-    fontFamily: 'Courier',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'courier',
   },
   subscribeButton: {
     borderRadius: 10,

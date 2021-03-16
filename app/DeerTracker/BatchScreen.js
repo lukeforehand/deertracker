@@ -187,7 +187,7 @@ export default class BatchScreen extends React.Component {
         photosToProcess: photos.length
       });
       let discardEmpty = this.state.config.discard_empty;
-      let labelFilter = config.object_filter.map((o) => {
+      let labelFilter = this.state.config.object_filter.map((o) => {
         return o.label;
       });
       for (p of photos) {
@@ -296,6 +296,7 @@ export default class BatchScreen extends React.Component {
         Upload.cancelUpload(photo.id);
         Upload.startUpload({
           url: api.url,
+          method: 'POST',
           path: root + '/' + photo.path,
           headers: {
             'Authorization': 'Basic ' + base64.encode(api.username + ":" + api.password)
@@ -304,8 +305,8 @@ export default class BatchScreen extends React.Component {
           customUploadId: photo.id,
           field: 'image',
           parameters: {
-            'lat': photo.location_lat,
-            'lon': photo.location_lon
+            'lat': photo.location_lat.toString(),
+            'lon': photo.location_lon.toString()
           }
         }).then((photoId) => {
           Upload.addListener('error', photoId, (err) => {
